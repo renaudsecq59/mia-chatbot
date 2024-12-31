@@ -1,0 +1,15 @@
+version: 1
+frontend:
+  phases:
+    preBuild:
+      commands:
+        - echo "Pas de phase preBuild nécessaire pour un projet HTML statique"
+    build:
+      commands:
+        - echo "Pas de build nécessaire pour un projet HTML statique"
+  artifacts:
+    baseDirectory: /
+    files:
+      - '**/*'
+  cache:
+    paths: []
