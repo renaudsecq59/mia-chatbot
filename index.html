@@ -251,6 +251,26 @@
     .stat-num { font-family: 'Syne', sans-serif; font-size: 38px; font-weight: 800; line-height: 1; margin-bottom: 6px; color: var(--t); }
     .stat-label { font-size: 12px; color: var(--m); line-height: 1.5; }
 
+    /* ── FORMATIONS ── */
+    .formations-row { display: grid; grid-template-columns: 200px 1fr; gap: 80px; align-items: start; padding: 60px 0; }
+    .formations-list { display: flex; flex-direction: column; gap: 10px; }
+    .formation-item {
+      display: flex; align-items: center; gap: 16px;
+      padding: 16px 20px;
+      background: var(--bg2); border: 1px solid var(--border); border-radius: 12px;
+      transition: .3s var(--ease);
+    }
+    .formation-item:hover { border-color: rgba(255,255,255,.14); }
+    .fi-badge {
+      font-size: 10px; font-weight: 700; letter-spacing: .06em; text-transform: uppercase;
+      padding: 4px 10px; border-radius: 100px; white-space: nowrap; flex-shrink: 0;
+    }
+    .fi-badge.ai   { background: rgba(200,255,0,.1);  color: var(--accent); border: 1px solid rgba(200,255,0,.2); }
+    .fi-badge.agile{ background: rgba(108,99,255,.1); color: #b3adff;       border: 1px solid rgba(108,99,255,.2); }
+    .fi-badge.edu  { background: rgba(255,255,255,.05); color: var(--m2);   border: 1px solid var(--border); }
+    .fi-name { font-size: 14px; font-weight: 600; color: var(--t); }
+    .fi-org  { font-size: 12px; color: var(--m); margin-top: 2px; }
+
     /* ── CONTACT ── */
     #contact { padding: 100px 0 120px; }
     .contact-grid { display: grid; grid-template-columns: 200px 1fr; gap: 80px; align-items: start; }
@@ -644,6 +664,38 @@
     </div>
   </div>
 </section>
+
+<hr class="divider"/>
+
+<!-- FORMATIONS -->
+<div class="c">
+  <div class="formations-row rv">
+    <div class="about-label">Formations &<br/>certifications</div>
+    <div class="formations-list">
+      <div class="formation-item">
+        <div class="fi-badge ai">IA</div>
+        <div>
+          <div class="fi-name">Google AI Essential</div>
+          <div class="fi-org">Google · 2025</div>
+        </div>
+      </div>
+      <div class="formation-item">
+        <div class="fi-badge agile">Agile</div>
+        <div>
+          <div class="fi-name">Professional Scrum Product Owner — PSPO I</div>
+          <div class="fi-org">Scrum.org · 2017</div>
+        </div>
+      </div>
+      <div class="formation-item">
+        <div class="fi-badge edu">Bac +5</div>
+        <div>
+          <div class="fi-name">Master II Marketing & Communication</div>
+          <div class="fi-org">ISTC Lille · 2003</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
 
 <hr class="divider"/>
 
