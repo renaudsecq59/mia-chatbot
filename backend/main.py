@@ -9,6 +9,7 @@ from google.cloud import firestore
 from scraper import scrape_all_sources
 from ai_curator import process_articles
 from visual_generator import save_visual_html
+from linkedin_publisher import generate_weekly_edito, publish_to_linkedin
 from config import GCP_PROJECT, MAX_ARTICLES_PER_WEEK
 
 logging.basicConfig(level=logging.INFO, format='%(asctime)s %(message)s')
@@ -172,6 +173,51 @@ async def get_linkedin_posts(limit: int = 10):
         })
     
     return {"posts": posts, "count": len(posts)}
+
+
+@app.post("/api/linkedin/edito")
+async def generate_edito():
+    """Génère l'édito LinkedIn hebdomadaire à partir des articles scrapés."""
+    logger.info("📝 Génération de l'édito LinkedIn...")
+
+    # 1. Scrape les articles frais
+    raw_articles = await scrape_all_sources()
+    if not raw_articles:
+        raise HTTPException(status_code=404, detail="Aucun article trouvé")
+
+    # 2. Extraire les tendances
+    trending = [a for a in raw_articles if a.get("is_trending")]
+    trend_keywords = set()
+    for a in trending:
+        trend_keywords.update(a.get("trending_keywords", []))
+    trends = list(trend_keywords)[:10]
+
+    # 3. Prendre les meilleurs articles (trending + récents)
+    top_articles = sorted(
+        raw_articles,
+        key=lambda x: (x.get("is_trending", False), x.get("source_weight", 1.0)),
+        reverse=True
+    )[:15]
+
+    # 4. Générer l'édito
+    edito = generate_weekly_edito(top_articles, trends)
+
+    return edito
+
+
+@app.post("/api/linkedin/publish")
+async def publish_edito(post_text: str = None):
+    """Publie l'édito sur LinkedIn. Si pas de texte fourni, en génère un."""
+    if not post_text:
+        # Générer d'abord
+        edito_response = await generate_edito()
+        post_text = edito_response.get("post_text", "")
+
+    if not post_text:
+        raise HTTPException(status_code=400, detail="Aucun texte à publier")
+
+    result = publish_to_linkedin(post_text)
+    return result
 
 
 if __name__ == "__main__":
