@@ -3,8 +3,8 @@
 <head>
   <meta charset="UTF-8"/>
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Renaud Secq — Consultant IA & Data | Automatisez. Prédisez. Croissez.</title>
-  <meta name="description" content="Renaud Secq, consultant freelance IA & Data. Je transforme vos données en systèmes intelligents qui automatisent et génèrent du revenu. Diagnostic gratuit en 30 min."/>
+  <title>MIA — Accélération IA & Data | Fondée par Renaud Secq</title>
+  <meta name="description" content="MIA, fondée par Renaud Secq, Head of AI Acceleration. Développement agentique, Data Governance, Product IA. 4 projets déployés en 3 mois chez Decathlon. Basé à Lille."/>
   <link rel="preconnect" href="https://fonts.googleapis.com"/>
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Syne:wght@700;800&display=swap" rel="stylesheet"/>
@@ -31,14 +31,14 @@
     .btn-g{background:var(--glass);color:var(--t);border:1px solid var(--border);backdrop-filter:blur(10px)}
     .btn-g:hover{background:rgba(255,255,255,.07);border-color:rgba(255,255,255,.18);transform:translateY(-2px)}
     .btn-lg{padding:18px 36px;font-size:16px}
-    .btn-w{background:#fff;color:#111;box-shadow:0 4px 30px rgba(0,0,0,.4)}
-    .btn-w:hover{transform:translateY(-3px);box-shadow:0 8px 50px rgba(0,0,0,.5)}
+    .btn-w{background:#fff;color:#111;box-shadow:0 4px 30px rgba(0,0,0,.3)}
+    .btn-w:hover{transform:translateY(-3px)}
     .tag{display:inline-flex;align-items:center;gap:6px;font-size:11px;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:var(--a2);background:rgba(0,212,255,.07);border:1px solid rgba(0,212,255,.2);padding:6px 14px;border-radius:100px;margin-bottom:20px}
     .tag::before{content:'';width:6px;height:6px;background:var(--a2);border-radius:50%;animation:blink 2s infinite}
     @keyframes blink{0%,100%{opacity:1;transform:scale(1)}50%{opacity:.3;transform:scale(1.5)}}
     .sh{text-align:center;margin-bottom:72px}
     .sh h2{font-family:'Syne',sans-serif;font-size:clamp(30px,5vw,52px);font-weight:800;line-height:1.1;letter-spacing:-.02em;margin-bottom:16px}
-    .sh p{font-size:17px;color:var(--m);max-width:520px;margin:0 auto;line-height:1.75}
+    .sh p{font-size:17px;color:var(--m);max-width:540px;margin:0 auto;line-height:1.75}
     .rv{opacity:0;transform:translateY(28px);transition:opacity .75s var(--ease),transform .75s var(--ease)}
     .rv.in{opacity:1;transform:none}
     .d1{transition-delay:.1s}.d2{transition-delay:.2s}.d3{transition-delay:.3s}
@@ -47,7 +47,9 @@
     nav{position:fixed;top:0;left:0;right:0;z-index:200;padding:18px 0;transition:all .3s}
     nav.s{background:rgba(5,5,15,.92);backdrop-filter:blur(24px);border-bottom:1px solid var(--border);padding:12px 0}
     .ni{display:flex;align-items:center;justify-content:space-between}
-    .logo{font-family:'Syne',sans-serif;font-size:20px;font-weight:800;background:linear-gradient(135deg,#fff,var(--a2));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;text-decoration:none;letter-spacing:-.01em}
+    .logo{display:flex;flex-direction:column;text-decoration:none}
+    .logo-name{font-family:'Syne',sans-serif;font-size:22px;font-weight:800;background:linear-gradient(135deg,#fff,var(--a2));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;line-height:1}
+    .logo-sub{font-size:10px;font-weight:500;color:var(--m);letter-spacing:.08em;margin-top:2px}
     .nl{display:flex;align-items:center;gap:28px;list-style:none}
     .nl a{font-size:14px;color:var(--m);text-decoration:none;font-weight:500;transition:color .2s}
     .nl a:hover{color:var(--t)}
@@ -59,56 +61,64 @@
     .hg{position:absolute;border-radius:50%;filter:blur(130px);pointer-events:none}
     .hg1{width:700px;height:700px;background:rgba(108,99,255,.12);top:-200px;left:-200px}
     .hg2{width:500px;height:500px;background:rgba(0,212,255,.08);bottom:-100px;right:5%}
-    .hero-inner{position:relative;z-index:2;display:grid;grid-template-columns:1fr 400px;gap:60px;align-items:center;width:100%}
-    .hero-left h1{font-family:'Syne',sans-serif;font-size:clamp(40px,6vw,78px);font-weight:800;line-height:1.04;letter-spacing:-.03em;margin-bottom:24px}
-    .hero-left p{font-size:clamp(15px,1.8vw,18px);color:var(--m);max-width:520px;line-height:1.8;margin-bottom:36px}
+    .hero-inner{position:relative;z-index:2;display:grid;grid-template-columns:1fr 420px;gap:60px;align-items:center;width:100%}
+    .hero-left h1{font-family:'Syne',sans-serif;font-size:clamp(38px,5.5vw,74px);font-weight:800;line-height:1.04;letter-spacing:-.03em;margin-bottom:24px}
+    .hero-left p{font-size:clamp(15px,1.6vw,18px);color:var(--m);max-width:520px;line-height:1.8;margin-bottom:36px}
     .hero-actions{display:flex;gap:14px;flex-wrap:wrap;margin-bottom:44px}
-    .social-proof{display:flex;align-items:center;gap:16px}
-    .avatars{display:flex}
-    .av{width:36px;height:36px;border-radius:50%;border:2px solid var(--bg);margin-right:-10px;font-size:12px;font-weight:700;display:flex;align-items:center;justify-content:center}
-    .sp-text{font-size:13px;color:var(--m);line-height:1.5}
-    .sp-text strong{color:var(--t);display:block}
+    .founder-proof{display:flex;align-items:center;gap:14px;padding:14px 20px;background:var(--glass);border:1px solid var(--border);border-radius:100px;width:fit-content}
+    .fp-avatar{width:36px;height:36px;border-radius:50%;background:linear-gradient(135deg,var(--a),var(--a2));display:flex;align-items:center;justify-content:center;font-weight:800;font-size:13px;flex-shrink:0}
+    .fp-text{font-size:13px;color:var(--m);line-height:1.4}
+    .fp-text strong{color:var(--t);font-weight:600}
 
-    /* Profile card */
-    .profile-card{background:rgba(12,12,30,.9);border:1px solid var(--border);border-radius:20px;padding:32px;backdrop-filter:blur(20px);animation:flt 7s ease-in-out infinite}
+    /* Hero card */
+    .hero-card{background:rgba(10,10,28,.92);border:1px solid var(--border);border-radius:20px;padding:28px;backdrop-filter:blur(20px);animation:flt 7s ease-in-out infinite}
     @keyframes flt{0%,100%{transform:translateY(0)}50%{transform:translateY(-10px)}}
-    .pc-avatar{width:72px;height:72px;border-radius:50%;background:linear-gradient(135deg,var(--a),var(--a2));display:flex;align-items:center;justify-content:center;font-family:'Syne',sans-serif;font-size:26px;font-weight:800;color:#fff;margin:0 auto 16px;box-shadow:0 0 30px rgba(108,99,255,.3)}
-    .pc-name{font-family:'Syne',sans-serif;font-size:20px;font-weight:800;text-align:center;margin-bottom:4px}
-    .pc-role{font-size:13px;color:var(--m);text-align:center;margin-bottom:24px}
-    .pc-stats{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:20px}
-    .pc-stat{background:rgba(255,255,255,.04);border:1px solid var(--border);border-radius:12px;padding:14px;text-align:center}
-    .pc-num{font-family:'Syne',sans-serif;font-size:24px;font-weight:800}
-    .pc-label{font-size:11px;color:var(--m);margin-top:2px}
-    .pc-skills{display:flex;flex-wrap:wrap;gap:6px}
-    .pc-skill{font-size:11px;font-weight:600;padding:4px 10px;border-radius:100px;background:rgba(108,99,255,.1);border:1px solid rgba(108,99,255,.2);color:#b3adff}
-    .pc-available{display:flex;align-items:center;gap:8px;margin-top:20px;padding-top:16px;border-top:1px solid var(--border);font-size:13px;font-weight:600;color:var(--a4)}
-    .dot-green{width:8px;height:8px;background:var(--a4);border-radius:50%;animation:blink 1.5s infinite}
+    .hc-label{font-size:11px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--m);margin-bottom:16px;display:flex;align-items:center;gap:8px}
+    .hc-label::before{content:'';width:6px;height:6px;background:var(--a4);border-radius:50%;animation:blink 1.5s infinite}
+    .result-item{display:flex;align-items:center;gap:14px;padding:14px 16px;background:rgba(255,255,255,.03);border:1px solid var(--border);border-radius:12px;margin-bottom:10px;transition:.3s}
+    .result-item:hover{border-color:rgba(255,255,255,.12)}
+    .ri-icon{font-size:20px;flex-shrink:0}
+    .ri-num{font-family:'Syne',sans-serif;font-size:20px;font-weight:800;line-height:1}
+    .ri-label{font-size:12px;color:var(--m);margin-top:1px}
+    .hc-footer{margin-top:16px;padding-top:16px;border-top:1px solid var(--border);font-size:12px;color:var(--m);text-align:center}
+    .hc-footer strong{color:var(--t)}
 
     /* LOGOS */
     .logos{padding:40px 0;border-top:1px solid var(--border);border-bottom:1px solid var(--border);overflow:hidden}
     .logos-label{text-align:center;font-size:11px;letter-spacing:.12em;text-transform:uppercase;color:var(--m);font-weight:600;margin-bottom:24px}
-    .track{display:flex;gap:56px;width:max-content;animation:sx 28s linear infinite}
+    .track{display:flex;gap:56px;width:max-content;animation:sx 30s linear infinite}
     @keyframes sx{from{transform:translateX(0)}to{transform:translateX(-50%)}}
     .li{font-family:'Syne',sans-serif;font-size:16px;font-weight:700;color:var(--m);opacity:.45;white-space:nowrap}
 
     /* ABOUT */
     #about{padding:120px 0}
     .about-grid{display:grid;grid-template-columns:1fr 1fr;gap:80px;align-items:center}
-    .about-img{position:relative}
-    .about-img-inner{width:100%;aspect-ratio:1;border-radius:24px;background:linear-gradient(135deg,rgba(108,99,255,.15),rgba(0,212,255,.08));border:1px solid rgba(108,99,255,.2);display:flex;align-items:center;justify-content:center;position:relative;overflow:hidden}
-    .about-initials{font-family:'Syne',sans-serif;font-size:80px;font-weight:800;opacity:.12}
-    .about-badge{position:absolute;bottom:-16px;right:-16px;background:var(--s1);border:1px solid var(--border);border-radius:16px;padding:16px 20px;backdrop-filter:blur(10px)}
-    .ab-num{font-family:'Syne',sans-serif;font-size:28px;font-weight:800}
-    .ab-label{font-size:12px;color:var(--m)}
-    .about-text h2{font-family:'Syne',sans-serif;font-size:clamp(28px,4vw,44px);font-weight:800;line-height:1.1;letter-spacing:-.02em;margin-bottom:20px}
-    .about-text p{font-size:15px;color:var(--m);line-height:1.85;margin-bottom:16px}
+    .about-card{background:var(--glass);border:1px solid var(--border);border-radius:20px;padding:40px;position:relative;overflow:hidden}
+    .about-card::before{content:'';position:absolute;top:-80px;right:-80px;width:300px;height:300px;background:rgba(108,99,255,.08);border-radius:50%;filter:blur(60px)}
+    .ac-header{display:flex;align-items:center;gap:16px;margin-bottom:28px}
+    .ac-avatar{width:64px;height:64px;border-radius:50%;background:linear-gradient(135deg,var(--a),var(--a2));display:flex;align-items:center;justify-content:center;font-family:'Syne',sans-serif;font-size:22px;font-weight:800;color:#fff;box-shadow:0 0 30px rgba(108,99,255,.3);flex-shrink:0}
+    .ac-name{font-family:'Syne',sans-serif;font-size:20px;font-weight:800}
+    .ac-title{font-size:13px;color:var(--a2);font-weight:600;margin-top:2px}
+    .ac-stats{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-bottom:24px}
+    .ac-stat{background:rgba(255,255,255,.04);border:1px solid var(--border);border-radius:12px;padding:14px;text-align:center}
+    .ac-num{font-family:'Syne',sans-serif;font-size:22px;font-weight:800}
+    .ac-label{font-size:11px;color:var(--m);margin-top:2px;line-height:1.4}
+    .ac-skills{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:20px}
+    .ac-skill{font-size:11px;font-weight:600;padding:4px 10px;border-radius:100px;background:rgba(108,99,255,.1);border:1px solid rgba(108,99,255,.2);color:#b3adff}
+    .ac-skill.g{background:rgba(0,212,255,.08);border-color:rgba(0,212,255,.2);color:var(--a2)}
+    .ac-skill.p{background:rgba(255,77,166,.08);border-color:rgba(255,77,166,.2);color:var(--a3)}
+    .ac-available{display:flex;align-items:center;gap:8px;font-size:13px;font-weight:600;color:var(--a4);padding:12px 16px;background:rgba(0,255,135,.06);border:1px solid rgba(0,255,135,.15);border-radius:10px}
+    .dot-g{width:8px;height:8px;background:var(--a4);border-radius:50%;animation:blink 1.5s infinite;flex-shrink:0}
+    .about-text h2{font-family:'Syne',sans-serif;font-size:clamp(26px,3.5vw,42px);font-weight:800;line-height:1.12;letter-spacing:-.02em;margin-bottom:20px}
+    .about-text p{font-size:15px;color:var(--m);line-height:1.85;margin-bottom:14px}
     .about-text p strong{color:var(--t)}
-    .xp-list{display:flex;flex-direction:column;gap:12px;margin-top:24px}
-    .xp{display:flex;gap:14px;align-items:flex-start;padding:16px 20px;background:var(--glass);border:1px solid var(--border);border-radius:12px;transition:.3s var(--ease)}
-    .xp:hover{border-color:rgba(255,255,255,.13);transform:translateX(4px)}
-    .xp-icon{font-size:20px;flex-shrink:0;margin-top:1px}
-    .xp strong{display:block;font-size:14px;font-weight:600;margin-bottom:2px}
-    .xp span{font-size:13px;color:var(--m)}
+    .timeline{display:flex;flex-direction:column;gap:0;margin-top:28px;position:relative;padding-left:24px}
+    .timeline::before{content:'';position:absolute;left:6px;top:8px;bottom:8px;width:1px;background:linear-gradient(180deg,var(--a),var(--a2),transparent)}
+    .tl-item{position:relative;padding-bottom:20px}
+    .tl-item::before{content:'';position:absolute;left:-20px;top:7px;width:8px;height:8px;border-radius:50%;background:var(--a);border:2px solid var(--bg)}
+    .tl-year{font-size:11px;font-weight:700;color:var(--a2);letter-spacing:.06em;margin-bottom:3px}
+    .tl-role{font-size:14px;font-weight:600;color:var(--t)}
+    .tl-company{font-size:13px;color:var(--m)}
 
     /* SERVICES */
     #services{padding:120px 0;background:linear-gradient(180deg,transparent,rgba(108,99,255,.03) 50%,transparent)}
@@ -126,18 +136,37 @@
     .srv-tags{display:flex;flex-wrap:wrap;gap:6px}
     .st{font-size:11px;font-weight:600;padding:3px 10px;border-radius:100px;background:rgba(255,255,255,.04);border:1px solid var(--border);color:var(--m)}
 
+    /* CASE STUDIES */
+    #cases{padding:120px 0}
+    .cases-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:24px}
+    .case{background:var(--glass);border:1px solid var(--border);border-radius:20px;padding:40px;transition:.4s var(--ease);position:relative;overflow:hidden}
+    .case:hover{transform:translateY(-5px);border-color:rgba(255,255,255,.12)}
+    .case.main{background:linear-gradient(135deg,rgba(108,99,255,.1),rgba(0,212,255,.05));border-color:rgba(108,99,255,.22);grid-column:span 2}
+    .case-logo{display:inline-flex;align-items:center;gap:8px;font-family:'Syne',sans-serif;font-size:13px;font-weight:800;letter-spacing:.06em;text-transform:uppercase;padding:6px 14px;border-radius:100px;background:rgba(255,255,255,.05);border:1px solid var(--border);margin-bottom:24px}
+    .case h3{font-family:'Syne',sans-serif;font-size:22px;font-weight:800;margin-bottom:12px;letter-spacing:-.01em}
+    .case p{font-size:14px;color:var(--m);line-height:1.8;margin-bottom:28px}
+    .case-results{display:flex;gap:16px;flex-wrap:wrap}
+    .cr{text-align:center;padding:16px 20px;background:rgba(0,255,135,.06);border:1px solid rgba(0,255,135,.15);border-radius:12px;flex:1;min-width:100px}
+    .cr-num{font-family:'Syne',sans-serif;font-size:26px;font-weight:800;color:var(--a4);line-height:1}
+    .cr-label{font-size:11px;color:var(--m);margin-top:4px;line-height:1.4}
+    .case-projects{display:grid;grid-template-columns:repeat(2,1fr);gap:12px;margin-top:24px}
+    .cp{padding:16px;background:rgba(255,255,255,.03);border:1px solid var(--border);border-radius:12px;transition:.3s}
+    .cp:hover{border-color:rgba(108,99,255,.25)}
+    .cp-name{font-size:13px;font-weight:700;color:var(--a2);margin-bottom:4px}
+    .cp-desc{font-size:12px;color:var(--m);line-height:1.6}
+
     /* OFFRES */
-    #offres{padding:120px 0}
+    #offres{padding:120px 0;background:linear-gradient(180deg,transparent,rgba(0,212,255,.03) 50%,transparent)}
     .offres-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:24px}
-    .offre{background:var(--glass);border:1px solid var(--border);border-radius:20px;padding:40px;transition:.4s var(--ease);position:relative;overflow:hidden}
+    .offre{background:var(--glass);border:1px solid var(--border);border-radius:20px;padding:40px;transition:.4s var(--ease);position:relative}
     .offre:hover{transform:translateY(-6px);border-color:rgba(255,255,255,.13)}
     .offre.pop{background:linear-gradient(160deg,rgba(108,99,255,.15),rgba(0,212,255,.08));border-color:rgba(108,99,255,.35);transform:scale(1.03)}
     .offre.pop:hover{transform:scale(1.03) translateY(-6px)}
     .pop-label{position:absolute;top:20px;right:20px;font-size:10px;font-weight:800;letter-spacing:.1em;text-transform:uppercase;padding:5px 12px;border-radius:100px;background:linear-gradient(135deg,var(--a),var(--a2));color:#fff}
     .offre-name{font-family:'Syne',sans-serif;font-size:13px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--m);margin-bottom:8px}
-    .offre-price{font-family:'Syne',sans-serif;font-size:40px;font-weight:800;line-height:1;margin-bottom:4px}
+    .offre-price{font-family:'Syne',sans-serif;font-size:38px;font-weight:800;line-height:1;margin-bottom:4px}
     .offre-sub{font-size:13px;color:var(--m);margin-bottom:28px}
-    .offre-features{display:flex;flex-direction:column;gap:12px;margin-bottom:36px}
+    .offre-features{display:flex;flex-direction:column;gap:11px;margin-bottom:32px}
     .of{display:flex;gap:10px;align-items:flex-start;font-size:14px}
     .of-dot{width:18px;height:18px;min-width:18px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:9px;margin-top:2px}
     .of-ok .of-dot{background:linear-gradient(135deg,var(--a4),var(--a2));color:#000}
@@ -145,45 +174,21 @@
     .of-ok span{color:var(--t)}
     .of-no span{color:var(--m)}
 
-    /* PROCESS */
-    #process{padding:120px 0;background:linear-gradient(180deg,transparent,rgba(0,212,255,.03) 50%,transparent)}
-    .proc-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:20px}
-    .proc{background:var(--glass);border:1px solid var(--border);border-radius:var(--r);padding:36px;display:grid;grid-template-columns:56px 1fr;gap:20px;align-items:start;transition:.35s var(--ease)}
-    .proc:hover{border-color:rgba(255,255,255,.13);transform:translateY(-3px)}
-    .proc-num{width:56px;height:56px;border-radius:16px;display:flex;align-items:center;justify-content:center;font-family:'Syne',sans-serif;font-size:18px;font-weight:800;flex-shrink:0}
-    .proc h3{font-family:'Syne',sans-serif;font-size:20px;font-weight:800;margin-bottom:8px}
-    .proc p{font-size:14px;color:var(--m);line-height:1.75}
-    .proc-detail{margin-top:14px;font-size:12px;color:var(--a2);font-weight:600}
-
     /* STATS */
     #stats{padding:80px 0}
     .stats-box{background:linear-gradient(135deg,rgba(108,99,255,.1),rgba(0,212,255,.05));border:1px solid rgba(108,99,255,.18);border-radius:24px;padding:70px 50px;display:grid;grid-template-columns:repeat(4,1fr);gap:40px;text-align:center;position:relative;overflow:hidden}
     .stats-box::before{content:'';position:absolute;top:-120px;right:-120px;width:400px;height:400px;background:rgba(108,99,255,.07);border-radius:50%;filter:blur(80px)}
     .stat{position:relative;z-index:1}
-    .sn{font-family:'Syne',sans-serif;font-size:clamp(34px,4vw,52px);font-weight:800;margin-bottom:6px}
+    .sn{font-family:'Syne',sans-serif;font-size:clamp(32px,3.5vw,50px);font-weight:800;margin-bottom:6px}
     .sl{font-size:13px;color:var(--m);font-weight:500}
     .sd{position:absolute;right:0;top:15%;height:70%;width:1px;background:var(--border)}
-
-    /* TESTIMONIALS */
-    #testimonials{padding:120px 0}
-    .tg{display:grid;grid-template-columns:repeat(3,1fr);gap:20px}
-    .tc{background:var(--glass);border:1px solid var(--border);border-radius:var(--r);padding:32px;transition:.35s var(--ease)}
-    .tc:hover{transform:translateY(-4px);border-color:rgba(255,255,255,.12)}
-    .tc.hl{background:linear-gradient(135deg,rgba(108,99,255,.1),rgba(0,212,255,.05));border-color:rgba(108,99,255,.22)}
-    .stars{color:#ffd700;font-size:13px;letter-spacing:2px;margin-bottom:16px}
-    .tc-result{background:rgba(0,255,135,.08);border:1px solid rgba(0,255,135,.15);border-radius:10px;padding:12px 16px;margin-bottom:16px;font-size:13px;font-weight:600;color:var(--a4)}
-    .tc-text{font-size:14px;color:var(--t);line-height:1.8;margin-bottom:24px;font-style:italic}
-    .tc-author{display:flex;align-items:center;gap:12px}
-    .av-big{width:42px;height:42px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-weight:700;font-size:15px;color:#fff;flex-shrink:0}
-    .ta-name{font-weight:700;font-size:14px}
-    .ta-role{font-size:12px;color:var(--m);margin-top:2px}
 
     /* FAQ */
     #faq{padding:120px 0}
     .faq-list{max-width:720px;margin:0 auto;display:flex;flex-direction:column;gap:12px}
     .faq-item{background:var(--glass);border:1px solid var(--border);border-radius:var(--r);overflow:hidden;transition:.3s var(--ease)}
     .faq-item.open{border-color:rgba(108,99,255,.25)}
-    .faq-q{display:flex;align-items:center;justify-content:space-between;padding:22px 28px;cursor:pointer;font-weight:600;font-size:15px;gap:16px}
+    .faq-q{display:flex;align-items:center;justify-content:space-between;padding:22px 28px;cursor:pointer;font-weight:600;font-size:15px;gap:16px;user-select:none}
     .faq-q:hover{background:rgba(255,255,255,.02)}
     .faq-icon{width:28px;height:28px;border-radius:50%;background:rgba(255,255,255,.05);border:1px solid var(--border);display:flex;align-items:center;justify-content:center;font-size:16px;flex-shrink:0;transition:transform .3s var(--ease)}
     .faq-item.open .faq-icon{transform:rotate(45deg);background:var(--a);border-color:var(--a)}
@@ -197,7 +202,7 @@
     .cta-g1,.cta-g2{position:absolute;border-radius:50%;filter:blur(100px);pointer-events:none}
     .cta-g1{width:500px;height:500px;background:rgba(108,99,255,.18);top:-200px;left:-100px}
     .cta-g2{width:400px;height:400px;background:rgba(0,212,255,.12);bottom:-150px;right:-50px}
-    .cta-box h2{font-family:'Syne',sans-serif;font-size:clamp(30px,5vw,56px);font-weight:800;line-height:1.08;letter-spacing:-.02em;margin-bottom:20px;position:relative}
+    .cta-box h2{font-family:'Syne',sans-serif;font-size:clamp(28px,4.5vw,54px);font-weight:800;line-height:1.08;letter-spacing:-.02em;margin-bottom:20px;position:relative}
     .cta-box p{font-size:17px;color:var(--m);max-width:480px;margin:0 auto 40px;line-height:1.7;position:relative}
     .cta-chips{display:flex;justify-content:center;gap:12px;flex-wrap:wrap;margin-bottom:40px;position:relative}
     .chip{display:flex;align-items:center;gap:6px;font-size:13px;font-weight:500;color:var(--m);padding:6px 14px;border-radius:100px;background:rgba(255,255,255,.04);border:1px solid var(--border)}
@@ -209,14 +214,14 @@
     .fg{display:grid;grid-template-columns:2fr 1fr 1fr;gap:56px;margin-bottom:56px}
     .fb-desc{font-size:14px;color:var(--m);line-height:1.8;margin:14px 0 24px;max-width:300px}
     .soc{display:flex;gap:10px}
-    .sl-link{width:36px;height:36px;border-radius:10px;background:var(--glass);border:1px solid var(--border);display:flex;align-items:center;justify-content:center;font-size:14px;text-decoration:none;color:var(--m);transition:.3s var(--ease)}
+    .sl-link{width:36px;height:36px;border-radius:10px;background:var(--glass);border:1px solid var(--border);display:flex;align-items:center;justify-content:center;font-size:13px;text-decoration:none;color:var(--m);transition:.3s var(--ease)}
     .sl-link:hover{background:var(--a);border-color:var(--a);color:#fff;transform:translateY(-2px)}
     .fc h4{font-size:12px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--m);margin-bottom:18px}
     .fl{list-style:none;display:flex;flex-direction:column;gap:10px}
     .fl a{font-size:14px;color:var(--m);text-decoration:none;transition:color .2s}
     .fl a:hover{color:var(--t)}
     .fb{display:flex;justify-content:space-between;align-items:center;padding-top:36px;border-top:1px solid var(--border);font-size:13px;color:var(--m)}
-    .status{display:flex;align-items:center;gap:8px}
+    .status-pill{display:flex;align-items:center;gap:8px}
     .dot-s{width:8px;height:8px;background:#00ff87;border-radius:50%;animation:blink 2s infinite}
 
     /* STICKY */
@@ -224,47 +229,50 @@
     @keyframes su{from{opacity:0;transform:translateY(20px)}to{opacity:1;transform:none}}
     .sticky-inner{display:flex;align-items:center;gap:10px;background:linear-gradient(135deg,var(--a),var(--a2));padding:14px 22px;border-radius:100px;box-shadow:0 8px 40px rgba(108,99,255,.45);cursor:pointer;font-weight:700;font-size:14px;color:#fff;text-decoration:none;transition:.3s var(--ease)}
     .sticky-inner:hover{transform:translateY(-3px);box-shadow:0 12px 60px rgba(108,99,255,.6)}
-    .sp{width:10px;height:10px;background:#fff;border-radius:50%;animation:blink 1.5s infinite}
+    .sp{width:10px;height:10px;background:#fff;border-radius:50%;animation:blink 1.5s infinite;opacity:.9}
 
     @media(max-width:1024px){
       .srv-grid{grid-template-columns:repeat(2,1fr)}
       .srv.hot{grid-column:span 1}
       .stats-box{grid-template-columns:repeat(2,1fr)}
       .fg{grid-template-columns:1fr 1fr;gap:36px}
+      .cases-grid{grid-template-columns:1fr}
+      .case.main{grid-column:span 1}
     }
     @media(max-width:768px){
       .nl{display:none}
       .hero-inner{grid-template-columns:1fr}
-      .profile-card{display:none}
+      .hero-card{display:none}
       .about-grid{grid-template-columns:1fr}
-      .about-img{display:none}
       .srv-grid{grid-template-columns:1fr}
       .offres-grid{grid-template-columns:1fr}
       .offre.pop{transform:scale(1)}
-      .proc-grid{grid-template-columns:1fr}
-      .tg{grid-template-columns:1fr}
       .stats-box{grid-template-columns:1fr 1fr;padding:40px 24px}
       .fg{grid-template-columns:1fr}
       .fb{flex-direction:column;gap:12px;text-align:center}
       .sticky-cta{bottom:16px;right:16px}
       .cta-box{padding:60px 20px}
+      .case-projects{grid-template-columns:1fr}
     }
   </style>
 </head>
 <body>
 
 <a href="#cta-final" class="sticky-cta">
-  <div class="sticky-inner"><div class="sp"></div>Travaillons ensemble →</div>
+  <div class="sticky-inner"><div class="sp"></div>Discutons de votre projet →</div>
 </a>
 
 <nav id="nav">
   <div class="c ni">
-    <a class="logo" href="#">Renaud Secq</a>
+    <a class="logo" href="#">
+      <span class="logo-name">MIA</span>
+      <span class="logo-sub">par Renaud Secq</span>
+    </a>
     <ul class="nl">
       <li><a href="#about">À propos</a></li>
       <li><a href="#services">Services</a></li>
+      <li><a href="#cases">Réalisations</a></li>
       <li><a href="#offres">Tarifs</a></li>
-      <li><a href="#testimonials">Clients</a></li>
       <li><a href="#faq">FAQ</a></li>
     </ul>
     <div class="nc">
@@ -281,117 +289,144 @@
   <div class="hg hg2"></div>
   <div class="c hero-inner">
     <div class="hero-left rv">
-      <div class="tag">Consultant Freelance IA & Data</div>
-      <h1>Je transforme vos données en <span class="gt">machines à valeur.</span></h1>
-      <p>Je suis Renaud Secq. J'aide les entreprises ambitieuses à exploiter l'IA et la data pour automatiser leurs opérations, anticiper les risques et générer des revenus supplémentaires — sans recruter une équipe entière.</p>
+      <div class="tag">Head of AI Acceleration · Freelance · Lille</div>
+      <h1>Je déploie des agents IA<br/>qui <span class="gt">passent à l'échelle.</span></h1>
+      <p>Je suis Renaud Secq. J'ai déployé 4 solutions IA en 3 mois chez Decathlon — chatbots, agents autonomes, conformité EU AI Act. Je fais la même chose pour votre entreprise, sans les frictions d'une grande structure.</p>
       <div class="hero-actions">
-        <a href="#cta-final" class="btn btn-p btn-lg">Réserver un appel gratuit →</a>
-        <a href="#services" class="btn btn-g btn-lg">Mes services</a>
+        <a href="#cta-final" class="btn btn-p btn-lg">Discuter de votre projet →</a>
+        <a href="#cases" class="btn btn-g btn-lg">Voir les réalisations</a>
       </div>
-      <div class="social-proof">
-        <div class="avatars">
-          <div class="av" style="background:linear-gradient(135deg,#6c63ff,#00d4ff)">SL</div>
-          <div class="av" style="background:linear-gradient(135deg,#ff4da6,#6c63ff)">TM</div>
-          <div class="av" style="background:linear-gradient(135deg,#00d4ff,#00ff87)">AR</div>
-          <div class="av" style="background:linear-gradient(135deg,#ff9f43,#ff4da6)">JB</div>
-        </div>
-        <div class="sp-text">
-          <strong>+50 clients satisfaits</strong>
-          Disponible pour de nouvelles missions
+      <div class="founder-proof">
+        <div class="fp-avatar">RS</div>
+        <div class="fp-text">
+          <strong>Renaud Secq</strong>
+          20k abonnés LinkedIn · 8 ans en freelance grands comptes
         </div>
       </div>
     </div>
 
-    <div class="profile-card rv d2">
-      <div class="pc-avatar">RS</div>
-      <div class="pc-name">Renaud Secq</div>
-      <div class="pc-role">Consultant Freelance IA & Data</div>
-      <div class="pc-stats">
-        <div class="pc-stat">
-          <div class="pc-num gt">6+</div>
-          <div class="pc-label">Années d'XP</div>
-        </div>
-        <div class="pc-stat">
-          <div class="pc-num gt">50+</div>
-          <div class="pc-label">Projets livrés</div>
-        </div>
-        <div class="pc-stat">
-          <div class="pc-num gt">×4</div>
-          <div class="pc-label">ROI moyen</div>
-        </div>
-        <div class="pc-stat">
-          <div class="pc-num gt">98%</div>
-          <div class="pc-label">Satisfaction</div>
+    <div class="hero-card rv d2">
+      <div class="hc-label">Dernière mission — Decathlon (Jan 2026)</div>
+      <div class="result-item">
+        <div class="ri-icon">🤖</div>
+        <div>
+          <div class="ri-num gt">4</div>
+          <div class="ri-label">agents IA déployés en production en 3 mois</div>
         </div>
       </div>
-      <div class="pc-skills">
-        <span class="pc-skill">LLM / RAG</span>
-        <span class="pc-skill">Python</span>
-        <span class="pc-skill">ML</span>
-        <span class="pc-skill">dbt</span>
-        <span class="pc-skill">Spark</span>
-        <span class="pc-skill">AWS</span>
+      <div class="result-item">
+        <div class="ri-icon">📊</div>
+        <div>
+          <div class="ri-num gt">320</div>
+          <div class="ri-label">Business Objects analysés / semaine automatiquement</div>
+        </div>
       </div>
-      <div class="pc-available">
-        <div class="dot-green"></div>
-        Disponible — Prochaine mission
+      <div class="result-item">
+        <div class="ri-icon">👥</div>
+        <div>
+          <div class="ri-num gt">350</div>
+          <div class="ri-label">utilisateurs uniques actifs sur les outils IA</div>
+        </div>
       </div>
+      <div class="result-item">
+        <div class="ri-icon">⚡</div>
+        <div>
+          <div class="ri-num gt">+20%</div>
+          <div class="ri-label">de productivité pour les offers managers</div>
+        </div>
+      </div>
+      <div class="hc-footer">Mission en cours · <strong>Disponible pour de nouveaux projets</strong></div>
     </div>
   </div>
 </section>
 
 <!-- LOGOS -->
 <div class="logos">
-  <div class="logos-label">Ils m'ont fait confiance</div>
+  <div class="logos-label">Entreprises avec lesquelles j'ai travaillé</div>
   <div class="track">
-    <span class="li">TechCorp</span><span class="li">DataFlow</span><span class="li">NexaGroup</span>
-    <span class="li">Synthos</span><span class="li">Luminary</span><span class="li">Axiom AI</span>
-    <span class="li">Corexa</span><span class="li">PulseData</span><span class="li">Vectoris</span><span class="li">Orbita</span>
-    <span class="li">TechCorp</span><span class="li">DataFlow</span><span class="li">NexaGroup</span>
-    <span class="li">Synthos</span><span class="li">Luminary</span><span class="li">Axiom AI</span>
-    <span class="li">Corexa</span><span class="li">PulseData</span><span class="li">Vectoris</span><span class="li">Orbita</span>
+    <span class="li">Decathlon</span><span class="li">Adeo</span><span class="li">Auchan</span>
+    <span class="li">Oney</span><span class="li">Experian</span><span class="li">Clic&Walk</span>
+    <span class="li">La Redoute</span><span class="li">Fnac</span><span class="li">Publicis</span><span class="li">Altavia</span>
+    <span class="li">Decathlon</span><span class="li">Adeo</span><span class="li">Auchan</span>
+    <span class="li">Oney</span><span class="li">Experian</span><span class="li">Clic&Walk</span>
+    <span class="li">La Redoute</span><span class="li">Fnac</span><span class="li">Publicis</span><span class="li">Altavia</span>
   </div>
 </div>
 
 <!-- ABOUT -->
 <section id="about">
   <div class="c about-grid">
-    <div class="about-img rv">
-      <div class="about-img-inner">
-        <div class="about-initials gt">RS</div>
-        <div style="position:absolute;inset:0;background:radial-gradient(circle at 60% 40%,rgba(108,99,255,.15),transparent 70%)"></div>
+    <div class="about-card rv">
+      <div class="ac-header">
+        <div class="ac-avatar">RS</div>
+        <div>
+          <div class="ac-name">Renaud Secq</div>
+          <div class="ac-title">Head of AI Acceleration</div>
+        </div>
       </div>
-      <div class="about-badge">
-        <div class="ab-num gt">6+</div>
-        <div class="ab-label">ans d'expertise IA & Data</div>
+      <div class="ac-stats">
+        <div class="ac-stat">
+          <div class="ac-num gt">8+</div>
+          <div class="ac-label">ans freelance grands comptes</div>
+        </div>
+        <div class="ac-stat">
+          <div class="ac-num gt">20k</div>
+          <div class="ac-label">abonnés LinkedIn</div>
+        </div>
+        <div class="ac-stat">
+          <div class="ac-num gt">2M€</div>
+          <div class="ac-label">budget FinOps géré</div>
+        </div>
+      </div>
+      <div class="ac-skills">
+        <span class="ac-skill">Agents IA</span>
+        <span class="ac-skill">Multi-agents</span>
+        <span class="ac-skill">RAG / MCP</span>
+        <span class="ac-skill g">GCP / Vertex AI</span>
+        <span class="ac-skill g">AWS Bedrock</span>
+        <span class="ac-skill g">Databricks</span>
+        <span class="ac-skill p">Data Governance</span>
+        <span class="ac-skill p">EU AI Act</span>
+        <span class="ac-skill">Python · SQL · React</span>
+        <span class="ac-skill">Product Management</span>
+        <span class="ac-skill">SAFe / OKR</span>
+      </div>
+      <div class="ac-available">
+        <div class="dot-g"></div>
+        Disponible pour de nouvelles missions
       </div>
     </div>
+
     <div class="about-text rv d1">
       <div class="tag">À propos</div>
-      <h2>Je ne suis pas une agence.<br/><span class="gt">C'est un avantage.</span></h2>
-      <p>Je suis <strong>Renaud Secq</strong>, consultant freelance spécialisé en intelligence artificielle et data engineering. Quand vous travaillez avec moi, vous avez affaire directement à l'expert — pas à un chef de projet qui délègue.</p>
-      <p>J'ai accompagné des startups Série A et des PME de 500M€ de CA dans leurs transformations data. J'ai une règle : je ne prends un projet que si je suis convaincu de pouvoir livrer un ROI positif.</p>
-      <div class="xp-list">
-        <div class="xp">
-          <div class="xp-icon">🎓</div>
-          <div>
-            <strong>Formation d'élite</strong>
-            <span>École d'ingénieur + Master Data Science — Spécialisation IA appliquée</span>
-          </div>
+      <h2>Entrepreneur, Product Manager,<br/><span class="gt">accélérateur IA.</span></h2>
+      <p>J'ai créé et revendu <strong>Yoo CI</strong>, une agence digitale de 10 personnes avec La Redoute, Fnac et Oney comme clients. Depuis 2016, j'interviens en freelance sur les plus grands comptes de la métropole lilloise.</p>
+      <p>Ma spécificité : je combine la vision <strong>Product Management</strong> (cadrage désirabilité / faisabilité / rentabilité) et l'exécution <strong>technique IA</strong> (développement agentique haute cadence, orchestration multi-agents). Je ne code pas l'IA pour coder — je la déploie pour qu'elle crée de la valeur métier mesurable.</p>
+      <div class="timeline">
+        <div class="tl-item">
+          <div class="tl-year">2026 → aujourd'hui</div>
+          <div class="tl-role">AI & Automation Specialist</div>
+          <div class="tl-company">Decathlon · COE Data Governance</div>
         </div>
-        <div class="xp">
-          <div class="xp-icon">🏢</div>
-          <div>
-            <strong>Expérience grands comptes</strong>
-            <span>Ex-consultant senior chez des cabinet de conseil top-tier avant de passer en freelance</span>
-          </div>
+        <div class="tl-item">
+          <div class="tl-year">2023 → 2026</div>
+          <div class="tl-role">Data Governance Manager & PM AI</div>
+          <div class="tl-company">Decathlon · Industry</div>
         </div>
-        <div class="xp">
-          <div class="xp-icon">🚀</div>
-          <div>
-            <strong>Culture startup & delivery</strong>
-            <span>J'ai un biais pour l'action : prototype en 48h, résultats mesurables en 4 semaines</span>
-          </div>
+        <div class="tl-item">
+          <div class="tl-year">2022 → 2023</div>
+          <div class="tl-role">Product Manager Recommandation E-com</div>
+          <div class="tl-company">Adeo · Ronchin</div>
+        </div>
+        <div class="tl-item">
+          <div class="tl-year">2018 → 2021</div>
+          <div class="tl-role">Product Leader Observability</div>
+          <div class="tl-company">Adeo · Budget 2M€ · 200 équipes</div>
+        </div>
+        <div class="tl-item">
+          <div class="tl-year">2010 → 2016</div>
+          <div class="tl-role">CEO & Fondateur — Yoo CI</div>
+          <div class="tl-company">Agence digitale · 10 pers. · Revendue</div>
         </div>
       </div>
     </div>
@@ -402,154 +437,119 @@
 <section id="services">
   <div class="c">
     <div class="sh rv">
-      <div class="tag">Ce que je fais</div>
-      <h2>Mes domaines d'expertise<br/><span class="gt">IA & Data</span></h2>
-      <p>J'interviens sur l'intégralité du cycle data — de la stratégie à la production. Seul, mais avec la profondeur d'un spécialiste.</p>
+      <div class="tag">Mes expertises</div>
+      <h2>Ce que je déploie<br/><span class="gt">concrètement</span></h2>
+      <p>Pas de slides. Des agents en production, des pipelines qui tournent, des métriques qui bougent.</p>
     </div>
     <div class="srv-grid">
+
       <div class="srv hot rv" style="--ca:var(--a)">
         <div class="srv-top">
-          <div class="srv-icon" style="background:rgba(108,99,255,.15);color:#b3adff">🧠</div>
-          <div class="srv-badge" style="background:rgba(108,99,255,.15);color:#b3adff;border:1px solid rgba(108,99,255,.3)">⭐ Ma spécialité</div>
+          <div class="srv-icon" style="background:rgba(108,99,255,.15);color:#b3adff">🤖</div>
+          <div class="srv-badge" style="background:rgba(108,99,255,.15);color:#b3adff;border:1px solid rgba(108,99,255,.3)">⭐ Spécialité #1</div>
         </div>
-        <h3>IA Générative & Agents Autonomes</h3>
-        <p>Chatbots métier sur vos données, agents IA qui automatisent des workflows complexes, LLMs fine-tunés sur vos documents propriétaires. Je construis des systèmes qui travaillent à votre place — 24h/24, sans erreur, sans pause.</p>
+        <h3>Développement Agentique & Multi-agents</h3>
+        <p>Conception et déploiement de systèmes multi-agents haute cadence. Orchestration de rôles, skills, RAG et MCP. J'ai un framework éprouvé : 4 projets livrés en 3 mois chez Decathlon via 8 agents coordonnés.</p>
         <div class="srv-tags">
-          <span class="st">LLM Fine-tuning</span><span class="st">RAG</span><span class="st">LangChain</span>
-          <span class="st">Agents IA</span><span class="st">OpenAI / Claude</span>
+          <span class="st">Orchestration multi-agents</span><span class="st">RAG</span>
+          <span class="st">MCP</span><span class="st">Google ADK</span>
+          <span class="st">LangChain</span><span class="st">Claude / OpenAI / Gemini</span>
         </div>
       </div>
 
       <div class="srv rv d1" style="--ca:var(--a2)">
-        <div class="srv-icon" style="background:rgba(0,212,255,.12);color:var(--a2)">🔮</div>
-        <h3>Machine Learning & Prédiction</h3>
-        <p>Modèles prédictifs sur-mesure : prévision de ventes, scoring clients, détection d'anomalies, churn prediction. Déployés et monitorés en production.</p>
-        <div class="srv-tags"><span class="st">PyTorch</span><span class="st">Scikit-learn</span><span class="st">MLflow</span></div>
+        <div class="srv-icon" style="background:rgba(0,212,255,.12);color:var(--a2)">🛡️</div>
+        <h3>Data Governance & EU AI Act</h3>
+        <p>Operating model data, data quality, data contracts. Conformité EU AI Act — classification des risques, plan d'actions. J'ai piloté 5 sous-domaines data critiques chez Decathlon pendant 3 ans.</p>
+        <div class="srv-tags"><span class="st">Collibra</span><span class="st">Databricks</span><span class="st">EU AI Act</span><span class="st">RGPD</span></div>
       </div>
 
       <div class="srv rv d2" style="--ca:var(--a3)">
-        <div class="srv-icon" style="background:rgba(255,77,166,.12);color:var(--a3)">📊</div>
-        <h3>Data Engineering</h3>
-        <p>Pipelines robustes, entrepôts de données scalables, ETL automatisés. Je construis la fondation sans laquelle aucun projet IA ne tient.</p>
-        <div class="srv-tags"><span class="st">dbt</span><span class="st">Airflow</span><span class="st">Spark</span><span class="st">Kafka</span></div>
+        <div class="srv-icon" style="background:rgba(255,77,166,.12);color:var(--a3)">🎯</div>
+        <h3>Product Management IA</h3>
+        <p>Cadrage des opportunités IA (désirabilité, faisabilité, rentabilité). Priorisation par la valeur. Je stoppe les projets non "AI ready" avant qu'ils coûtent cher — et réoriente vers le "Data first".</p>
+        <div class="srv-tags"><span class="st">OKR / Roadmap</span><span class="st">SAFe</span><span class="st">Backlog</span><span class="st">FinOps</span></div>
       </div>
 
       <div class="srv rv d1" style="--ca:#ff9f43">
-        <div class="srv-icon" style="background:rgba(255,159,67,.12);color:#ff9f43">📈</div>
-        <h3>Business Intelligence</h3>
-        <p>Dashboards temps réel, rapports automatisés, alertes intelligentes. Vos décideurs ont les bonnes données au bon moment.</p>
-        <div class="srv-tags"><span class="st">Power BI</span><span class="st">Metabase</span><span class="st">Looker</span></div>
+        <div class="srv-icon" style="background:rgba(255,159,67,.12);color:#ff9f43">☁️</div>
+        <h3>Architecture Cloud IA</h3>
+        <p>Déploiement de solutions IA sur GCP (Vertex AI, Cloud Run, Firestore, ADK) et AWS (Bedrock, S3). Infrastructure scalable pensée pour passer à l'échelle dès le départ.</p>
+        <div class="srv-tags"><span class="st">GCP</span><span class="st">AWS</span><span class="st">Cloud Run</span><span class="st">Vertex AI</span><span class="st">Firestore</span></div>
       </div>
 
       <div class="srv rv d2" style="--ca:var(--a4)">
-        <div class="srv-icon" style="background:rgba(0,255,135,.1);color:var(--a4)">☁️</div>
-        <h3>Audit & Stratégie Data</h3>
-        <p>Diagnostic de votre maturité data, roadmap IA prioritisée, choix technologiques. Idéal avant de lancer un projet ou de recruter.</p>
-        <div class="srv-tags"><span class="st">Audit data</span><span class="st">Roadmap</span><span class="st">Quick wins</span></div>
+        <div class="srv-icon" style="background:rgba(0,255,135,.1);color:var(--a4)">📈</div>
+        <h3>ML & Recommandation</h3>
+        <p>A/B tests algorithmiques, knowledge graph, systèmes de recommandation. +15% conversion et +22% ajout au panier obtenus chez Adeo sur la reco e-com multi-BU internationales.</p>
+        <div class="srv-tags"><span class="st">A/B testing</span><span class="st">Knowledge graph</span><span class="st">Python</span><span class="st">SQL</span></div>
       </div>
+
     </div>
   </div>
 </section>
 
-<!-- OFFRES -->
-<section id="offres">
+<!-- CASE STUDIES -->
+<section id="cases">
   <div class="c">
     <div class="sh rv">
-      <div class="tag">Mes tarifs</div>
-      <h2>Transparent sur les prix,<br/><span class="gt">exigeant sur les résultats</span></h2>
-      <p>Trois façons de travailler ensemble, selon votre situation et vos objectifs.</p>
+      <div class="tag">Réalisations concrètes</div>
+      <h2>Des projets réels,<br/><span class="gt">des chiffres réels</span></h2>
+      <p>Voici ce que j'ai déployé. Pas des maquettes, pas des POCs abandonnés — des systèmes en production.</p>
     </div>
-    <div class="offres-grid">
-      <div class="offre rv">
-        <div class="offre-name">Audit & Conseil</div>
-        <div class="offre-price gt2">1 500€</div>
-        <div class="offre-sub">Diagnostic complet · Livré en 1 semaine</div>
-        <div class="offre-features">
-          <div class="of of-ok"><div class="of-dot">✓</div><span>Audit de vos données et processus</span></div>
-          <div class="of of-ok"><div class="of-dot">✓</div><span>Identification des 3 leviers IA prioritaires</span></div>
-          <div class="of of-ok"><div class="of-dot">✓</div><span>Roadmap IA chiffrée sur 12 mois</span></div>
-          <div class="of of-ok"><div class="of-dot">✓</div><span>Recommandations stack technique</span></div>
-          <div class="of of-no"><div class="of-dot">–</div><span>Développement</span></div>
-          <div class="of of-no"><div class="of-dot">–</div><span>Déploiement</span></div>
+    <div class="cases-grid">
+
+      <div class="case main rv">
+        <div class="case-logo">🔵 Decathlon · COE Data Governance · 2026</div>
+        <h3>Framework 8 agents — 4 produits IA en 3 mois</h3>
+        <p>Conception d'un framework de développement assisté par IA permettant de concevoir et déployer des outils agentiques à haute cadence. 350 utilisateurs uniques, connecté à Collibra, Databricks, FedID et Google Cloud.</p>
+        <div class="case-results">
+          <div class="cr"><div class="cr-num">4</div><div class="cr-label">produits en prod en 3 mois</div></div>
+          <div class="cr"><div class="cr-num">320</div><div class="cr-label">Business Objects / semaine</div></div>
+          <div class="cr"><div class="cr-num">+12pts</div><div class="cr-label">qualité doc en 3 mois</div></div>
+          <div class="cr"><div class="cr-num">350</div><div class="cr-label">utilisateurs uniques</div></div>
         </div>
-        <a href="#cta-final" class="btn btn-g" style="width:100%;justify-content:center">Demander un audit →</a>
+        <div class="case-projects">
+          <div class="cp">
+            <div class="cp-name">BO Analyser</div>
+            <div class="cp-desc">Plateforme connectée à Collibra — analyse 320 Business Objects/semaine automatiquement</div>
+          </div>
+          <div class="cp">
+            <div class="cp-name">AI Compass</div>
+            <div class="cp-desc">Assistant conformité EU AI Act — classification des risques IA et plan d'actions</div>
+          </div>
+          <div class="cp">
+            <div class="cp-name">DataGov Discovery</div>
+            <div class="cp-desc">Chatbot connecté au data dictionnaire — requêtage des assets data en langage naturel</div>
+          </div>
+          <div class="cp">
+            <div class="cp-name">Notebook Documenter</div>
+            <div class="cp-desc">Agent de documentation technique automatisée interconnecté à Databricks</div>
+          </div>
+        </div>
       </div>
 
-      <div class="offre pop rv d1">
-        <div class="pop-label">Populaire</div>
-        <div class="offre-name">Mission Projet</div>
-        <div class="offre-price gt">Sur devis</div>
-        <div class="offre-sub">Forfait au projet · 4 à 8 semaines</div>
-        <div class="offre-features">
-          <div class="of of-ok"><div class="of-dot">✓</div><span>Audit inclus + stratégie</span></div>
-          <div class="of of-ok"><div class="of-dot">✓</div><span>Développement IA complet</span></div>
-          <div class="of of-ok"><div class="of-dot">✓</div><span>Déploiement en production</span></div>
-          <div class="of of-ok"><div class="of-dot">✓</div><span>Documentation & formation</span></div>
-          <div class="of of-ok"><div class="of-dot">✓</div><span>Support 1 mois post-livraison</span></div>
-          <div class="of of-ok"><div class="of-dot">✓</div><span>ROI garanti contractuellement</span></div>
+      <div class="case rv d1">
+        <div class="case-logo">🔵 Decathlon · Industry · 2023–2026</div>
+        <h3>Plateforme GenAI & Gouvernance data critique</h3>
+        <p>De 0 à 50 Business Objects pilotés et mis en qualité sur 5 sous-domaines critiques (Suppliers, composants, matières premières, food, traçabilité). Animation de 12 personnes.</p>
+        <div class="case-results">
+          <div class="cr"><div class="cr-num">+20%</div><div class="cr-label">productivité offers managers</div></div>
+          <div class="cr"><div class="cr-num">0→50</div><div class="cr-label">Business Objects pilotés</div></div>
+          <div class="cr"><div class="cr-num">12</div><div class="cr-label">personnes animées</div></div>
         </div>
-        <a href="#cta-final" class="btn btn-p" style="width:100%;justify-content:center">Discuter de mon projet →</a>
       </div>
 
-      <div class="offre rv d2">
-        <div class="offre-name">Mission Régie</div>
-        <div class="offre-price" style="font-family:'Syne',sans-serif;font-size:40px;font-weight:800">TJM</div>
-        <div class="offre-sub">Tarif journalier · Minimum 10 jours</div>
-        <div class="offre-features">
-          <div class="of of-ok"><div class="of-dot">✓</div><span>Intégration dans votre équipe</span></div>
-          <div class="of of-ok"><div class="of-dot">✓</div><span>Flexibilité totale sur le périmètre</span></div>
-          <div class="of of-ok"><div class="of-dot">✓</div><span>Reporting hebdomadaire</span></div>
-          <div class="of of-ok"><div class="of-dot">✓</div><span>Idéal pour les projets évolutifs</span></div>
-          <div class="of of-ok"><div class="of-dot">✓</div><span>Possible full-remote ou sur site</span></div>
-          <div class="of of-no"><div class="of-dot">–</div><span>Engagement durée fixe</span></div>
+      <div class="case rv d2">
+        <div class="case-logo">🟡 Adeo · Recommandation · 2022–2023</div>
+        <h3>Système de recommandation e-commerce multi-BU</h3>
+        <p>A/B tests algorithmiques vs knowledge graph sur des BU internationales. Équipe de 12 personnes incluant data scientists, data engineers, devs et UX.</p>
+        <div class="case-results">
+          <div class="cr"><div class="cr-num">+15%</div><div class="cr-label">taux de conversion</div></div>
+          <div class="cr"><div class="cr-num">+22%</div><div class="cr-label">ajout au panier</div></div>
         </div>
-        <a href="#cta-final" class="btn btn-g" style="width:100%;justify-content:center">Discuter du TJM →</a>
       </div>
-    </div>
-  </div>
-</section>
 
-<!-- PROCESS -->
-<section id="process">
-  <div class="c">
-    <div class="sh rv">
-      <div class="tag">Ma méthode</div>
-      <h2>Du premier appel<br/><span class="gt">aux résultats en production</span></h2>
-      <p>Un processus rodé sur 50+ projets. Pas de surprise, pas de dérive de scope, des livrables concrets à chaque étape.</p>
-    </div>
-    <div class="proc-grid">
-      <div class="proc rv">
-        <div class="proc-num" style="background:linear-gradient(135deg,rgba(108,99,255,.2),rgba(108,99,255,.05));color:#b3adff">01</div>
-        <div>
-          <h3>Appel découverte — Gratuit</h3>
-          <p>30 minutes pour comprendre votre situation, vos données disponibles et vos objectifs. Je vous dis honnêtement si je peux vous aider et comment.</p>
-          <div class="proc-detail">→ Délai : sous 24h après demande</div>
-        </div>
-      </div>
-      <div class="proc rv d1">
-        <div class="proc-num" style="background:linear-gradient(135deg,rgba(0,212,255,.2),rgba(0,212,255,.05));color:var(--a2)">02</div>
-        <div>
-          <h3>Audit & Proposition — Semaine 1</h3>
-          <p>J'analyse vos données, vos processus et vos contraintes. Je vous remets une proposition détaillée avec scope, délais, budget et métriques de succès.</p>
-          <div class="proc-detail">→ Livrable : Proposition signée</div>
-        </div>
-      </div>
-      <div class="proc rv d2">
-        <div class="proc-num" style="background:linear-gradient(135deg,rgba(255,77,166,.2),rgba(255,77,166,.05));color:var(--a3)">03</div>
-        <div>
-          <h3>Prototype validé — Semaine 2</h3>
-          <p>Avant de développer le système complet, je livre un prototype sur vos vraies données. Vous validez que la direction est bonne avant d'investir.</p>
-          <div class="proc-detail">→ Livrable : POC fonctionnel</div>
-        </div>
-      </div>
-      <div class="proc rv d3">
-        <div class="proc-num" style="background:linear-gradient(135deg,rgba(0,255,135,.15),rgba(0,255,135,.03));color:var(--a4)">04</div>
-        <div>
-          <h3>Livraison & Suivi — Semaine 4-8</h3>
-          <p>Développement, tests, déploiement, formation. Je reste disponible après la livraison pour m'assurer que les métriques sont au rendez-vous.</p>
-          <div class="proc-detail">→ Livrable : Système en prod + Dashboard ROI</div>
-        </div>
-      </div>
     </div>
   </div>
 </section>
@@ -560,72 +560,83 @@
     <div class="stats-box rv">
       <div class="stat">
         <div class="sn gt" id="s1">0</div>
-        <div class="sl">Projets livrés</div>
+        <div class="sl">Années en freelance grands comptes</div>
         <div class="sd"></div>
       </div>
       <div class="stat">
         <div class="sn gt" id="s2">0</div>
-        <div class="sl">ROI moyen client</div>
+        <div class="sl">Agents IA déployés en prod (2026)</div>
         <div class="sd"></div>
       </div>
       <div class="stat">
         <div class="sn gt" id="s3">0</div>
-        <div class="sl">Clients satisfaits</div>
+        <div class="sl">Abonnés LinkedIn</div>
         <div class="sd"></div>
       </div>
       <div class="stat">
         <div class="sn gt" id="s4">0</div>
-        <div class="sl">Années d'expertise</div>
+        <div class="sl">Budget FinOps géré (Adeo)</div>
       </div>
     </div>
   </div>
 </section>
 
-<!-- TESTIMONIALS -->
-<section id="testimonials">
+<!-- OFFRES -->
+<section id="offres">
   <div class="c">
     <div class="sh rv">
-      <div class="tag">Ce qu'ils disent</div>
-      <h2>Des clients qui parlent<br/><span class="gt">à ma place</span></h2>
-      <p>Des retours concrets sur des projets réels — avec les chiffres qui vont avec.</p>
+      <div class="tag">Mes formules</div>
+      <h2>Trois façons de<br/><span class="gt">travailler ensemble</span></h2>
+      <p>Audit ponctuel, projet forfait ou mission longue durée — on adapte le cadre à votre situation.</p>
     </div>
-    <div class="tg">
-      <div class="tc hl rv">
-        <div class="stars">★★★★★</div>
-        <div class="tc-result">+320% productivité service client</div>
-        <p class="tc-text">"Renaud a su comprendre notre métier rapidement et livrer un agent IA qui gère 80% de nos tickets. Autonome, carré, orienté résultats. Exactement ce qu'on cherchait."</p>
-        <div class="tc-author">
-          <div class="av-big" style="background:linear-gradient(135deg,var(--a),var(--a2))">SL</div>
-          <div>
-            <div class="ta-name">Sophie Laurent</div>
-            <div class="ta-role">CDO · Retail Group · 1 200 salariés</div>
-          </div>
+    <div class="offres-grid">
+
+      <div class="offre rv">
+        <div class="offre-name">Audit IA</div>
+        <div class="offre-price gt2">1 500€</div>
+        <div class="offre-sub">Diagnostic · Livré en 1 semaine</div>
+        <div class="offre-features">
+          <div class="of of-ok"><div class="of-dot">✓</div><span>Analyse de vos données et processus</span></div>
+          <div class="of of-ok"><div class="of-dot">✓</div><span>Identification des opportunités IA prioritaires</span></div>
+          <div class="of of-ok"><div class="of-dot">✓</div><span>Évaluation "AI ready" vs "Data first"</span></div>
+          <div class="of of-ok"><div class="of-dot">✓</div><span>Roadmap chiffrée sur 12 mois</span></div>
+          <div class="of of-ok"><div class="of-dot">✓</div><span>Recommandations stack technique</span></div>
+          <div class="of of-no"><div class="of-dot">–</div><span>Développement inclus</span></div>
         </div>
+        <a href="#cta-final" class="btn btn-g" style="width:100%;justify-content:center">Demander un audit →</a>
       </div>
-      <div class="tc rv d1">
-        <div class="stars">★★★★★</div>
-        <div class="tc-result">-62% coûts logistiques en 6 mois</div>
-        <p class="tc-text">"Ce qui m'a convaincu avec Renaud c'est qu'il a dit non à 2 idées que j'avais — et il avait raison. Il ne cherche pas à facturer, il cherche à avoir de l'impact."</p>
-        <div class="tc-author">
-          <div class="av-big" style="background:linear-gradient(135deg,var(--a2),var(--a4))">TM</div>
-          <div>
-            <div class="ta-name">Thomas Mercier</div>
-            <div class="ta-role">VP Supply Chain · E-commerce · 50M€ CA</div>
-          </div>
+
+      <div class="offre pop rv d1">
+        <div class="pop-label">Recommandé</div>
+        <div class="offre-name">Mission Projet</div>
+        <div class="offre-price gt">Sur devis</div>
+        <div class="offre-sub">Forfait · 4 à 10 semaines</div>
+        <div class="offre-features">
+          <div class="of of-ok"><div class="of-dot">✓</div><span>Cadrage désirabilité / faisabilité / rentabilité</span></div>
+          <div class="of of-ok"><div class="of-dot">✓</div><span>Développement agentique complet</span></div>
+          <div class="of of-ok"><div class="of-dot">✓</div><span>Déploiement GCP ou AWS en production</span></div>
+          <div class="of of-ok"><div class="of-dot">✓</div><span>Intégration à vos outils existants</span></div>
+          <div class="of of-ok"><div class="of-dot">✓</div><span>Formation de vos équipes</span></div>
+          <div class="of of-ok"><div class="of-dot">✓</div><span>Métriques de succès garanties contractuellement</span></div>
         </div>
+        <a href="#cta-final" class="btn btn-p" style="width:100%;justify-content:center">Discuter de mon projet →</a>
       </div>
-      <div class="tc rv d2">
-        <div class="stars">★★★★★</div>
-        <div class="tc-result">Architecture data 0 → prod en 5 semaines</div>
-        <p class="tc-text">"Qualité de code exemplaire, communication irréprochable, livrables dans les temps. Renaud s'est comporté comme un vrai membre de l'équipe, pas comme un prestataire."</p>
-        <div class="tc-author">
-          <div class="av-big" style="background:linear-gradient(135deg,var(--a3),#cc2d7a)">AR</div>
-          <div>
-            <div class="ta-name">Amina Rachidi</div>
-            <div class="ta-role">CTO · HealthTech · Série A</div>
-          </div>
+
+      <div class="offre rv d2">
+        <div class="offre-name">Mission Régie</div>
+        <div class="offre-price" style="font-family:'Syne',sans-serif;font-size:38px;font-weight:800">TJM</div>
+        <div class="offre-sub">Régie · Minimum 10 jours</div>
+        <div class="offre-features">
+          <div class="of of-ok"><div class="of-dot">✓</div><span>Intégration dans votre équipe produit / data</span></div>
+          <div class="of of-ok"><div class="of-dot">✓</div><span>Périmètre flexible et évolutif</span></div>
+          <div class="of of-ok"><div class="of-dot">✓</div><span>Full-remote ou sur site (Lille / France)</span></div>
+          <div class="of of-ok"><div class="of-dot">✓</div><span>Profil PI Planning SAFe si besoin</span></div>
+          <div class="of of-ok"><div class="of-dot">✓</div><span>Reporting OKR hebdomadaire</span></div>
+          <div class="of of-no"><div class="of-dot">–</div><span>Engagement durée fixe</span></div>
         </div>
+        <a href="#cta-final" class="btn btn-g" style="width:100%;justify-content:center">Discuter du TJM →</a>
       </div>
+
     </div>
   </div>
 </section>
@@ -635,50 +646,50 @@
   <div class="c">
     <div class="sh rv">
       <div class="tag">Questions fréquentes</div>
-      <h2>Vos questions,<br/><span class="gt">mes réponses directes</span></h2>
+      <h2>Ce que les clients<br/><span class="gt">me demandent toujours</span></h2>
     </div>
     <div class="faq-list">
       <div class="faq-item rv">
         <div class="faq-q" onclick="toggleFaq(this)">
-          <span>Vous êtes disponible pour une mission qui commence quand ?</span>
+          <span>Vous travaillez sur quels types de projets ?</span>
           <div class="faq-icon">+</div>
         </div>
-        <div class="faq-a"><div class="faq-a-inner">Je suis généralement disponible sous 1 à 2 semaines. La meilleure façon de savoir est de réserver un appel — on verra ensemble si les dates correspondent. Je travaille sur un nombre limité de projets simultanément pour garantir la qualité.</div></div>
+        <div class="faq-a"><div class="faq-a-inner">Principalement du développement agentique (agents IA autonomes, chatbots connectés à vos données, automatisation de workflows), de la data governance et du product management IA. Ma zone de confort : les environnements complexes avec des données hétérogènes et des contraintes métier fortes — exactement le contexte Decathlon/Adeo dans lequel j'évolue depuis 8 ans.</div></div>
       </div>
       <div class="faq-item rv d1">
         <div class="faq-q" onclick="toggleFaq(this)">
-          <span>Remote ou présentiel ?</span>
+          <span>Vous êtes basé à Lille — vous travaillez aussi à distance ?</span>
           <div class="faq-icon">+</div>
         </div>
-        <div class="faq-a"><div class="faq-a-inner">Les deux. Je travaille majoritairement en remote, ce qui me permet d'intervenir partout en France et en Europe. Des déplacements ponctuels sur site sont toujours possibles pour les lancements de projet ou les ateliers stratégiques. On adapte selon vos besoins.</div></div>
+        <div class="faq-a"><div class="faq-a-inner">Oui, majoritairement en remote. J'interviens sur des projets partout en France et en Europe. Des déplacements ponctuels sur site sont possibles pour les ateliers de cadrage ou les PI Planning. Mon expérience chez Adeo et Decathlon est entièrement en mode hybride.</div></div>
       </div>
       <div class="faq-item rv d2">
         <div class="faq-q" onclick="toggleFaq(this)">
-          <span>Puis-je vous confier mes données ? Elles sont confidentielles.</span>
+          <span>Comment vous différenciez-vous d'une agence IA classique ?</span>
           <div class="faq-icon">+</div>
         </div>
-        <div class="faq-a"><div class="faq-a-inner">Absolument. Je signe systématiquement un NDA avant toute transmission de données. Vos données ne sont jamais utilisées à d'autres fins que votre projet. Je suis en mesure de travailler dans des environnements cloisonnés et je suis RGPD-compliant.</div></div>
+        <div class="faq-a"><div class="faq-a-inner">Je combine trois profils rares en un : entrepreneur (j'ai créé et revendu une agence), product manager senior (8 ans sur des backlog data/IA chez des leaders du retail) et développeur IA (je code, je déploie, je monitore). Vous n'avez pas un chef de projet qui transmet à une équipe offshore — vous avez l'expert directement. Et j'ai un biais fort pour le "Data first" : si votre projet n'est pas AI-ready, je vous le dis avant de démarrer.</div></div>
       </div>
       <div class="faq-item rv">
         <div class="faq-q" onclick="toggleFaq(this)">
-          <span>Que se passe-t-il si les résultats ne sont pas au rendez-vous ?</span>
+          <span>Qu'est-ce que l'EU AI Act change pour mon projet ?</span>
           <div class="faq-icon">+</div>
         </div>
-        <div class="faq-a"><div class="faq-a-inner">Je définis des métriques de succès avec vous avant de démarrer et je m'y engage contractuellement. Si les objectifs ne sont pas atteints à la livraison, je continue d'itérer sans surcoût jusqu'à ce qu'ils le soient. Je ne prends pas de mission si je ne suis pas convaincu de pouvoir tenir ces métriques.</div></div>
+        <div class="faq-a"><div class="faq-a-inner">L'EU AI Act impose une classification des systèmes IA par niveau de risque et des obligations de documentation, de transparence et de supervision humaine. J'ai développé AI Compass chez Decathlon, un POC d'assistant de conformité EU AI Act. Je peux auditer vos projets IA existants, les classifier et établir un plan d'actions pour vous mettre en conformité avant les échéances réglementaires.</div></div>
       </div>
       <div class="faq-item rv d1">
         <div class="faq-q" onclick="toggleFaq(this)">
-          <span>Avez-vous une expérience dans mon secteur ?</span>
+          <span>Quelle est votre disponibilité actuelle ?</span>
           <div class="faq-icon">+</div>
         </div>
-        <div class="faq-a"><div class="faq-a-inner">J'ai travaillé dans le retail, la logistique, la fintech, la santé, l'industrie et les services. La data et l'IA ont des patterns récurrents quel que soit le secteur. Ce qui compte, c'est de bien comprendre votre métier — et ça, c'est la première chose que je fais dès l'appel découverte.</div></div>
+        <div class="faq-a"><div class="faq-a-inner">Je suis actuellement en mission chez Decathlon, mais je reste disponible pour de nouveaux projets en parallèle ou à venir. La meilleure façon de le savoir : un appel de 30 minutes pour cadrer votre besoin et voir comment je peux m'organiser. Je travaille sur un nombre limité de projets simultanément pour garantir la qualité.</div></div>
       </div>
       <div class="faq-item rv d2">
         <div class="faq-q" onclick="toggleFaq(this)">
-          <span>Quel est votre TJM ?</span>
+          <span>Mes données sont-elles en sécurité ?</span>
           <div class="faq-icon">+</div>
         </div>
-        <div class="faq-a"><div class="faq-a-inner">Mon TJM varie selon la nature de la mission, la durée et le niveau d'expertise requis. Je travaille aussi bien en forfait projet qu'en régie. Pour obtenir un chiffre précis, le plus simple est qu'on en parle — 30 minutes suffisent pour cadrer une proposition adaptée à votre budget.</div></div>
+        <div class="faq-a"><div class="faq-a-inner">Absolument. Je signe systématiquement un NDA avant tout partage de données. J'ai l'habitude de travailler avec des données critiques (données fournisseurs, composants, food chez Decathlon) dans des environnements sécurisés. Je suis RGPD-compliant et habitué aux contraintes de conformité des grands groupes.</div></div>
       </div>
     </div>
   </div>
@@ -691,17 +702,17 @@
       <div class="cta-g1"></div>
       <div class="cta-g2"></div>
       <div class="tag" style="justify-content:center">Parlons-en</div>
-      <h2>30 minutes pour savoir<br/><span class="gt">si je peux vraiment vous aider</span></h2>
-      <p>Un appel sans engagement, sans pitch commercial. Je vous pose des questions, j'écoute votre situation et je vous dis franchement ce que je pense être faisable — et ce qui ne l'est pas.</p>
+      <h2>Un appel de 30 min pour<br/><span class="gt">savoir si je peux vous aider</span></h2>
+      <p>Je vous pose des questions sur votre situation, vos données et vos objectifs. Je vous dis ce qui est faisable, ce qui ne l'est pas, et ce que je ferais en premier si j'étais vous.</p>
       <div class="cta-chips">
-        <div class="chip">100% gratuit</div>
-        <div class="chip">Sans engagement</div>
+        <div class="chip">Gratuit & sans engagement</div>
         <div class="chip">Réponse sous 24h</div>
-        <div class="chip">Vous parlez à moi directement</div>
+        <div class="chip">Vous parlez directement à Renaud</div>
+        <div class="chip">NDA signable immédiatement</div>
       </div>
       <div class="cta-btns">
-        <a href="mailto:renaud.secq@gmail.com" class="btn btn-p btn-lg">Envoyer un message →</a>
-        <a href="mailto:renaud.secq@gmail.com" class="btn btn-w btn-lg">renaud.secq@gmail.com</a>
+        <a href="mailto:renaudsecq@gmail.com" class="btn btn-p btn-lg">Envoyer un message →</a>
+        <a href="https://www.linkedin.com/in/renaud-secq-5593832a/" target="_blank" class="btn btn-w btn-lg">LinkedIn (20k)</a>
       </div>
     </div>
   </div>
@@ -712,38 +723,41 @@
   <div class="c">
     <div class="fg">
       <div>
-        <a class="logo" href="#">Renaud Secq</a>
-        <p class="fb-desc">Consultant freelance IA & Data. J'aide les entreprises à transformer leurs données en systèmes intelligents qui créent de la valeur réelle.</p>
+        <a class="logo" href="#" style="display:inline-flex;flex-direction:column;margin-bottom:4px">
+          <span class="logo-name">MIA</span>
+          <span class="logo-sub">par Renaud Secq</span>
+        </a>
+        <p class="fb-desc">Accélération IA & Data. Développement agentique, Data Governance, Product IA. Basé à Lompret (Lille), actif partout en France.</p>
         <div class="soc">
-          <a class="sl-link" href="#" aria-label="LinkedIn">in</a>
-          <a class="sl-link" href="#" aria-label="Twitter">𝕏</a>
-          <a class="sl-link" href="#" aria-label="GitHub">⌥</a>
-          <a class="sl-link" href="mailto:renaud.secq@gmail.com" aria-label="Email">@</a>
+          <a class="sl-link" href="https://www.linkedin.com/in/renaud-secq-5593832a/" target="_blank" title="LinkedIn">in</a>
+          <a class="sl-link" href="mailto:renaudsecq@gmail.com" title="Email">@</a>
+          <a class="sl-link" href="tel:0664997359" title="Téléphone">☎</a>
         </div>
       </div>
       <div class="fc">
         <h4>Services</h4>
         <ul class="fl">
-          <li><a href="#services">IA Générative</a></li>
-          <li><a href="#services">Machine Learning</a></li>
-          <li><a href="#services">Data Engineering</a></li>
-          <li><a href="#services">Business Intelligence</a></li>
-          <li><a href="#services">Audit & Stratégie</a></li>
+          <li><a href="#services">Développement Agentique</a></li>
+          <li><a href="#services">Data Governance</a></li>
+          <li><a href="#services">Product Management IA</a></li>
+          <li><a href="#services">Architecture Cloud IA</a></li>
+          <li><a href="#services">EU AI Act</a></li>
         </ul>
       </div>
       <div class="fc">
         <h4>Contact</h4>
         <ul class="fl">
-          <li><a href="mailto:renaud.secq@gmail.com">renaud.secq@gmail.com</a></li>
-          <li><a href="#">LinkedIn</a></li>
-          <li><a href="#">France · Remote</a></li>
+          <li><a href="mailto:renaudsecq@gmail.com">renaudsecq@gmail.com</a></li>
+          <li><a href="tel:0664997359">06 64 99 73 59</a></li>
+          <li><a href="#">Lompret · Lille · Remote</a></li>
+          <li><a href="https://www.linkedin.com/in/renaud-secq-5593832a/" target="_blank">LinkedIn (20k abonnés)</a></li>
           <li><a href="#cta-final">Réserver un appel</a></li>
         </ul>
       </div>
     </div>
     <div class="fb">
-      <span>© 2026 Renaud Secq — Consultant Freelance IA & Data. Tous droits réservés.</span>
-      <div class="status"><div class="dot-s"></div><span>Disponible pour de nouvelles missions</span></div>
+      <span>© 2026 MIA · Renaud Secq — Head of AI Acceleration. Tous droits réservés.</span>
+      <div class="status-pill"><div class="dot-s"></div><span>Disponible pour de nouvelles missions</span></div>
     </div>
   </div>
 </footer>
@@ -791,11 +805,17 @@ let counted=false;
 new IntersectionObserver(e=>{
   if(e[0].isIntersecting&&!counted){
     counted=true;
-    [[s1,50,'+'],[s2,4,'×',1],[s3,98,'%'],[s4,6,'+']].forEach(([el,t,sfx,dec=0])=>{
+    const items=[
+      [document.getElementById('s1'),8,'+'],
+      [document.getElementById('s2'),4,''],
+      [document.getElementById('s3'),20,'k'],
+      [document.getElementById('s4'),2,'M€']
+    ];
+    items.forEach(([el,t,sfx])=>{
       const dur=1800,start=performance.now();
       (function tick(now){
         const p=Math.min((now-start)/dur,1),ease=1-Math.pow(1-p,3);
-        el.textContent=(t*ease).toFixed(dec)+sfx;
+        el.textContent=Math.floor(t*ease)+sfx;
         if(p<1)requestAnimationFrame(tick);
       })(start);
     });
