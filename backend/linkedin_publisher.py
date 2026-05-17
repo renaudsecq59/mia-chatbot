@@ -29,36 +29,79 @@ claude = Anthropic(api_key=ANTHROPIC_API_KEY) if ANTHROPIC_API_KEY else None
 
 EDITO_PROMPT = """Tu es le ghostwriter LinkedIn de {name}, {title}.
 
-CONTEXTE : C'est l'édito hebdomadaire de sa veille IA & Data. Tu dois rédiger UN SEUL post LinkedIn 
-qui synthétise les tendances de la semaine et donne envie de lire la veille complète.
+CONTEXTE : Chaque semaine, Renaud publie un post LinkedIn basé sur sa veille IA & Data.
+L'objectif : le positionner comme EXPERT reconnu, PAS comme curateur de contenu.
 
-ARTICLES DE LA SEMAINE (top {count}) :
+ARTICLES LUS CETTE SEMAINE (contexte, ne pas citer directement) :
 {articles_summary}
 
 TENDANCES DÉTECTÉES : {trends}
 
-RÈGLES DU POST :
-- Hook percutant en 1ère ligne (visible avant "voir plus") — pose une question ou une affirmation forte
-- 3-4 paragraphes courts : tendances clés, ce que ça change, son avis d'expert
-- Terminer par un CTA vers le site de veille : {site_url}
-- 4-6 hashtags pertinents en fin de post
-- Max 2-3 emojis, pas plus
-- Ton : expert terrain qui partage ses découvertes, pas corporate
-- Max 1500 caractères
-- NE PAS lister les articles un par un, faire une SYNTHÈSE éditoriale
+TYPE DE POST CETTE SEMAINE : {post_type}
+
+=== SI TYPE = OBSERVATEUR (génère des partages) ===
+Structure :
+- Hook = observation terrain contre-intuitive que personne n'ose dire
+- 2-3 paragraphes : développement avec exemples concrets
+- Question ouverte finale pour créer le débat
+
+=== SI TYPE = VULGARISATEUR (génère des saves) ===
+Structure :
+- Hook = concept complexe promis en version simple
+- Analogie du quotidien
+- Application concrète
+- Une phrase à retenir
+
+=== SI TYPE = QUESTIONNEUR (génère des commentaires) ===
+Structure :
+- Hook = question polarisante qui divise
+- Point de vue nuancé de Renaud
+- Invitation explicite à donner son avis
+
+RÈGLES ABSOLUES :
+- Max 150 mots. Phrases de max 15 mots.
+- Un paragraphe = une idée. Sauts de ligne entre chaque.
+- Opinion TRANCHÉE. Quelqu'un doit pouvoir être en désaccord.
+- Ton direct : "Je pense", "J'ai vu", "Mon expérience". Pas de conditionnel.
+- ZÉRO auto-promo. NE PAS dire "ma veille", "ma sélection", "mon site".
+- 0 à 2 emojis max. JAMAIS en début de ligne.
+- Pas de "game-changer", "révolutionnaire", "incroyable". Préfère "utile", "concret", "j'ai testé".
+- Le lien {site_url} doit apparaître UNE SEULE fois, intégré naturellement (pas en CTA).
+- 3-4 hashtags max, spécifiques (pas #IA tout seul).
+- NE PAS lister les articles. Le post s'inspire de la veille sans la résumer.
+
+CHECKLIST AVANT DE RÉPONDRE :
+- [ ] Le hook arrêterait MON scroll si c'était quelqu'un d'autre ?
+- [ ] Pas de mention de produit/outil que Renaud vend ?
+- [ ] Opinion claire et assumée ?
+- [ ] Quelqu'un pourrait être en désaccord ?
+- [ ] Moins de 150 mots ?
+- [ ] Question finale qui invite au commentaire ?
 
 RÉPONDS EN JSON STRICT :
 {{
-  "post_text": "Le post LinkedIn complet prêt à publier",
-  "hook": "La première ligne seule",
-  "hashtags": ["#tag1", "#tag2"]
+  "post_text": "Le post complet prêt à publier",
+  "hook": "La première ligne seule (sans emoji)",
+  "post_type": "{post_type}",
+  "hashtags": ["#tag1", "#tag2", "#tag3"],
+  "word_count": 0
 }}"""
 
+POST_TYPES = ["observateur", "vulgarisateur", "questionneur"]
 
-def generate_weekly_edito(articles: list[dict], trends: list[str] = None) -> dict:
+
+def _pick_post_type() -> str:
+    """Alterne le type de post chaque semaine (observateur → vulgarisateur → questionneur)."""
+    week_number = datetime.now(timezone.utc).isocalendar()[1]
+    return POST_TYPES[week_number % len(POST_TYPES)]
+
+
+def generate_weekly_edito(articles: list[dict], trends: list[str] = None, post_type: str = None) -> dict:
     """Génère l'édito LinkedIn hebdomadaire à partir des meilleurs articles."""
     if not articles:
         return {"error": "Aucun article pour générer l'édito"}
+
+    post_type = post_type or _pick_post_type()
 
     # Préparer le résumé des articles pour Claude
     articles_summary = ""
@@ -73,15 +116,15 @@ def generate_weekly_edito(articles: list[dict], trends: list[str] = None) -> dic
 
     if not claude:
         logger.warning("⚠️ ANTHROPIC_API_KEY non configurée, édito simulé")
-        return _mock_edito(articles, trends_str)
+        return _mock_edito(articles, trends_str, post_type)
 
     try:
         prompt = EDITO_PROMPT.format(
             name=EXPERT_PROFILE["name"],
             title=EXPERT_PROFILE["title"],
-            count=len(articles[:10]),
             articles_summary=articles_summary,
             trends=trends_str,
+            post_type=post_type,
             site_url=SITE_URL,
         )
 
@@ -94,14 +137,15 @@ def generate_weekly_edito(articles: list[dict], trends: list[str] = None) -> dic
         result = json.loads(response.content[0].text)
         result["generated_at"] = datetime.now(timezone.utc).isoformat()
         result["article_count"] = len(articles)
+        result["post_type"] = post_type
         result["status"] = "generated"
 
-        logger.info(f"📝 Édito LinkedIn généré ({len(result['post_text'])} chars)")
+        logger.info(f"📝 Édito LinkedIn [{post_type}] généré ({len(result['post_text'])} chars, {result.get('word_count', '?')} mots)")
         return result
 
     except Exception as e:
         logger.error(f"❌ Erreur génération édito: {e}")
-        return _mock_edito(articles, trends_str)
+        return _mock_edito(articles, trends_str, post_type)
 
 
 def publish_to_linkedin(post_text: str) -> dict:
@@ -192,28 +236,67 @@ def publish_to_linkedin(post_text: str) -> dict:
         }
 
 
-def _mock_edito(articles: list[dict], trends: str) -> dict:
-    """Édito simulé pour tests sans API key."""
-    top_titles = [a["title"][:60] for a in articles[:5]]
-    sources = list(set(a.get("source_name", "") for a in articles[:10]))
+def _mock_edito(articles: list[dict], trends: str, post_type: str = "observateur") -> dict:
+    """Édito simulé pour tests sans API key. 3 templates selon le type."""
+    mock_posts = {
+        "observateur": {
+            "hook": "J'ai vu 30 entreprises déployer des agents IA cette année. La moitié n'a pas de data governance.",
+            "post_text": f"""J'ai vu 30 entreprises déployer des agents IA cette année. La moitié n'a pas de data governance.
 
-    post_text = f"""Cette semaine dans ma veille IA & Data, 3 signaux forts à retenir.
+Le résultat : des hallucinations en production, des données sensibles qui fuient, et 6 mois perdus à corriger.
 
-Les plateformes cloud accélèrent sur l'IA agentique. Google Cloud, AWS et Databricks ont tous annoncé des avancées majeures sur leurs outils d'IA en entreprise.
+Le problème n'est pas la techno. AWS, Databricks, Vertex AI — les outils sont matures. Le problème, c'est qu'on donne accès à des données qu'on ne maîtrise pas.
 
-Côté gouvernance, la question de la souveraineté des données revient en force — et ce n'est pas qu'un sujet réglementaire, c'est un enjeu business concret.
+Mon observation terrain : les boîtes qui réussissent ont structuré leur gouvernance AVANT de brancher l'IA. Pas après.
 
-Mon take : les entreprises qui ne structurent pas leur data governance AVANT de déployer leurs agents IA vont perdre 6 à 12 mois.
+Plus de détails dans les sources que je compile chaque semaine → {SITE_URL}
 
-Ma sélection complète ({len(articles)} articles, {len(sources)} sources) 👇
-{SITE_URL}
+Et vous, vous déployez vos agents sur des données gouvernées ?
 
-#IA #DataGovernance #AIAgents #EntrepriseIA #VeilleIA"""
+#DataGovernance #AIAgents #IAenEntreprise""",
+            "hashtags": ["#DataGovernance", "#AIAgents", "#IAenEntreprise"],
+        },
+        "vulgarisateur": {
+            "hook": "L'AI Act expliqué comme un permis de conduire.",
+            "post_text": f"""L'AI Act expliqué comme un permis de conduire.
 
+Votre voiture (= votre IA) peut rouler. Mais il faut un permis (= conformité), une assurance (= gestion des risques), et un contrôle technique (= audit régulier).
+
+Un système IA "haut risque", c'est comme conduire un bus scolaire. Plus de responsabilité, plus de contrôles.
+
+La phrase à retenir : l'AI Act ne vous interdit pas d'innover. Il vous demande de savoir ce que vous faites.
+
+J'en parle plus en détail ici → {SITE_URL}
+
+#AIAct #RéglementationIA #Conformité""",
+            "hashtags": ["#AIAct", "#RéglementationIA", "#Conformité"],
+        },
+        "questionneur": {
+            "hook": "Un Data Catalog sans adoption, ça sert à quoi ?",
+            "post_text": f"""Un Data Catalog sans adoption, ça sert à quoi ?
+
+J'ai vu des équipes passer 18 mois à documenter 100% de leurs assets. Résultat : personne ne l'utilise.
+
+Je pense qu'on se trompe de combat. Mieux vaut 20% des données bien documentées et utilisées que 100% dans un outil que personne n'ouvre.
+
+Le vrai KPI d'un catalogue, c'est le nombre de recherches par semaine. Pas le taux de couverture.
+
+J'explore ce sujet dans mes lectures de la semaine → {SITE_URL}
+
+Vous mesurez quoi, vous, pour évaluer l'adoption ?
+
+#DataCatalog #DataGovernance #DataManagement""",
+            "hashtags": ["#DataCatalog", "#DataGovernance", "#DataManagement"],
+        },
+    }
+
+    post = mock_posts.get(post_type, mock_posts["observateur"])
     return {
-        "post_text": post_text,
-        "hook": "Cette semaine dans ma veille IA & Data, 3 signaux forts à retenir.",
-        "hashtags": ["#IA", "#DataGovernance", "#AIAgents", "#EntrepriseIA", "#VeilleIA"],
+        "post_text": post["post_text"],
+        "hook": post["hook"],
+        "post_type": post_type,
+        "hashtags": post["hashtags"],
+        "word_count": len(post["post_text"].split()),
         "generated_at": datetime.now(timezone.utc).isoformat(),
         "article_count": len(articles),
         "status": "mock",
