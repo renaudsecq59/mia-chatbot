@@ -22,13 +22,15 @@ MAX_ARTICLE_AGE_DAYS = 7
 # Profil expert
 EXPERT_PROFILE = {
     "name": "Renaud Secq",
-    "title": "Consultant Freelance IA & Data",
+    "title": "Consultant Freelance IA & Data — Builder & Strategist",
     "expertise": [
-        "Développement agentique & multi-agents",
-        "Data & AI Governance (Collibra, EU AI Act)",
-        "Product Management IA"
+        "Mise en place de solutions IA end-to-end (Vertex AI, AWS, Databricks, agents IA)",
+        "Architecture data & plateformes cloud (Snowflake, BigQuery, data pipelines)",
+        "Data & AI Governance (Collibra, catalogues, qualité, EU AI Act)",
+        "Management d'équipes tech & data, pilotage de programmes",
+        "Stratégie IA en entreprise (ROI, adoption, change management)",
     ],
-    "tone": "Expert pragmatique, orienté business. Vulgarise sans simplifier. Donne des avis tranchés basés sur l'expérience terrain.",
+    "tone": "Expert terrain qui build ET qui gouverne. Parle autant code que stratégie. Avis tranchés, pas de bullshit.",
     "linkedin_url": "https://www.linkedin.com/in/renaud-secq-5593832a/",
     "photo_url": "photo-000.jpg"
 }

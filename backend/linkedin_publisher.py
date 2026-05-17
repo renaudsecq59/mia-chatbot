@@ -240,53 +240,55 @@ def _mock_edito(articles: list[dict], trends: str, post_type: str = "observateur
     """Édito simulé pour tests sans API key. 3 templates selon le type."""
     mock_posts = {
         "observateur": {
-            "hook": "J'ai vu 30 entreprises déployer des agents IA cette année. La moitié n'a pas de data governance.",
-            "post_text": f"""J'ai vu 30 entreprises déployer des agents IA cette année. La moitié n'a pas de data governance.
+            "hook": "On me demande souvent quel cloud choisir pour l'IA. La vraie réponse : ça n'a aucune importance.",
+            "post_text": f"""On me demande souvent quel cloud choisir pour l'IA. La vraie réponse : ça n'a aucune importance.
 
-Le résultat : des hallucinations en production, des données sensibles qui fuient, et 6 mois perdus à corriger.
+Vertex AI, SageMaker, Databricks — j'ai déployé des modèles sur les trois. Le bottleneck n'est jamais la plateforme.
 
-Le problème n'est pas la techno. AWS, Databricks, Vertex AI — les outils sont matures. Le problème, c'est qu'on donne accès à des données qu'on ne maîtrise pas.
+C'est toujours le même trio : données mal préparées, équipe pas staffée, et zéro mesure de ROI.
 
-Mon observation terrain : les boîtes qui réussissent ont structuré leur gouvernance AVANT de brancher l'IA. Pas après.
+J'ai vu un projet passer de POC à production en 6 semaines. Le secret ? Pas le choix du cloud. Un sponsor business qui savait exactement quel problème résoudre.
 
-Plus de détails dans les sources que je compile chaque semaine → {SITE_URL}
+J'en parle dans mes lectures de la semaine → {SITE_URL}
 
-Et vous, vous déployez vos agents sur des données gouvernées ?
+Vous, c'est quoi le vrai bottleneck de vos projets IA ?
 
-#DataGovernance #AIAgents #IAenEntreprise""",
-            "hashtags": ["#DataGovernance", "#AIAgents", "#IAenEntreprise"],
+#IAenEntreprise #VertexAI #Databricks""",
+            "hashtags": ["#IAenEntreprise", "#VertexAI", "#Databricks"],
         },
         "vulgarisateur": {
-            "hook": "L'AI Act expliqué comme un permis de conduire.",
-            "post_text": f"""L'AI Act expliqué comme un permis de conduire.
+            "hook": "Un agent IA, c'est un stagiaire très rapide avec une mémoire parfaite.",
+            "post_text": f"""Un agent IA, c'est un stagiaire très rapide avec une mémoire parfaite.
 
-Votre voiture (= votre IA) peut rouler. Mais il faut un permis (= conformité), une assurance (= gestion des risques), et un contrôle technique (= audit régulier).
+Il exécute exactement ce que vous lui demandez. Ni plus, ni moins. Si le brief est flou, le résultat sera flou.
 
-Un système IA "haut risque", c'est comme conduire un bus scolaire. Plus de responsabilité, plus de contrôles.
+La différence avec un stagiaire humain : il ne vous dira jamais "j'ai pas compris". Il inventera une réponse.
 
-La phrase à retenir : l'AI Act ne vous interdit pas d'innover. Il vous demande de savoir ce que vous faites.
+C'est pour ça que le vrai travail d'un projet IA, c'est le cadrage. Pas le prompt engineering.
 
-J'en parle plus en détail ici → {SITE_URL}
+Les outils mûrissent vite — j'en parle ici → {SITE_URL}
 
-#AIAct #RéglementationIA #Conformité""",
-            "hashtags": ["#AIAct", "#RéglementationIA", "#Conformité"],
+#AgentsIA #IAenEntreprise #LLM""",
+            "hashtags": ["#AgentsIA", "#IAenEntreprise", "#LLM"],
         },
         "questionneur": {
-            "hook": "Un Data Catalog sans adoption, ça sert à quoi ?",
-            "post_text": f"""Un Data Catalog sans adoption, ça sert à quoi ?
+            "hook": "Faut-il un CTO pour piloter l'IA ou un CDO ?",
+            "post_text": f"""Faut-il un CTO pour piloter l'IA ou un CDO ?
 
-J'ai vu des équipes passer 18 mois à documenter 100% de leurs assets. Résultat : personne ne l'utilise.
+Je manage des équipes data et IA depuis 3 ans. Et la question revient à chaque mission.
 
-Je pense qu'on se trompe de combat. Mieux vaut 20% des données bien documentées et utilisées que 100% dans un outil que personne n'ouvre.
+Le CTO veut builder. Le CDO veut gouverner. Les deux ont raison. Les deux ont tort seuls.
 
-Le vrai KPI d'un catalogue, c'est le nombre de recherches par semaine. Pas le taux de couverture.
+Mon expérience : les projets IA qui marchent ont un binôme tech-data au sommet. Pas un chef unique.
 
-J'explore ce sujet dans mes lectures de la semaine → {SITE_URL}
+Le vrai risque, c'est le silo entre ceux qui codent et ceux qui gèrent la donnée.
 
-Vous mesurez quoi, vous, pour évaluer l'adoption ?
+J'explore ce sujet dans mes lectures → {SITE_URL}
 
-#DataCatalog #DataGovernance #DataManagement""",
-            "hashtags": ["#DataCatalog", "#DataGovernance", "#DataManagement"],
+Et dans votre boîte, qui pilote l'IA ?
+
+#ManagementIA #DataStrategy #Leadership""",
+            "hashtags": ["#ManagementIA", "#DataStrategy", "#Leadership"],
         },
     }
 
