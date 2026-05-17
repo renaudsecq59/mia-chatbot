@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8"/>
+  <title>LinkedIn — Autorisation réussie</title>
+  <style>
+    body { font-family: 'Inter', sans-serif; background: #0c0c0c; color: #f0f0f0; display: flex; align-items: center; justify-content: center; min-height: 100vh; margin: 0; }
+    .card { background: #111; border: 1px solid rgba(255,255,255,.1); border-radius: 16px; padding: 40px; max-width: 500px; text-align: center; }
+    h1 { font-size: 24px; margin-bottom: 16px; }
+    .code { background: #1a1a1a; border: 1px solid #c8ff00; border-radius: 8px; padding: 16px; font-family: monospace; font-size: 14px; word-break: break-all; margin: 20px 0; color: #c8ff00; cursor: pointer; }
+    .code:hover { background: #222; }
+    p { color: #999; font-size: 14px; line-height: 1.6; }
+    .btn { background: #c8ff00; color: #000; border: none; padding: 10px 24px; border-radius: 100px; font-weight: 600; cursor: pointer; font-size: 14px; margin-top: 12px; }
+    .btn:hover { background: #b8ef00; }
+    .error { color: #ff6b6b; }
+    .success { color: #c8ff00; }
+  </style>
+</head>
+<body>
+  <div class="card">
+    <div id="content"></div>
+  </div>
+  <script>
+    const params = new URLSearchParams(window.location.search);
+    const code = params.get('code');
+    const error = params.get('error');
+    const el = document.getElementById('content');
+    
+    if (code) {
+      el.innerHTML = `
+        <h1 class="success">✅ Autorisation LinkedIn réussie !</h1>
+        <p>Copie ce code et envoie-le moi :</p>
+        <div class="code" onclick="navigator.clipboard.writeText('${code}'); this.style.borderColor='#00ff00'; this.textContent='✅ Copié !'; setTimeout(() => { this.textContent='${code}'; this.style.borderColor='#c8ff00'; }, 2000);">${code}</div>
+        <button class="btn" onclick="navigator.clipboard.writeText('${code}')">📋 Copier le code</button>
+        <p style="margin-top: 16px; font-size: 12px;">Ce code expire dans 30 minutes.</p>
+      `;
+    } else if (error) {
+      el.innerHTML = `
+        <h1 class="error">❌ Erreur d'autorisation</h1>
+        <p>${params.get('error_description') || error}</p>
+      `;
+    } else {
+      el.innerHTML = `<h1>⏳ En attente d'autorisation LinkedIn...</h1>`;
+    }
+  </script>
+</body>
+</html>
