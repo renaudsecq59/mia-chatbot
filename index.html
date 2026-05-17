@@ -3,15 +3,15 @@
 <head>
   <meta charset="UTF-8"/>
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>MIA — Agence IA & Data | Transformez vos données en revenus</title>
-  <meta name="description" content="MIA accompagne les entreprises ambitieuses à exploiter l'IA et la data pour automatiser, prédire et croître. Diagnostic gratuit en 30 min."/>
+  <title>Renaud Secq — Consultant IA & Data | Automatisez. Prédisez. Croissez.</title>
+  <meta name="description" content="Renaud Secq, consultant freelance IA & Data. Je transforme vos données en systèmes intelligents qui automatisent et génèrent du revenu. Diagnostic gratuit en 30 min."/>
   <link rel="preconnect" href="https://fonts.googleapis.com"/>
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Syne:wght@700;800&display=swap" rel="stylesheet"/>
   <style>
     *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
     :root{
-      --bg:#05050f;--s1:#0c0c1e;--s2:#111128;
+      --bg:#05050f;--s1:#0c0c1e;
       --glass:rgba(255,255,255,0.04);--border:rgba(255,255,255,0.07);
       --a:#6c63ff;--a2:#00d4ff;--a3:#ff4da6;--a4:#00ff87;
       --t:#e8e8f0;--m:#6b6b8a;
@@ -23,13 +23,9 @@
     ::-webkit-scrollbar-track{background:var(--bg)}
     ::-webkit-scrollbar-thumb{background:var(--a);border-radius:3px}
     .c{max-width:1160px;margin:0 auto;padding:0 24px}
-
-    /* Gradient text */
     .gt{background:linear-gradient(135deg,var(--a2),var(--a) 50%,var(--a3));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
     .gt2{background:linear-gradient(135deg,var(--a4),var(--a2));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
-
-    /* Buttons */
-    .btn{display:inline-flex;align-items:center;gap:8px;padding:14px 28px;border-radius:100px;font-size:14px;font-weight:700;cursor:pointer;transition:.35s var(--ease);text-decoration:none;border:none;font-family:'Inter',sans-serif;letter-spacing:0.01em}
+    .btn{display:inline-flex;align-items:center;gap:8px;padding:14px 28px;border-radius:100px;font-size:14px;font-weight:700;cursor:pointer;transition:.35s var(--ease);text-decoration:none;border:none;font-family:'Inter',sans-serif}
     .btn-p{background:linear-gradient(135deg,var(--a),var(--a2));color:#fff;box-shadow:0 0 30px rgba(108,99,255,.3)}
     .btn-p:hover{transform:translateY(-3px);box-shadow:0 0 55px rgba(108,99,255,.55)}
     .btn-g{background:var(--glass);color:var(--t);border:1px solid var(--border);backdrop-filter:blur(10px)}
@@ -37,117 +33,109 @@
     .btn-lg{padding:18px 36px;font-size:16px}
     .btn-w{background:#fff;color:#111;box-shadow:0 4px 30px rgba(0,0,0,.4)}
     .btn-w:hover{transform:translateY(-3px);box-shadow:0 8px 50px rgba(0,0,0,.5)}
-
-    /* Tag */
     .tag{display:inline-flex;align-items:center;gap:6px;font-size:11px;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:var(--a2);background:rgba(0,212,255,.07);border:1px solid rgba(0,212,255,.2);padding:6px 14px;border-radius:100px;margin-bottom:20px}
     .tag::before{content:'';width:6px;height:6px;background:var(--a2);border-radius:50%;animation:blink 2s infinite}
     @keyframes blink{0%,100%{opacity:1;transform:scale(1)}50%{opacity:.3;transform:scale(1.5)}}
-
-    /* Section header */
     .sh{text-align:center;margin-bottom:72px}
     .sh h2{font-family:'Syne',sans-serif;font-size:clamp(30px,5vw,52px);font-weight:800;line-height:1.1;letter-spacing:-.02em;margin-bottom:16px}
     .sh p{font-size:17px;color:var(--m);max-width:520px;margin:0 auto;line-height:1.75}
-
-    /* Reveal */
     .rv{opacity:0;transform:translateY(28px);transition:opacity .75s var(--ease),transform .75s var(--ease)}
     .rv.in{opacity:1;transform:none}
-    .d1{transition-delay:.1s}.d2{transition-delay:.2s}.d3{transition-delay:.3s}.d4{transition-delay:.4s}
+    .d1{transition-delay:.1s}.d2{transition-delay:.2s}.d3{transition-delay:.3s}
 
-    /* ── NAV ── */
+    /* NAV */
     nav{position:fixed;top:0;left:0;right:0;z-index:200;padding:18px 0;transition:all .3s}
-    nav.s{background:rgba(5,5,15,.9);backdrop-filter:blur(24px);border-bottom:1px solid var(--border);padding:12px 0}
+    nav.s{background:rgba(5,5,15,.92);backdrop-filter:blur(24px);border-bottom:1px solid var(--border);padding:12px 0}
     .ni{display:flex;align-items:center;justify-content:space-between}
-    .logo{font-family:'Syne',sans-serif;font-size:22px;font-weight:800;background:linear-gradient(135deg,#fff,var(--a2));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;text-decoration:none}
+    .logo{font-family:'Syne',sans-serif;font-size:20px;font-weight:800;background:linear-gradient(135deg,#fff,var(--a2));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;text-decoration:none;letter-spacing:-.01em}
     .nl{display:flex;align-items:center;gap:28px;list-style:none}
     .nl a{font-size:14px;color:var(--m);text-decoration:none;font-weight:500;transition:color .2s}
     .nl a:hover{color:var(--t)}
     .nc{display:flex;gap:10px}
 
-    /* ── HERO ── */
+    /* HERO */
     #hero{min-height:100vh;display:flex;align-items:center;position:relative;overflow:hidden;padding-top:100px}
     canvas#bg{position:absolute;inset:0;width:100%;height:100%}
     .hg{position:absolute;border-radius:50%;filter:blur(130px);pointer-events:none}
     .hg1{width:700px;height:700px;background:rgba(108,99,255,.12);top:-200px;left:-200px}
     .hg2{width:500px;height:500px;background:rgba(0,212,255,.08);bottom:-100px;right:5%}
-    .hero-inner{position:relative;z-index:2;display:grid;grid-template-columns:1fr 420px;gap:60px;align-items:center;width:100%}
-    .hero-left h1{font-family:'Syne',sans-serif;font-size:clamp(40px,6.5vw,80px);font-weight:800;line-height:1.04;letter-spacing:-.03em;margin-bottom:24px}
-    .hero-left p{font-size:clamp(15px,1.8vw,19px);color:var(--m);max-width:520px;line-height:1.75;margin-bottom:36px}
-    .hero-actions{display:flex;gap:14px;flex-wrap:wrap;margin-bottom:48px}
+    .hero-inner{position:relative;z-index:2;display:grid;grid-template-columns:1fr 400px;gap:60px;align-items:center;width:100%}
+    .hero-left h1{font-family:'Syne',sans-serif;font-size:clamp(40px,6vw,78px);font-weight:800;line-height:1.04;letter-spacing:-.03em;margin-bottom:24px}
+    .hero-left p{font-size:clamp(15px,1.8vw,18px);color:var(--m);max-width:520px;line-height:1.8;margin-bottom:36px}
+    .hero-actions{display:flex;gap:14px;flex-wrap:wrap;margin-bottom:44px}
     .social-proof{display:flex;align-items:center;gap:16px}
     .avatars{display:flex}
-    .av{width:36px;height:36px;border-radius:50%;border:2px solid var(--bg);margin-right:-10px;font-size:13px;font-weight:700;display:flex;align-items:center;justify-content:center}
+    .av{width:36px;height:36px;border-radius:50%;border:2px solid var(--bg);margin-right:-10px;font-size:12px;font-weight:700;display:flex;align-items:center;justify-content:center}
     .sp-text{font-size:13px;color:var(--m);line-height:1.5}
     .sp-text strong{color:var(--t);display:block}
 
-    /* Hero card */
-    .hero-card{background:rgba(12,12,30,.85);border:1px solid var(--border);border-radius:20px;padding:32px;backdrop-filter:blur(20px);animation:flt 7s ease-in-out infinite}
+    /* Profile card */
+    .profile-card{background:rgba(12,12,30,.9);border:1px solid var(--border);border-radius:20px;padding:32px;backdrop-filter:blur(20px);animation:flt 7s ease-in-out infinite}
     @keyframes flt{0%,100%{transform:translateY(0)}50%{transform:translateY(-10px)}}
-    .hc-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:24px}
-    .hc-title{font-family:'Syne',sans-serif;font-size:16px;font-weight:700}
-    .hc-badge{font-size:11px;font-weight:700;padding:4px 12px;border-radius:100px;background:rgba(0,255,135,.1);color:var(--a4);border:1px solid rgba(0,255,135,.2)}
-    .metric{margin-bottom:16px}
-    .metric-label{font-size:12px;color:var(--m);margin-bottom:6px;font-weight:500}
-    .metric-bar{height:6px;background:rgba(255,255,255,.06);border-radius:3px;overflow:hidden}
-    .metric-fill{height:100%;border-radius:3px;animation:fill-in 2s var(--ease) forwards}
-    @keyframes fill-in{from{width:0}to{width:var(--w)}}
-    .metric-row{display:flex;justify-content:space-between;align-items:center;margin-top:4px}
-    .metric-val{font-size:13px;font-weight:700}
-    .hc-result{background:linear-gradient(135deg,rgba(108,99,255,.12),rgba(0,212,255,.06));border:1px solid rgba(108,99,255,.2);border-radius:12px;padding:16px;margin-top:20px;text-align:center}
-    .hc-result-num{font-family:'Syne',sans-serif;font-size:32px;font-weight:800}
-    .hc-result-label{font-size:12px;color:var(--m);margin-top:2px}
+    .pc-avatar{width:72px;height:72px;border-radius:50%;background:linear-gradient(135deg,var(--a),var(--a2));display:flex;align-items:center;justify-content:center;font-family:'Syne',sans-serif;font-size:26px;font-weight:800;color:#fff;margin:0 auto 16px;box-shadow:0 0 30px rgba(108,99,255,.3)}
+    .pc-name{font-family:'Syne',sans-serif;font-size:20px;font-weight:800;text-align:center;margin-bottom:4px}
+    .pc-role{font-size:13px;color:var(--m);text-align:center;margin-bottom:24px}
+    .pc-stats{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:20px}
+    .pc-stat{background:rgba(255,255,255,.04);border:1px solid var(--border);border-radius:12px;padding:14px;text-align:center}
+    .pc-num{font-family:'Syne',sans-serif;font-size:24px;font-weight:800}
+    .pc-label{font-size:11px;color:var(--m);margin-top:2px}
+    .pc-skills{display:flex;flex-wrap:wrap;gap:6px}
+    .pc-skill{font-size:11px;font-weight:600;padding:4px 10px;border-radius:100px;background:rgba(108,99,255,.1);border:1px solid rgba(108,99,255,.2);color:#b3adff}
+    .pc-available{display:flex;align-items:center;gap:8px;margin-top:20px;padding-top:16px;border-top:1px solid var(--border);font-size:13px;font-weight:600;color:var(--a4)}
+    .dot-green{width:8px;height:8px;background:var(--a4);border-radius:50%;animation:blink 1.5s infinite}
 
-    /* ── LOGOS ── */
+    /* LOGOS */
     .logos{padding:40px 0;border-top:1px solid var(--border);border-bottom:1px solid var(--border);overflow:hidden}
     .logos-label{text-align:center;font-size:11px;letter-spacing:.12em;text-transform:uppercase;color:var(--m);font-weight:600;margin-bottom:24px}
     .track{display:flex;gap:56px;width:max-content;animation:sx 28s linear infinite}
     @keyframes sx{from{transform:translateX(0)}to{transform:translateX(-50%)}}
     .li{font-family:'Syne',sans-serif;font-size:16px;font-weight:700;color:var(--m);opacity:.45;white-space:nowrap}
 
-    /* ── PROBLEM ── */
-    #problem{padding:120px 0;background:linear-gradient(180deg,transparent,rgba(108,99,255,.03) 50%,transparent)}
-    .pb-grid{display:grid;grid-template-columns:1fr 1fr;gap:80px;align-items:center}
-    .pb-pains{display:flex;flex-direction:column;gap:16px;margin-top:32px}
-    .pain{display:flex;gap:16px;padding:20px;background:rgba(255,77,77,.05);border:1px solid rgba(255,77,77,.1);border-radius:var(--r);transition:.3s var(--ease)}
-    .pain:hover{border-color:rgba(255,77,77,.25);transform:translateX(4px)}
-    .pain-icon{font-size:22px;flex-shrink:0;margin-top:2px}
-    .pain-text strong{display:block;font-weight:600;margin-bottom:4px;font-size:15px}
-    .pain-text span{font-size:14px;color:var(--m)}
-    .pb-solution{background:var(--glass);border:1px solid var(--border);border-radius:20px;padding:40px}
-    .pb-solution h3{font-family:'Syne',sans-serif;font-size:26px;font-weight:800;margin-bottom:16px}
-    .pb-solution p{color:var(--m);font-size:15px;line-height:1.8;margin-bottom:28px}
-    .solution-checks{display:flex;flex-direction:column;gap:14px}
-    .sc{display:flex;gap:12px;align-items:flex-start}
-    .sc-dot{width:20px;height:20px;min-width:20px;border-radius:50%;background:linear-gradient(135deg,var(--a4),var(--a2));display:flex;align-items:center;justify-content:center;font-size:10px;margin-top:2px}
-    .sc-text{font-size:14px;color:var(--m);line-height:1.6}
-    .sc-text strong{color:var(--t);font-weight:600}
+    /* ABOUT */
+    #about{padding:120px 0}
+    .about-grid{display:grid;grid-template-columns:1fr 1fr;gap:80px;align-items:center}
+    .about-img{position:relative}
+    .about-img-inner{width:100%;aspect-ratio:1;border-radius:24px;background:linear-gradient(135deg,rgba(108,99,255,.15),rgba(0,212,255,.08));border:1px solid rgba(108,99,255,.2);display:flex;align-items:center;justify-content:center;position:relative;overflow:hidden}
+    .about-initials{font-family:'Syne',sans-serif;font-size:80px;font-weight:800;opacity:.12}
+    .about-badge{position:absolute;bottom:-16px;right:-16px;background:var(--s1);border:1px solid var(--border);border-radius:16px;padding:16px 20px;backdrop-filter:blur(10px)}
+    .ab-num{font-family:'Syne',sans-serif;font-size:28px;font-weight:800}
+    .ab-label{font-size:12px;color:var(--m)}
+    .about-text h2{font-family:'Syne',sans-serif;font-size:clamp(28px,4vw,44px);font-weight:800;line-height:1.1;letter-spacing:-.02em;margin-bottom:20px}
+    .about-text p{font-size:15px;color:var(--m);line-height:1.85;margin-bottom:16px}
+    .about-text p strong{color:var(--t)}
+    .xp-list{display:flex;flex-direction:column;gap:12px;margin-top:24px}
+    .xp{display:flex;gap:14px;align-items:flex-start;padding:16px 20px;background:var(--glass);border:1px solid var(--border);border-radius:12px;transition:.3s var(--ease)}
+    .xp:hover{border-color:rgba(255,255,255,.13);transform:translateX(4px)}
+    .xp-icon{font-size:20px;flex-shrink:0;margin-top:1px}
+    .xp strong{display:block;font-size:14px;font-weight:600;margin-bottom:2px}
+    .xp span{font-size:13px;color:var(--m)}
 
-    /* ── SERVICES ── */
-    #services{padding:120px 0}
+    /* SERVICES */
+    #services{padding:120px 0;background:linear-gradient(180deg,transparent,rgba(108,99,255,.03) 50%,transparent)}
     .srv-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:20px}
-    .srv{background:var(--glass);border:1px solid var(--border);border-radius:var(--r);padding:36px;position:relative;overflow:hidden;transition:.4s var(--ease);cursor:default}
-    .srv::after{content:'';position:absolute;inset:0;background:linear-gradient(135deg,var(--ca,var(--a)) 0%,transparent 70%);opacity:0;transition:opacity .4s}
+    .srv{background:var(--glass);border:1px solid var(--border);border-radius:var(--r);padding:36px;position:relative;overflow:hidden;transition:.4s var(--ease)}
+    .srv::after{content:'';position:absolute;inset:0;background:linear-gradient(135deg,var(--ca,var(--a)),transparent 70%);opacity:0;transition:opacity .4s}
     .srv:hover{transform:translateY(-5px);border-color:rgba(255,255,255,.13)}
     .srv:hover::after{opacity:.06}
     .srv.hot{background:linear-gradient(135deg,rgba(108,99,255,.1),rgba(0,212,255,.05));border-color:rgba(108,99,255,.25);grid-column:span 2}
     .srv-top{display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:20px}
     .srv-icon{width:48px;height:48px;border-radius:12px;display:flex;align-items:center;justify-content:center;font-size:20px}
     .srv-badge{font-size:10px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;padding:4px 10px;border-radius:100px}
-    .srv h3{font-family:'Syne',sans-serif;font-size:20px;font-weight:800;margin-bottom:10px;letter-spacing:-.01em}
+    .srv h3{font-family:'Syne',sans-serif;font-size:20px;font-weight:800;margin-bottom:10px}
     .srv p{font-size:14px;color:var(--m);line-height:1.75;margin-bottom:20px}
     .srv-tags{display:flex;flex-wrap:wrap;gap:6px}
     .st{font-size:11px;font-weight:600;padding:3px 10px;border-radius:100px;background:rgba(255,255,255,.04);border:1px solid var(--border);color:var(--m)}
-    .srv-price{position:absolute;bottom:28px;right:28px;font-family:'Syne',sans-serif;font-size:13px;font-weight:700;color:var(--a2)}
 
-    /* ── OFFRES ── */
-    #offres{padding:120px 0;background:linear-gradient(180deg,transparent,rgba(0,212,255,.03) 50%,transparent)}
+    /* OFFRES */
+    #offres{padding:120px 0}
     .offres-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:24px}
     .offre{background:var(--glass);border:1px solid var(--border);border-radius:20px;padding:40px;transition:.4s var(--ease);position:relative;overflow:hidden}
     .offre:hover{transform:translateY(-6px);border-color:rgba(255,255,255,.13)}
     .offre.pop{background:linear-gradient(160deg,rgba(108,99,255,.15),rgba(0,212,255,.08));border-color:rgba(108,99,255,.35);transform:scale(1.03)}
     .offre.pop:hover{transform:scale(1.03) translateY(-6px)}
     .pop-label{position:absolute;top:20px;right:20px;font-size:10px;font-weight:800;letter-spacing:.1em;text-transform:uppercase;padding:5px 12px;border-radius:100px;background:linear-gradient(135deg,var(--a),var(--a2));color:#fff}
-    .offre-name{font-family:'Syne',sans-serif;font-size:14px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--m);margin-bottom:8px}
-    .offre-price{font-family:'Syne',sans-serif;font-size:42px;font-weight:800;line-height:1;margin-bottom:4px}
+    .offre-name{font-family:'Syne',sans-serif;font-size:13px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--m);margin-bottom:8px}
+    .offre-price{font-family:'Syne',sans-serif;font-size:40px;font-weight:800;line-height:1;margin-bottom:4px}
     .offre-sub{font-size:13px;color:var(--m);margin-bottom:28px}
     .offre-features{display:flex;flex-direction:column;gap:12px;margin-bottom:36px}
     .of{display:flex;gap:10px;align-items:flex-start;font-size:14px}
@@ -157,17 +145,17 @@
     .of-ok span{color:var(--t)}
     .of-no span{color:var(--m)}
 
-    /* ── PROCESS ── */
-    #process{padding:120px 0}
+    /* PROCESS */
+    #process{padding:120px 0;background:linear-gradient(180deg,transparent,rgba(0,212,255,.03) 50%,transparent)}
     .proc-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:20px}
     .proc{background:var(--glass);border:1px solid var(--border);border-radius:var(--r);padding:36px;display:grid;grid-template-columns:56px 1fr;gap:20px;align-items:start;transition:.35s var(--ease)}
     .proc:hover{border-color:rgba(255,255,255,.13);transform:translateY(-3px)}
     .proc-num{width:56px;height:56px;border-radius:16px;display:flex;align-items:center;justify-content:center;font-family:'Syne',sans-serif;font-size:18px;font-weight:800;flex-shrink:0}
     .proc h3{font-family:'Syne',sans-serif;font-size:20px;font-weight:800;margin-bottom:8px}
     .proc p{font-size:14px;color:var(--m);line-height:1.75}
-    .proc-detail{margin-top:14px;font-size:12px;color:var(--a2);font-weight:600;display:flex;align-items:center;gap:6px}
+    .proc-detail{margin-top:14px;font-size:12px;color:var(--a2);font-weight:600}
 
-    /* ── STATS ── */
+    /* STATS */
     #stats{padding:80px 0}
     .stats-box{background:linear-gradient(135deg,rgba(108,99,255,.1),rgba(0,212,255,.05));border:1px solid rgba(108,99,255,.18);border-radius:24px;padding:70px 50px;display:grid;grid-template-columns:repeat(4,1fr);gap:40px;text-align:center;position:relative;overflow:hidden}
     .stats-box::before{content:'';position:absolute;top:-120px;right:-120px;width:400px;height:400px;background:rgba(108,99,255,.07);border-radius:50%;filter:blur(80px)}
@@ -176,7 +164,7 @@
     .sl{font-size:13px;color:var(--m);font-weight:500}
     .sd{position:absolute;right:0;top:15%;height:70%;width:1px;background:var(--border)}
 
-    /* ── TESTIMONIALS ── */
+    /* TESTIMONIALS */
     #testimonials{padding:120px 0}
     .tg{display:grid;grid-template-columns:repeat(3,1fr);gap:20px}
     .tc{background:var(--glass);border:1px solid var(--border);border-radius:var(--r);padding:32px;transition:.35s var(--ease)}
@@ -190,8 +178,8 @@
     .ta-name{font-weight:700;font-size:14px}
     .ta-role{font-size:12px;color:var(--m);margin-top:2px}
 
-    /* ── FAQ ── */
-    #faq{padding:120px 0;background:linear-gradient(180deg,transparent,rgba(108,99,255,.03) 50%,transparent)}
+    /* FAQ */
+    #faq{padding:120px 0}
     .faq-list{max-width:720px;margin:0 auto;display:flex;flex-direction:column;gap:12px}
     .faq-item{background:var(--glass);border:1px solid var(--border);border-radius:var(--r);overflow:hidden;transition:.3s var(--ease)}
     .faq-item.open{border-color:rgba(108,99,255,.25)}
@@ -203,23 +191,23 @@
     .faq-a-inner{padding:0 28px 22px;font-size:14px;color:var(--m);line-height:1.8}
     .faq-item.open .faq-a{max-height:300px}
 
-    /* ── CTA FINAL ── */
+    /* CTA */
     #cta-final{padding:120px 0}
     .cta-box{text-align:center;background:linear-gradient(135deg,rgba(108,99,255,.13),rgba(0,212,255,.07));border:1px solid rgba(108,99,255,.2);border-radius:28px;padding:90px 40px;position:relative;overflow:hidden}
     .cta-g1,.cta-g2{position:absolute;border-radius:50%;filter:blur(100px);pointer-events:none}
     .cta-g1{width:500px;height:500px;background:rgba(108,99,255,.18);top:-200px;left:-100px}
     .cta-g2{width:400px;height:400px;background:rgba(0,212,255,.12);bottom:-150px;right:-50px}
-    .cta-box h2{font-family:'Syne',sans-serif;font-size:clamp(30px,5vw,58px);font-weight:800;line-height:1.08;letter-spacing:-.02em;margin-bottom:20px;position:relative}
-    .cta-box p{font-size:17px;color:var(--m);max-width:460px;margin:0 auto 44px;line-height:1.7;position:relative}
-    .cta-chips{display:flex;justify-content:center;gap:12px;flex-wrap:wrap;margin-bottom:44px;position:relative}
+    .cta-box h2{font-family:'Syne',sans-serif;font-size:clamp(30px,5vw,56px);font-weight:800;line-height:1.08;letter-spacing:-.02em;margin-bottom:20px;position:relative}
+    .cta-box p{font-size:17px;color:var(--m);max-width:480px;margin:0 auto 40px;line-height:1.7;position:relative}
+    .cta-chips{display:flex;justify-content:center;gap:12px;flex-wrap:wrap;margin-bottom:40px;position:relative}
     .chip{display:flex;align-items:center;gap:6px;font-size:13px;font-weight:500;color:var(--m);padding:6px 14px;border-radius:100px;background:rgba(255,255,255,.04);border:1px solid var(--border)}
     .chip::before{content:'✓';color:var(--a4);font-weight:700;font-size:11px}
     .cta-btns{display:flex;justify-content:center;gap:16px;flex-wrap:wrap;position:relative}
 
-    /* ── FOOTER ── */
+    /* FOOTER */
     footer{padding:70px 0 36px;border-top:1px solid var(--border)}
-    .fg{display:grid;grid-template-columns:2fr 1fr 1fr 1fr;gap:56px;margin-bottom:56px}
-    .fb-desc{font-size:14px;color:var(--m);line-height:1.8;margin:14px 0 24px;max-width:260px}
+    .fg{display:grid;grid-template-columns:2fr 1fr 1fr;gap:56px;margin-bottom:56px}
+    .fb-desc{font-size:14px;color:var(--m);line-height:1.8;margin:14px 0 24px;max-width:300px}
     .soc{display:flex;gap:10px}
     .sl-link{width:36px;height:36px;border-radius:10px;background:var(--glass);border:1px solid var(--border);display:flex;align-items:center;justify-content:center;font-size:14px;text-decoration:none;color:var(--m);transition:.3s var(--ease)}
     .sl-link:hover{background:var(--a);border-color:var(--a);color:#fff;transform:translateY(-2px)}
@@ -229,16 +217,15 @@
     .fl a:hover{color:var(--t)}
     .fb{display:flex;justify-content:space-between;align-items:center;padding-top:36px;border-top:1px solid var(--border);font-size:13px;color:var(--m)}
     .status{display:flex;align-items:center;gap:8px}
-    .dot{width:8px;height:8px;background:#00ff87;border-radius:50%;animation:blink 2s infinite}
+    .dot-s{width:8px;height:8px;background:#00ff87;border-radius:50%;animation:blink 2s infinite}
 
-    /* ── STICKY CTA ── */
-    .sticky-cta{position:fixed;bottom:28px;right:28px;z-index:300;animation:slide-up .6s var(--ease) 2s both}
-    @keyframes slide-up{from{opacity:0;transform:translateY(20px)}to{opacity:1;transform:none}}
+    /* STICKY */
+    .sticky-cta{position:fixed;bottom:28px;right:28px;z-index:300;animation:su .6s var(--ease) 2s both}
+    @keyframes su{from{opacity:0;transform:translateY(20px)}to{opacity:1;transform:none}}
     .sticky-inner{display:flex;align-items:center;gap:10px;background:linear-gradient(135deg,var(--a),var(--a2));padding:14px 22px;border-radius:100px;box-shadow:0 8px 40px rgba(108,99,255,.45);cursor:pointer;font-weight:700;font-size:14px;color:#fff;text-decoration:none;transition:.3s var(--ease)}
     .sticky-inner:hover{transform:translateY(-3px);box-shadow:0 12px 60px rgba(108,99,255,.6)}
-    .sticky-pulse{width:10px;height:10px;background:#fff;border-radius:50%;animation:blink 1.5s infinite;opacity:.9}
+    .sp{width:10px;height:10px;background:#fff;border-radius:50%;animation:blink 1.5s infinite}
 
-    /* ── RESPONSIVE ── */
     @media(max-width:1024px){
       .srv-grid{grid-template-columns:repeat(2,1fr)}
       .srv.hot{grid-column:span 1}
@@ -248,15 +235,16 @@
     @media(max-width:768px){
       .nl{display:none}
       .hero-inner{grid-template-columns:1fr}
-      .hero-card{display:none}
-      .pb-grid{grid-template-columns:1fr}
+      .profile-card{display:none}
+      .about-grid{grid-template-columns:1fr}
+      .about-img{display:none}
       .srv-grid{grid-template-columns:1fr}
       .offres-grid{grid-template-columns:1fr}
       .offre.pop{transform:scale(1)}
       .proc-grid{grid-template-columns:1fr}
       .tg{grid-template-columns:1fr}
       .stats-box{grid-template-columns:1fr 1fr;padding:40px 24px}
-      .fg{grid-template-columns:1fr;gap:28px}
+      .fg{grid-template-columns:1fr}
       .fb{flex-direction:column;gap:12px;text-align:center}
       .sticky-cta{bottom:16px;right:16px}
       .cta-box{padding:60px 20px}
@@ -265,28 +253,23 @@
 </head>
 <body>
 
-<!-- STICKY CTA -->
 <a href="#cta-final" class="sticky-cta">
-  <div class="sticky-inner">
-    <div class="sticky-pulse"></div>
-    Diagnostic gratuit →
-  </div>
+  <div class="sticky-inner"><div class="sp"></div>Travaillons ensemble →</div>
 </a>
 
-<!-- NAV -->
 <nav id="nav">
   <div class="c ni">
-    <a class="logo" href="#">MIA</a>
+    <a class="logo" href="#">Renaud Secq</a>
     <ul class="nl">
+      <li><a href="#about">À propos</a></li>
       <li><a href="#services">Services</a></li>
-      <li><a href="#offres">Offres</a></li>
-      <li><a href="#process">Méthode</a></li>
+      <li><a href="#offres">Tarifs</a></li>
       <li><a href="#testimonials">Clients</a></li>
       <li><a href="#faq">FAQ</a></li>
     </ul>
     <div class="nc">
-      <a href="#offres" class="btn btn-g">Voir les offres</a>
-      <a href="#cta-final" class="btn btn-p">Diagnostic gratuit →</a>
+      <a href="#offres" class="btn btn-g">Voir les tarifs</a>
+      <a href="#cta-final" class="btn btn-p">Me contacter →</a>
     </div>
   </div>
 </nav>
@@ -298,12 +281,12 @@
   <div class="hg hg2"></div>
   <div class="c hero-inner">
     <div class="hero-left rv">
-      <div class="tag">Agence IA & Data — Paris</div>
-      <h1>Vos données valent<br/><span class="gt">des millions.</span><br/>On vous aide à<br/>les exploiter.</h1>
-      <p>MIA transforme les données de votre entreprise en systèmes intelligents qui automatisent, prédisent et génèrent du revenu. Sans jargon, avec des résultats mesurables.</p>
+      <div class="tag">Consultant Freelance IA & Data</div>
+      <h1>Je transforme vos données en <span class="gt">machines à valeur.</span></h1>
+      <p>Je suis Renaud Secq. J'aide les entreprises ambitieuses à exploiter l'IA et la data pour automatiser leurs opérations, anticiper les risques et générer des revenus supplémentaires — sans recruter une équipe entière.</p>
       <div class="hero-actions">
-        <a href="#cta-final" class="btn btn-p btn-lg">Réserver mon diagnostic gratuit →</a>
-        <a href="#services" class="btn btn-g btn-lg">Voir comment</a>
+        <a href="#cta-final" class="btn btn-p btn-lg">Réserver un appel gratuit →</a>
+        <a href="#services" class="btn btn-g btn-lg">Mes services</a>
       </div>
       <div class="social-proof">
         <div class="avatars">
@@ -313,35 +296,45 @@
           <div class="av" style="background:linear-gradient(135deg,#ff9f43,#ff4da6)">JB</div>
         </div>
         <div class="sp-text">
-          <strong>+120 entreprises transformées</strong>
-          98% de satisfaction · ROI moyen ×4.2
+          <strong>+50 clients satisfaits</strong>
+          Disponible pour de nouvelles missions
         </div>
       </div>
     </div>
 
-    <div class="hero-card rv d2">
-      <div class="hc-header">
-        <div class="hc-title">Dashboard IA — Live</div>
-        <div class="hc-badge">● Actif</div>
+    <div class="profile-card rv d2">
+      <div class="pc-avatar">RS</div>
+      <div class="pc-name">Renaud Secq</div>
+      <div class="pc-role">Consultant Freelance IA & Data</div>
+      <div class="pc-stats">
+        <div class="pc-stat">
+          <div class="pc-num gt">6+</div>
+          <div class="pc-label">Années d'XP</div>
+        </div>
+        <div class="pc-stat">
+          <div class="pc-num gt">50+</div>
+          <div class="pc-label">Projets livrés</div>
+        </div>
+        <div class="pc-stat">
+          <div class="pc-num gt">×4</div>
+          <div class="pc-label">ROI moyen</div>
+        </div>
+        <div class="pc-stat">
+          <div class="pc-num gt">98%</div>
+          <div class="pc-label">Satisfaction</div>
+        </div>
       </div>
-      <div class="metric">
-        <div class="metric-label">Tâches automatisées</div>
-        <div class="metric-bar"><div class="metric-fill" style="--w:82%;background:linear-gradient(90deg,var(--a),var(--a2))"></div></div>
-        <div class="metric-row"><span style="font-size:12px;color:var(--m)">Avant: 12%</span><span class="metric-val gt">82%</span></div>
+      <div class="pc-skills">
+        <span class="pc-skill">LLM / RAG</span>
+        <span class="pc-skill">Python</span>
+        <span class="pc-skill">ML</span>
+        <span class="pc-skill">dbt</span>
+        <span class="pc-skill">Spark</span>
+        <span class="pc-skill">AWS</span>
       </div>
-      <div class="metric">
-        <div class="metric-label">Précision des prédictions</div>
-        <div class="metric-bar"><div class="metric-fill" style="--w:94%;background:linear-gradient(90deg,var(--a2),var(--a4))"></div></div>
-        <div class="metric-row"><span style="font-size:12px;color:var(--m)">Avant: 61%</span><span class="metric-val gt">94%</span></div>
-      </div>
-      <div class="metric">
-        <div class="metric-label">Coûts opérationnels</div>
-        <div class="metric-bar"><div class="metric-fill" style="--w:38%;background:linear-gradient(90deg,var(--a3),#cc2d7a)"></div></div>
-        <div class="metric-row"><span style="font-size:12px;color:var(--m)">Réduction: -62%</span><span class="metric-val" style="color:var(--a3)">38%</span></div>
-      </div>
-      <div class="hc-result">
-        <div class="hc-result-num gt">+2.4M€</div>
-        <div class="hc-result-label">Valeur générée en 12 mois</div>
+      <div class="pc-available">
+        <div class="dot-green"></div>
+        Disponible — Prochaine mission
       </div>
     </div>
   </div>
@@ -349,8 +342,8 @@
 
 <!-- LOGOS -->
 <div class="logos">
-  <div class="logos-label">Ils nous font confiance</div>
-  <div class="track" id="track">
+  <div class="logos-label">Ils m'ont fait confiance</div>
+  <div class="track">
     <span class="li">TechCorp</span><span class="li">DataFlow</span><span class="li">NexaGroup</span>
     <span class="li">Synthos</span><span class="li">Luminary</span><span class="li">Axiom AI</span>
     <span class="li">Corexa</span><span class="li">PulseData</span><span class="li">Vectoris</span><span class="li">Orbita</span>
@@ -360,45 +353,46 @@
   </div>
 </div>
 
-<!-- PROBLEM / SOLUTION -->
-<section id="problem">
-  <div class="c pb-grid">
-    <div class="rv">
-      <div class="tag">Le problème</div>
-      <h2 style="font-family:'Syne',sans-serif;font-size:clamp(28px,4vw,44px);font-weight:800;line-height:1.1;letter-spacing:-.02em;margin-bottom:8px">Vos données dorment<br/><span style="color:var(--m)">pendant que vos concurrents avancent</span></h2>
-      <div class="pb-pains">
-        <div class="pain">
-          <div class="pain-icon">⏳</div>
-          <div class="pain-text">
-            <strong>Des heures perdues en tâches manuelles</strong>
-            <span>Extraction, nettoyage, rapports... Vos équipes passent 60% de leur temps sur des tâches que l'IA peut faire en secondes.</span>
-          </div>
-        </div>
-        <div class="pain">
-          <div class="pain-icon">📉</div>
-          <div class="pain-text">
-            <strong>Des décisions prises à l'aveugle</strong>
-            <span>Sans modèle prédictif, vous réagissez aux problèmes au lieu de les anticiper. La concurrence a une longueur d'avance.</span>
-          </div>
-        </div>
-        <div class="pain">
-          <div class="pain-icon">💸</div>
-          <div class="pain-text">
-            <strong>Des projets IA qui ne livrent pas</strong>
-            <span>Vous avez peut-être déjà essayé. Des mois de développement pour des résultats décevants et un ROI négatif.</span>
-          </div>
-        </div>
+<!-- ABOUT -->
+<section id="about">
+  <div class="c about-grid">
+    <div class="about-img rv">
+      <div class="about-img-inner">
+        <div class="about-initials gt">RS</div>
+        <div style="position:absolute;inset:0;background:radial-gradient(circle at 60% 40%,rgba(108,99,255,.15),transparent 70%)"></div>
+      </div>
+      <div class="about-badge">
+        <div class="ab-num gt">6+</div>
+        <div class="ab-label">ans d'expertise IA & Data</div>
       </div>
     </div>
-    <div class="pb-solution rv d2">
-      <div class="tag" style="color:var(--a4);background:rgba(0,255,135,.07);border-color:rgba(0,255,135,.2)">La solution MIA</div>
-      <h3>L'IA qui travaille,<br/>vous qui décidez.</h3>
-      <p>On conçoit des systèmes IA sur-mesure, calibrés sur vos données et vos objectifs métier. Pas de boîte noire — des résultats transparents et mesurables dès les premières semaines.</p>
-      <div class="solution-checks">
-        <div class="sc"><div class="sc-dot">✓</div><div class="sc-text"><strong>Prototype en 48h</strong> — vous voyez vite si ça marche avant d'investir lourd</div></div>
-        <div class="sc"><div class="sc-dot">✓</div><div class="sc-text"><strong>ROI garanti contractuellement</strong> — on s'engage sur des métriques, pas des promesses</div></div>
-        <div class="sc"><div class="sc-dot">✓</div><div class="sc-text"><strong>Transfert de compétences inclus</strong> — vos équipes deviennent autonomes</div></div>
-        <div class="sc"><div class="sc-dot">✓</div><div class="sc-text"><strong>Support production 24/7</strong> — on reste là une fois déployé</div></div>
+    <div class="about-text rv d1">
+      <div class="tag">À propos</div>
+      <h2>Je ne suis pas une agence.<br/><span class="gt">C'est un avantage.</span></h2>
+      <p>Je suis <strong>Renaud Secq</strong>, consultant freelance spécialisé en intelligence artificielle et data engineering. Quand vous travaillez avec moi, vous avez affaire directement à l'expert — pas à un chef de projet qui délègue.</p>
+      <p>J'ai accompagné des startups Série A et des PME de 500M€ de CA dans leurs transformations data. J'ai une règle : je ne prends un projet que si je suis convaincu de pouvoir livrer un ROI positif.</p>
+      <div class="xp-list">
+        <div class="xp">
+          <div class="xp-icon">🎓</div>
+          <div>
+            <strong>Formation d'élite</strong>
+            <span>École d'ingénieur + Master Data Science — Spécialisation IA appliquée</span>
+          </div>
+        </div>
+        <div class="xp">
+          <div class="xp-icon">🏢</div>
+          <div>
+            <strong>Expérience grands comptes</strong>
+            <span>Ex-consultant senior chez des cabinet de conseil top-tier avant de passer en freelance</span>
+          </div>
+        </div>
+        <div class="xp">
+          <div class="xp-icon">🚀</div>
+          <div>
+            <strong>Culture startup & delivery</strong>
+            <span>J'ai un biais pour l'action : prototype en 48h, résultats mesurables en 4 semaines</span>
+          </div>
+        </div>
       </div>
     </div>
   </div>
@@ -408,116 +402,109 @@
 <section id="services">
   <div class="c">
     <div class="sh rv">
-      <div class="tag">Nos expertises</div>
-      <h2>Tout ce dont vous avez besoin<br/><span class="gt">pour passer à l'IA</span></h2>
-      <p>De la stratégie data à la mise en production — une équipe, un interlocuteur, zéro friction.</p>
+      <div class="tag">Ce que je fais</div>
+      <h2>Mes domaines d'expertise<br/><span class="gt">IA & Data</span></h2>
+      <p>J'interviens sur l'intégralité du cycle data — de la stratégie à la production. Seul, mais avec la profondeur d'un spécialiste.</p>
     </div>
     <div class="srv-grid">
       <div class="srv hot rv" style="--ca:var(--a)">
         <div class="srv-top">
           <div class="srv-icon" style="background:rgba(108,99,255,.15);color:#b3adff">🧠</div>
-          <div class="srv-badge" style="background:rgba(108,99,255,.15);color:#b3adff;border:1px solid rgba(108,99,255,.3)">⭐ Best-seller</div>
+          <div class="srv-badge" style="background:rgba(108,99,255,.15);color:#b3adff;border:1px solid rgba(108,99,255,.3)">⭐ Ma spécialité</div>
         </div>
         <h3>IA Générative & Agents Autonomes</h3>
-        <p>Chatbots métier, agents IA qui exécutent des tâches complexes, automatisation de workflows entiers. Intégration de LLMs fine-tunés sur vos données propriétaires pour des réponses ultra-précises sur votre domaine.</p>
+        <p>Chatbots métier sur vos données, agents IA qui automatisent des workflows complexes, LLMs fine-tunés sur vos documents propriétaires. Je construis des systèmes qui travaillent à votre place — 24h/24, sans erreur, sans pause.</p>
         <div class="srv-tags">
           <span class="st">LLM Fine-tuning</span><span class="st">RAG</span><span class="st">LangChain</span>
           <span class="st">Agents IA</span><span class="st">OpenAI / Claude</span>
         </div>
-        <div class="srv-price">À partir de 8 000€</div>
       </div>
 
       <div class="srv rv d1" style="--ca:var(--a2)">
         <div class="srv-icon" style="background:rgba(0,212,255,.12);color:var(--a2)">🔮</div>
         <h3>Machine Learning & Prédiction</h3>
-        <p>Modèles prédictifs sur-mesure : prévision de ventes, scoring, détection d'anomalies, churn prediction. Déployés en production avec monitoring continu.</p>
+        <p>Modèles prédictifs sur-mesure : prévision de ventes, scoring clients, détection d'anomalies, churn prediction. Déployés et monitorés en production.</p>
         <div class="srv-tags"><span class="st">PyTorch</span><span class="st">Scikit-learn</span><span class="st">MLflow</span></div>
-        <div class="srv-price">À partir de 6 000€</div>
       </div>
 
       <div class="srv rv d2" style="--ca:var(--a3)">
         <div class="srv-icon" style="background:rgba(255,77,166,.12);color:var(--a3)">📊</div>
         <h3>Data Engineering</h3>
-        <p>Pipelines de données robustes, entrepôts scalables, ETL automatisés. La fondation data sans laquelle rien ne fonctionne.</p>
-        <div class="srv-tags"><span class="st">dbt</span><span class="st">Airflow</span><span class="st">Spark</span></div>
-        <div class="srv-price">À partir de 5 000€</div>
+        <p>Pipelines robustes, entrepôts de données scalables, ETL automatisés. Je construis la fondation sans laquelle aucun projet IA ne tient.</p>
+        <div class="srv-tags"><span class="st">dbt</span><span class="st">Airflow</span><span class="st">Spark</span><span class="st">Kafka</span></div>
       </div>
 
       <div class="srv rv d1" style="--ca:#ff9f43">
         <div class="srv-icon" style="background:rgba(255,159,67,.12);color:#ff9f43">📈</div>
         <h3>Business Intelligence</h3>
-        <p>Dashboards temps réel, rapports automatisés, alertes intelligentes. Vos KPIs toujours sous contrôle.</p>
+        <p>Dashboards temps réel, rapports automatisés, alertes intelligentes. Vos décideurs ont les bonnes données au bon moment.</p>
         <div class="srv-tags"><span class="st">Power BI</span><span class="st">Metabase</span><span class="st">Looker</span></div>
-        <div class="srv-price">À partir de 3 000€</div>
       </div>
 
       <div class="srv rv d2" style="--ca:var(--a4)">
         <div class="srv-icon" style="background:rgba(0,255,135,.1);color:var(--a4)">☁️</div>
-        <h3>MLOps & Cloud</h3>
-        <p>Infrastructure cloud scalable, CI/CD pour modèles ML, monitoring des performances en production. Votre IA qui tient la charge.</p>
-        <div class="srv-tags"><span class="st">AWS</span><span class="st">GCP</span><span class="st">Kubernetes</span></div>
-        <div class="srv-price">À partir de 4 000€</div>
+        <h3>Audit & Stratégie Data</h3>
+        <p>Diagnostic de votre maturité data, roadmap IA prioritisée, choix technologiques. Idéal avant de lancer un projet ou de recruter.</p>
+        <div class="srv-tags"><span class="st">Audit data</span><span class="st">Roadmap</span><span class="st">Quick wins</span></div>
       </div>
     </div>
   </div>
 </section>
 
-<!-- OFFRES / PRICING -->
+<!-- OFFRES -->
 <section id="offres">
   <div class="c">
     <div class="sh rv">
-      <div class="tag">Nos formules</div>
-      <h2>Des offres claires,<br/><span class="gt">sans mauvaise surprise</span></h2>
-      <p>Choisissez le niveau d'accompagnement qui correspond à votre ambition. Tout est personnalisable.</p>
+      <div class="tag">Mes tarifs</div>
+      <h2>Transparent sur les prix,<br/><span class="gt">exigeant sur les résultats</span></h2>
+      <p>Trois façons de travailler ensemble, selon votre situation et vos objectifs.</p>
     </div>
     <div class="offres-grid">
-
       <div class="offre rv">
-        <div class="offre-name">Starter</div>
-        <div class="offre-price gt2">5 000€</div>
-        <div class="offre-sub">Projet one-shot · Livré en 3 semaines</div>
+        <div class="offre-name">Audit & Conseil</div>
+        <div class="offre-price gt2">1 500€</div>
+        <div class="offre-sub">Diagnostic complet · Livré en 1 semaine</div>
         <div class="offre-features">
-          <div class="of of-ok"><div class="of-dot">✓</div><span>Audit de vos données existantes</span></div>
-          <div class="of of-ok"><div class="of-dot">✓</div><span>1 cas d'usage IA ciblé</span></div>
-          <div class="of of-ok"><div class="of-dot">✓</div><span>Prototype fonctionnel livré</span></div>
-          <div class="of of-ok"><div class="of-dot">✓</div><span>Dashboard de suivi des métriques</span></div>
-          <div class="of of-no"><div class="of-dot">–</div><span>Déploiement production</span></div>
-          <div class="of of-no"><div class="of-dot">–</div><span>Support continu</span></div>
+          <div class="of of-ok"><div class="of-dot">✓</div><span>Audit de vos données et processus</span></div>
+          <div class="of of-ok"><div class="of-dot">✓</div><span>Identification des 3 leviers IA prioritaires</span></div>
+          <div class="of of-ok"><div class="of-dot">✓</div><span>Roadmap IA chiffrée sur 12 mois</span></div>
+          <div class="of of-ok"><div class="of-dot">✓</div><span>Recommandations stack technique</span></div>
+          <div class="of of-no"><div class="of-dot">–</div><span>Développement</span></div>
+          <div class="of of-no"><div class="of-dot">–</div><span>Déploiement</span></div>
         </div>
-        <a href="#cta-final" class="btn btn-g" style="width:100%;justify-content:center">Démarrer →</a>
+        <a href="#cta-final" class="btn btn-g" style="width:100%;justify-content:center">Demander un audit →</a>
       </div>
 
       <div class="offre pop rv d1">
-        <div class="pop-label">Recommandé</div>
-        <div class="offre-name">Growth</div>
-        <div class="offre-price gt">15 000€</div>
-        <div class="offre-sub">Projet complet · Livré en 6 semaines</div>
+        <div class="pop-label">Populaire</div>
+        <div class="offre-name">Mission Projet</div>
+        <div class="offre-price gt">Sur devis</div>
+        <div class="offre-sub">Forfait au projet · 4 à 8 semaines</div>
         <div class="offre-features">
-          <div class="of of-ok"><div class="of-dot">✓</div><span>Audit + Stratégie data complète</span></div>
-          <div class="of of-ok"><div class="of-dot">✓</div><span>2-3 cas d'usage IA</span></div>
+          <div class="of of-ok"><div class="of-dot">✓</div><span>Audit inclus + stratégie</span></div>
+          <div class="of of-ok"><div class="of-dot">✓</div><span>Développement IA complet</span></div>
           <div class="of of-ok"><div class="of-dot">✓</div><span>Déploiement en production</span></div>
-          <div class="of of-ok"><div class="of-dot">✓</div><span>Intégration dans vos systèmes</span></div>
-          <div class="of of-ok"><div class="of-dot">✓</div><span>Formation équipe incluse</span></div>
-          <div class="of of-ok"><div class="of-dot">✓</div><span>Support 3 mois post-livraison</span></div>
+          <div class="of of-ok"><div class="of-dot">✓</div><span>Documentation & formation</span></div>
+          <div class="of of-ok"><div class="of-dot">✓</div><span>Support 1 mois post-livraison</span></div>
+          <div class="of of-ok"><div class="of-dot">✓</div><span>ROI garanti contractuellement</span></div>
         </div>
-        <a href="#cta-final" class="btn btn-p" style="width:100%;justify-content:center">Choisir Growth →</a>
+        <a href="#cta-final" class="btn btn-p" style="width:100%;justify-content:center">Discuter de mon projet →</a>
       </div>
 
       <div class="offre rv d2">
-        <div class="offre-name">Enterprise</div>
-        <div class="offre-price" style="font-family:'Syne',sans-serif;font-size:42px;font-weight:800;">Sur devis</div>
-        <div class="offre-sub">Partenariat long terme · Dédié</div>
+        <div class="offre-name">Mission Régie</div>
+        <div class="offre-price" style="font-family:'Syne',sans-serif;font-size:40px;font-weight:800">TJM</div>
+        <div class="offre-sub">Tarif journalier · Minimum 10 jours</div>
         <div class="offre-features">
-          <div class="of of-ok"><div class="of-dot">✓</div><span>Équipe dédiée full-time</span></div>
-          <div class="of of-ok"><div class="of-dot">✓</div><span>Architecture data complète</span></div>
-          <div class="of of-ok"><div class="of-dot">✓</div><span>Roadmap IA sur 12 mois</span></div>
-          <div class="of of-ok"><div class="of-dot">✓</div><span>SLA garanti 99.9% uptime</span></div>
-          <div class="of of-ok"><div class="of-dot">✓</div><span>CTO as a Service</span></div>
-          <div class="of of-ok"><div class="of-dot">✓</div><span>Support 24/7</span></div>
+          <div class="of of-ok"><div class="of-dot">✓</div><span>Intégration dans votre équipe</span></div>
+          <div class="of of-ok"><div class="of-dot">✓</div><span>Flexibilité totale sur le périmètre</span></div>
+          <div class="of of-ok"><div class="of-dot">✓</div><span>Reporting hebdomadaire</span></div>
+          <div class="of of-ok"><div class="of-dot">✓</div><span>Idéal pour les projets évolutifs</span></div>
+          <div class="of of-ok"><div class="of-dot">✓</div><span>Possible full-remote ou sur site</span></div>
+          <div class="of of-no"><div class="of-dot">–</div><span>Engagement durée fixe</span></div>
         </div>
-        <a href="#cta-final" class="btn btn-g" style="width:100%;justify-content:center">Nous contacter →</a>
+        <a href="#cta-final" class="btn btn-g" style="width:100%;justify-content:center">Discuter du TJM →</a>
       </div>
-
     </div>
   </div>
 </section>
@@ -526,40 +513,40 @@
 <section id="process">
   <div class="c">
     <div class="sh rv">
-      <div class="tag">Notre méthode</div>
-      <h2>De zéro à la production<br/><span class="gt">en 6 semaines</span></h2>
-      <p>Un processus rodé sur 120+ projets qui élimine les risques et maximise l'impact à chaque étape.</p>
+      <div class="tag">Ma méthode</div>
+      <h2>Du premier appel<br/><span class="gt">aux résultats en production</span></h2>
+      <p>Un processus rodé sur 50+ projets. Pas de surprise, pas de dérive de scope, des livrables concrets à chaque étape.</p>
     </div>
     <div class="proc-grid">
       <div class="proc rv">
         <div class="proc-num" style="background:linear-gradient(135deg,rgba(108,99,255,.2),rgba(108,99,255,.05));color:#b3adff">01</div>
         <div>
-          <h3>Audit & Opportunités — Semaine 1</h3>
-          <p>On plonge dans vos données, vos processus et vos objectifs. On identifie les 3 leviers IA qui auront le plus d'impact sur votre P&L.</p>
-          <div class="proc-detail">→ Livrable : Rapport d'audit + Roadmap priorisée</div>
+          <h3>Appel découverte — Gratuit</h3>
+          <p>30 minutes pour comprendre votre situation, vos données disponibles et vos objectifs. Je vous dis honnêtement si je peux vous aider et comment.</p>
+          <div class="proc-detail">→ Délai : sous 24h après demande</div>
         </div>
       </div>
       <div class="proc rv d1">
         <div class="proc-num" style="background:linear-gradient(135deg,rgba(0,212,255,.2),rgba(0,212,255,.05));color:var(--a2)">02</div>
         <div>
-          <h3>Prototype Rapide — Semaine 2</h3>
-          <p>48h pour un premier prototype validable. Vous voyez les résultats sur vos vraies données avant de vous engager sur le projet complet.</p>
-          <div class="proc-detail">→ Livrable : POC fonctionnel démontrable</div>
+          <h3>Audit & Proposition — Semaine 1</h3>
+          <p>J'analyse vos données, vos processus et vos contraintes. Je vous remets une proposition détaillée avec scope, délais, budget et métriques de succès.</p>
+          <div class="proc-detail">→ Livrable : Proposition signée</div>
         </div>
       </div>
       <div class="proc rv d2">
         <div class="proc-num" style="background:linear-gradient(135deg,rgba(255,77,166,.2),rgba(255,77,166,.05));color:var(--a3)">03</div>
         <div>
-          <h3>Développement & Tests — Semaine 3-5</h3>
-          <p>Construction du système complet avec tests rigoureux sur vos jeux de données. Votre équipe est impliquée à chaque sprint.</p>
-          <div class="proc-detail">→ Livrable : Système IA testé et validé</div>
+          <h3>Prototype validé — Semaine 2</h3>
+          <p>Avant de développer le système complet, je livre un prototype sur vos vraies données. Vous validez que la direction est bonne avant d'investir.</p>
+          <div class="proc-detail">→ Livrable : POC fonctionnel</div>
         </div>
       </div>
       <div class="proc rv d3">
         <div class="proc-num" style="background:linear-gradient(135deg,rgba(0,255,135,.15),rgba(0,255,135,.03));color:var(--a4)">04</div>
         <div>
-          <h3>Déploiement & Suivi — Semaine 6+</h3>
-          <p>Mise en production, formation de vos équipes et monitoring continu. On mesure le ROI et on itère pour maximiser l'impact.</p>
+          <h3>Livraison & Suivi — Semaine 4-8</h3>
+          <p>Développement, tests, déploiement, formation. Je reste disponible après la livraison pour m'assurer que les métriques sont au rendez-vous.</p>
           <div class="proc-detail">→ Livrable : Système en prod + Dashboard ROI</div>
         </div>
       </div>
@@ -583,12 +570,12 @@
       </div>
       <div class="stat">
         <div class="sn gt" id="s3">0</div>
-        <div class="sl">Satisfaction client</div>
+        <div class="sl">Clients satisfaits</div>
         <div class="sd"></div>
       </div>
       <div class="stat">
         <div class="sn gt" id="s4">0</div>
-        <div class="sl">Heures économisées / client</div>
+        <div class="sl">Années d'expertise</div>
       </div>
     </div>
   </div>
@@ -598,15 +585,15 @@
 <section id="testimonials">
   <div class="c">
     <div class="sh rv">
-      <div class="tag">Résultats clients</div>
-      <h2>Des chiffres réels,<br/><span class="gt">des entreprises réelles</span></h2>
-      <p>Pas de promesses. Des cas concrets avec des résultats mesurables.</p>
+      <div class="tag">Ce qu'ils disent</div>
+      <h2>Des clients qui parlent<br/><span class="gt">à ma place</span></h2>
+      <p>Des retours concrets sur des projets réels — avec les chiffres qui vont avec.</p>
     </div>
     <div class="tg">
       <div class="tc hl rv">
         <div class="stars">★★★★★</div>
-        <div class="tc-result">+320% de productivité sur le service client</div>
-        <p class="tc-text">"L'agent IA de MIA traite maintenant 80% de nos tickets automatiquement. On a pu redéployer 4 ETP sur des missions à plus forte valeur. Le ROI a été atteint en 3 mois."</p>
+        <div class="tc-result">+320% productivité service client</div>
+        <p class="tc-text">"Renaud a su comprendre notre métier rapidement et livrer un agent IA qui gère 80% de nos tickets. Autonome, carré, orienté résultats. Exactement ce qu'on cherchait."</p>
         <div class="tc-author">
           <div class="av-big" style="background:linear-gradient(135deg,var(--a),var(--a2))">SL</div>
           <div>
@@ -617,8 +604,8 @@
       </div>
       <div class="tc rv d1">
         <div class="stars">★★★★★</div>
-        <div class="tc-result">-62% de coûts logistiques en 6 mois</div>
-        <p class="tc-text">"Le modèle prédictif anticipe nos ruptures de stock 3 semaines à l'avance. On ne subit plus les imprévus. MIA a vraiment compris notre métier avant de coder."</p>
+        <div class="tc-result">-62% coûts logistiques en 6 mois</div>
+        <p class="tc-text">"Ce qui m'a convaincu avec Renaud c'est qu'il a dit non à 2 idées que j'avais — et il avait raison. Il ne cherche pas à facturer, il cherche à avoir de l'impact."</p>
         <div class="tc-author">
           <div class="av-big" style="background:linear-gradient(135deg,var(--a2),var(--a4))">TM</div>
           <div>
@@ -629,8 +616,8 @@
       </div>
       <div class="tc rv d2">
         <div class="stars">★★★★★</div>
-        <div class="tc-result">10Tb/jour traités sans accroc</div>
-        <p class="tc-text">"Architecture data de zéro à production en 5 semaines. La qualité du code est exemplaire, et l'équipe MIA s'est intégrée naturellement avec nos développeurs internes."</p>
+        <div class="tc-result">Architecture data 0 → prod en 5 semaines</div>
+        <p class="tc-text">"Qualité de code exemplaire, communication irréprochable, livrables dans les temps. Renaud s'est comporté comme un vrai membre de l'équipe, pas comme un prestataire."</p>
         <div class="tc-author">
           <div class="av-big" style="background:linear-gradient(135deg,var(--a3),#cc2d7a)">AR</div>
           <div>
@@ -648,73 +635,73 @@
   <div class="c">
     <div class="sh rv">
       <div class="tag">Questions fréquentes</div>
-      <h2>Tout ce que vous<br/><span class="gt">voulez savoir</span></h2>
+      <h2>Vos questions,<br/><span class="gt">mes réponses directes</span></h2>
     </div>
     <div class="faq-list">
       <div class="faq-item rv">
         <div class="faq-q" onclick="toggleFaq(this)">
-          <span>Combien de temps pour voir les premiers résultats ?</span>
+          <span>Vous êtes disponible pour une mission qui commence quand ?</span>
           <div class="faq-icon">+</div>
         </div>
-        <div class="faq-a"><div class="faq-a-inner">Dès la semaine 2, vous avez un prototype fonctionnel sur vos vraies données. Les premiers résultats en production sont généralement visibles entre 4 et 8 semaines selon la complexité du projet. On ne démarre pas le développement complet sans que vous ayez validé les premières métriques.</div></div>
+        <div class="faq-a"><div class="faq-a-inner">Je suis généralement disponible sous 1 à 2 semaines. La meilleure façon de savoir est de réserver un appel — on verra ensemble si les dates correspondent. Je travaille sur un nombre limité de projets simultanément pour garantir la qualité.</div></div>
       </div>
       <div class="faq-item rv d1">
         <div class="faq-q" onclick="toggleFaq(this)">
-          <span>Faut-il avoir des données structurées pour démarrer ?</span>
+          <span>Remote ou présentiel ?</span>
           <div class="faq-icon">+</div>
         </div>
-        <div class="faq-a"><div class="faq-a-inner">Non. Beaucoup de nos clients démarrent avec des données éparpillées dans des Excel, CRMs, ERP ou PDF. Notre première étape est justement de consolider, nettoyer et structurer vos données. On est habitués à travailler avec de la donnée imparfaite — c'est souvent le cas réel.</div></div>
+        <div class="faq-a"><div class="faq-a-inner">Les deux. Je travaille majoritairement en remote, ce qui me permet d'intervenir partout en France et en Europe. Des déplacements ponctuels sur site sont toujours possibles pour les lancements de projet ou les ateliers stratégiques. On adapte selon vos besoins.</div></div>
       </div>
       <div class="faq-item rv d2">
         <div class="faq-q" onclick="toggleFaq(this)">
-          <span>Est-ce que mes données restent confidentielles ?</span>
+          <span>Puis-je vous confier mes données ? Elles sont confidentielles.</span>
           <div class="faq-icon">+</div>
         </div>
-        <div class="faq-a"><div class="faq-a-inner">Absolument. Nous signons systématiquement un NDA avant tout partage de données. Vos données ne quittent jamais vos infrastructures sans votre accord explicite, et ne sont jamais utilisées pour entraîner nos propres modèles. Nous sommes conformes RGPD et pouvons travailler en environnement ISO 27001.</div></div>
+        <div class="faq-a"><div class="faq-a-inner">Absolument. Je signe systématiquement un NDA avant toute transmission de données. Vos données ne sont jamais utilisées à d'autres fins que votre projet. Je suis en mesure de travailler dans des environnements cloisonnés et je suis RGPD-compliant.</div></div>
       </div>
       <div class="faq-item rv">
         <div class="faq-q" onclick="toggleFaq(this)">
-          <span>Que se passe-t-il si le projet ne livre pas les résultats promis ?</span>
+          <span>Que se passe-t-il si les résultats ne sont pas au rendez-vous ?</span>
           <div class="faq-icon">+</div>
         </div>
-        <div class="faq-a"><div class="faq-a-inner">On s'engage contractuellement sur des métriques de performance (précision du modèle, taux d'automatisation, temps de traitement...). Si ces seuils ne sont pas atteints à la livraison, on continue d'itérer gratuitement jusqu'à les atteindre. Notre réputation repose sur les résultats, pas sur les livrables.</div></div>
+        <div class="faq-a"><div class="faq-a-inner">Je définis des métriques de succès avec vous avant de démarrer et je m'y engage contractuellement. Si les objectifs ne sont pas atteints à la livraison, je continue d'itérer sans surcoût jusqu'à ce qu'ils le soient. Je ne prends pas de mission si je ne suis pas convaincu de pouvoir tenir ces métriques.</div></div>
       </div>
       <div class="faq-item rv d1">
         <div class="faq-q" onclick="toggleFaq(this)">
-          <span>Nos équipes techniques doivent-elles être impliquées ?</span>
+          <span>Avez-vous une expérience dans mon secteur ?</span>
           <div class="faq-icon">+</div>
         </div>
-        <div class="faq-a"><div class="faq-a-inner">C'est utile mais pas obligatoire. On peut travailler en totale autonomie ou en co-développement avec vos développeurs. Dans tous les cas, on documente tout, on forme vos équipes et on transfère le code proprement. L'objectif est que vous ne dépendiez pas de nous indéfiniment.</div></div>
+        <div class="faq-a"><div class="faq-a-inner">J'ai travaillé dans le retail, la logistique, la fintech, la santé, l'industrie et les services. La data et l'IA ont des patterns récurrents quel que soit le secteur. Ce qui compte, c'est de bien comprendre votre métier — et ça, c'est la première chose que je fais dès l'appel découverte.</div></div>
       </div>
       <div class="faq-item rv d2">
         <div class="faq-q" onclick="toggleFaq(this)">
-          <span>Quelle taille d'entreprise travaillez-vous avec MIA ?</span>
+          <span>Quel est votre TJM ?</span>
           <div class="faq-icon">+</div>
         </div>
-        <div class="faq-a"><div class="faq-a-inner">De la startup Série A aux groupes cotés en bourse. La fourchette typique est des PME de 50 à 5 000 salariés avec un CA entre 10M€ et 500M€. Ce qui compte, c'est l'ambition et la présence de données exploitables — pas la taille. Le diagnostic gratuit permet de savoir en 30 min si on peut vous aider.</div></div>
+        <div class="faq-a"><div class="faq-a-inner">Mon TJM varie selon la nature de la mission, la durée et le niveau d'expertise requis. Je travaille aussi bien en forfait projet qu'en régie. Pour obtenir un chiffre précis, le plus simple est qu'on en parle — 30 minutes suffisent pour cadrer une proposition adaptée à votre budget.</div></div>
       </div>
     </div>
   </div>
 </section>
 
-<!-- CTA FINAL -->
+<!-- CTA -->
 <section id="cta-final">
   <div class="c">
     <div class="cta-box rv">
       <div class="cta-g1"></div>
       <div class="cta-g2"></div>
-      <div class="tag" style="justify-content:center">Première étape</div>
-      <h2>30 minutes pour savoir<br/><span class="gt">si l'IA peut transformer<br/>votre business</span></h2>
-      <p>Un diagnostic gratuit avec un expert MIA. On analyse votre situation, on identifie les opportunités réelles et on vous dit honnêtement ce qu'on peut faire.</p>
+      <div class="tag" style="justify-content:center">Parlons-en</div>
+      <h2>30 minutes pour savoir<br/><span class="gt">si je peux vraiment vous aider</span></h2>
+      <p>Un appel sans engagement, sans pitch commercial. Je vous pose des questions, j'écoute votre situation et je vous dis franchement ce que je pense être faisable — et ce qui ne l'est pas.</p>
       <div class="cta-chips">
-        <div class="chip">Sans engagement</div>
         <div class="chip">100% gratuit</div>
+        <div class="chip">Sans engagement</div>
         <div class="chip">Réponse sous 24h</div>
-        <div class="chip">Expert senior</div>
+        <div class="chip">Vous parlez à moi directement</div>
       </div>
       <div class="cta-btns">
-        <a href="mailto:hello@mia.ai" class="btn btn-p btn-lg">Réserver mon créneau →</a>
-        <a href="mailto:hello@mia.ai" class="btn btn-w btn-lg">hello@mia.ai</a>
+        <a href="mailto:renaud.secq@gmail.com" class="btn btn-p btn-lg">Envoyer un message →</a>
+        <a href="mailto:renaud.secq@gmail.com" class="btn btn-w btn-lg">renaud.secq@gmail.com</a>
       </div>
     </div>
   </div>
@@ -725,13 +712,13 @@
   <div class="c">
     <div class="fg">
       <div>
-        <a class="logo" href="#">MIA</a>
-        <p class="fb-desc">L'agence IA & Data qui transforme vos données en avantage compétitif concret. Basée à Paris, active dans toute l'Europe.</p>
+        <a class="logo" href="#">Renaud Secq</a>
+        <p class="fb-desc">Consultant freelance IA & Data. J'aide les entreprises à transformer leurs données en systèmes intelligents qui créent de la valeur réelle.</p>
         <div class="soc">
           <a class="sl-link" href="#" aria-label="LinkedIn">in</a>
           <a class="sl-link" href="#" aria-label="Twitter">𝕏</a>
           <a class="sl-link" href="#" aria-label="GitHub">⌥</a>
-          <a class="sl-link" href="mailto:hello@mia.ai" aria-label="Email">@</a>
+          <a class="sl-link" href="mailto:renaud.secq@gmail.com" aria-label="Email">@</a>
         </div>
       </div>
       <div class="fc">
@@ -741,61 +728,45 @@
           <li><a href="#services">Machine Learning</a></li>
           <li><a href="#services">Data Engineering</a></li>
           <li><a href="#services">Business Intelligence</a></li>
-          <li><a href="#services">MLOps & Cloud</a></li>
-        </ul>
-      </div>
-      <div class="fc">
-        <h4>Agence</h4>
-        <ul class="fl">
-          <li><a href="#process">Notre méthode</a></li>
-          <li><a href="#offres">Tarifs</a></li>
-          <li><a href="#testimonials">Références</a></li>
-          <li><a href="#">Blog IA</a></li>
-          <li><a href="#">Carrières</a></li>
+          <li><a href="#services">Audit & Stratégie</a></li>
         </ul>
       </div>
       <div class="fc">
         <h4>Contact</h4>
         <ul class="fl">
-          <li><a href="mailto:hello@mia.ai">hello@mia.ai</a></li>
-          <li><a href="tel:+33123456789">+33 1 23 45 67 89</a></li>
-          <li><a href="#">Paris, France</a></li>
-          <li><a href="#cta-final">Diagnostic gratuit</a></li>
+          <li><a href="mailto:renaud.secq@gmail.com">renaud.secq@gmail.com</a></li>
+          <li><a href="#">LinkedIn</a></li>
+          <li><a href="#">France · Remote</a></li>
+          <li><a href="#cta-final">Réserver un appel</a></li>
         </ul>
       </div>
     </div>
     <div class="fb">
-      <span>© 2026 MIA — Agence Intelligence Artificielle & Data. Tous droits réservés.</span>
-      <div class="status"><div class="dot"></div><span>Tous les systèmes opérationnels</span></div>
+      <span>© 2026 Renaud Secq — Consultant Freelance IA & Data. Tous droits réservés.</span>
+      <div class="status"><div class="dot-s"></div><span>Disponible pour de nouvelles missions</span></div>
     </div>
   </div>
 </footer>
 
 <script>
-/* Navbar */
 const nav = document.getElementById('nav');
 window.addEventListener('scroll', () => nav.classList.toggle('s', scrollY > 50));
 
-/* Reveal on scroll */
-const rvEls = document.querySelectorAll('.rv');
-new IntersectionObserver((e) => e.forEach(x => x.isIntersecting && x.target.classList.add('in')), { threshold: 0.1 }).observe || null;
-const io = new IntersectionObserver((e) => e.forEach(x => x.isIntersecting && x.target.classList.add('in')), { threshold: 0.1 });
-rvEls.forEach(el => io.observe(el));
+const io = new IntersectionObserver(e => e.forEach(x => x.isIntersecting && x.target.classList.add('in')), {threshold:.1});
+document.querySelectorAll('.rv').forEach(el => io.observe(el));
 
-/* FAQ toggle */
 function toggleFaq(btn) {
   const item = btn.parentElement;
-  const isOpen = item.classList.contains('open');
+  const open = item.classList.contains('open');
   document.querySelectorAll('.faq-item.open').forEach(i => i.classList.remove('open'));
-  if (!isOpen) item.classList.add('open');
+  if (!open) item.classList.add('open');
 }
 
-/* Canvas particles */
 (function(){
   const c = document.getElementById('bg'), ctx = c.getContext('2d');
   let W, H, pts;
   function resize(){ W = c.width = innerWidth; H = c.height = innerHeight; }
-  function mkPts(n){ return Array.from({length:n}, ()=>({ x:Math.random()*W, y:Math.random()*H, vx:(Math.random()-.5)*.25, vy:(Math.random()-.5)*.25, r:Math.random()*1.2+.4 })); }
+  function mk(n){ return Array.from({length:n}, ()=>({x:Math.random()*W,y:Math.random()*H,vx:(Math.random()-.5)*.25,vy:(Math.random()-.5)*.25,r:Math.random()*1.2+.4})); }
   function draw(){
     ctx.clearRect(0,0,W,H);
     for(let i=0;i<pts.length;i++){
@@ -804,36 +775,30 @@ function toggleFaq(btn) {
       if(p.x<0)p.x=W; if(p.x>W)p.x=0;
       if(p.y<0)p.y=H; if(p.y>H)p.y=0;
       ctx.beginPath(); ctx.arc(p.x,p.y,p.r,0,Math.PI*2);
-      ctx.fillStyle='rgba(108,99,255,.45)'; ctx.fill();
+      ctx.fillStyle='rgba(108,99,255,.4)'; ctx.fill();
       for(let j=i+1;j<pts.length;j++){
-        const q=pts[j], dx=p.x-q.x, dy=p.y-q.y, d=Math.hypot(dx,dy);
-        if(d<110){ ctx.beginPath(); ctx.moveTo(p.x,p.y); ctx.lineTo(q.x,q.y);
-          ctx.strokeStyle=`rgba(108,99,255,${.1*(1-d/110)})`; ctx.lineWidth=.5; ctx.stroke(); }
+        const q=pts[j],dx=p.x-q.x,dy=p.y-q.y,d=Math.hypot(dx,dy);
+        if(d<110){ctx.beginPath();ctx.moveTo(p.x,p.y);ctx.lineTo(q.x,q.y);ctx.strokeStyle=`rgba(108,99,255,${.1*(1-d/110)})`;ctx.lineWidth=.5;ctx.stroke();}
       }
     }
     requestAnimationFrame(draw);
   }
-  resize(); pts = mkPts(60); draw();
-  window.addEventListener('resize', ()=>{ resize(); pts=mkPts(60); });
+  resize(); pts=mk(60); draw();
+  window.addEventListener('resize',()=>{resize();pts=mk(60);});
 })();
 
-/* Stat counters */
-function counter(el, target, suffix, decimals=0){
-  const dur=1800, start=performance.now();
-  (function tick(now){
-    const p=Math.min((now-start)/dur,1), e=1-Math.pow(1-p,3);
-    el.textContent=(target*e).toFixed(decimals)+suffix;
-    if(p<1) requestAnimationFrame(tick);
-  })(start);
-}
 let counted=false;
 new IntersectionObserver(e=>{
-  if(e[0].isIntersecting && !counted){
+  if(e[0].isIntersecting&&!counted){
     counted=true;
-    counter(document.getElementById('s1'),120,'+');
-    counter(document.getElementById('s2'),4.2,'×',1);
-    counter(document.getElementById('s3'),98,'%');
-    counter(document.getElementById('s4'),2400,'h');
+    [[s1,50,'+'],[s2,4,'×',1],[s3,98,'%'],[s4,6,'+']].forEach(([el,t,sfx,dec=0])=>{
+      const dur=1800,start=performance.now();
+      (function tick(now){
+        const p=Math.min((now-start)/dur,1),ease=1-Math.pow(1-p,3);
+        el.textContent=(t*ease).toFixed(dec)+sfx;
+        if(p<1)requestAnimationFrame(tick);
+      })(start);
+    });
   }
 },{threshold:.4}).observe(document.getElementById('stats'));
 </script>
