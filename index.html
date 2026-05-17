@@ -223,24 +223,54 @@
       margin-bottom: 16px;
     }
     .contact-body p { font-size: 15px; color: var(--m2); line-height: 1.75; max-width: 480px; margin-bottom: 36px; }
-    .contact-links { display: flex; flex-direction: column; gap: 12px; }
-    .contact-link {
-      display: flex; align-items: center; justify-content: space-between;
-      padding: 18px 24px;
+    .contact-form { display: flex; flex-direction: column; gap: 14px; max-width: 520px; }
+    .cf-row { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+    .cf-field { display: flex; flex-direction: column; gap: 6px; }
+    .cf-label { font-size: 11px; font-weight: 600; letter-spacing: .08em; text-transform: uppercase; color: var(--m); }
+    .cf-input, .cf-textarea {
       background: var(--bg2);
       border: 1px solid var(--border);
-      border-radius: 14px;
-      text-decoration: none;
-      transition: .3s var(--ease);
-      max-width: 480px;
+      border-radius: 10px;
+      padding: 13px 16px;
+      font-size: 14px;
+      color: var(--t);
+      font-family: 'Inter', sans-serif;
+      outline: none;
+      transition: border-color .2s;
+      width: 100%;
+      resize: none;
     }
-    .contact-link:hover { border-color: rgba(255,255,255,.16); transform: translateX(4px); }
-    .cl-left { display: flex; align-items: center; gap: 14px; }
-    .cl-icon { width: 36px; height: 36px; border-radius: 10px; background: rgba(255,255,255,.05); display: flex; align-items: center; justify-content: center; font-size: 16px; }
-    .cl-label { font-size: 14px; font-weight: 600; color: var(--t); }
-    .cl-sub { font-size: 12px; color: var(--m); margin-top: 1px; }
-    .cl-arrow { font-size: 18px; color: var(--m); transition: transform .25s, color .25s; }
-    .contact-link:hover .cl-arrow { transform: translateX(4px); color: var(--t); }
+    .cf-input::placeholder, .cf-textarea::placeholder { color: var(--m); }
+    .cf-input:focus, .cf-textarea:focus { border-color: rgba(255,255,255,.22); }
+    .cf-textarea { min-height: 120px; line-height: 1.6; }
+    .cf-select {
+      display: flex; flex-wrap: wrap; gap: 8px; margin-top: 4px;
+    }
+    .cf-option {
+      font-size: 12px; font-weight: 500; padding: 6px 14px; border-radius: 100px;
+      background: var(--bg2); border: 1px solid var(--border); color: var(--m2);
+      cursor: pointer; transition: .2s; user-select: none;
+    }
+    .cf-option:hover { border-color: rgba(255,255,255,.2); color: var(--t); }
+    .cf-option.active { background: var(--t); color: var(--bg); border-color: var(--t); }
+    .cf-submit {
+      display: inline-flex; align-items: center; gap: 8px;
+      padding: 14px 28px; border-radius: 100px;
+      background: var(--t); color: var(--bg);
+      font-size: 14px; font-weight: 700; font-family: 'Inter', sans-serif;
+      border: none; cursor: pointer; transition: .3s var(--ease);
+      align-self: flex-start;
+    }
+    .cf-submit:hover { background: var(--accent); transform: translateY(-2px); }
+    .cf-submit:disabled { opacity: .5; cursor: not-allowed; transform: none; }
+    .cf-success {
+      display: none; padding: 16px 20px;
+      background: rgba(200,255,0,.08); border: 1px solid rgba(200,255,0,.2);
+      border-radius: 12px; font-size: 14px; color: var(--accent); font-weight: 500;
+    }
+    .contact-linkedin { display: flex; align-items: center; gap: 12px; margin-top: 20px; padding-top: 20px; border-top: 1px solid var(--border); }
+    .contact-linkedin a { font-size: 13px; color: var(--m2); text-decoration: none; transition: color .2s; }
+    .contact-linkedin a:hover { color: var(--t); }
 
     /* ── FOOTER ── */
     footer {
@@ -526,37 +556,37 @@
       <div class="contact-body rv d1">
         <h2>Une mission en tête ?<br/>Parlons-en.</h2>
         <p>Je réponds à tous les messages sous 24h. Remote ou sur site, projet forfait ou régie — prenons 30 minutes pour voir si je peux vous aider.</p>
-        <div class="contact-links">
-          <a href="mailto:renaudsecq@gmail.com" class="contact-link">
-            <div class="cl-left">
-              <div class="cl-icon">✉️</div>
-              <div>
-                <div class="cl-label">Email</div>
-                <div class="cl-sub">renaudsecq@gmail.com</div>
-              </div>
+        <form class="contact-form" id="contact-form" action="https://formspree.io/f/YOUR_FORM_ID" method="POST">
+          <div class="cf-row">
+            <div class="cf-field">
+              <label class="cf-label" for="cf-name">Prénom & Nom</label>
+              <input class="cf-input" id="cf-name" type="text" name="name" placeholder="Sophie Martin" required/>
             </div>
-            <div class="cl-arrow">→</div>
-          </a>
-          <a href="https://www.linkedin.com/in/renaud-secq-5593832a/" target="_blank" class="contact-link">
-            <div class="cl-left">
-              <div class="cl-icon">💼</div>
-              <div>
-                <div class="cl-label">LinkedIn</div>
-                <div class="cl-sub">20 000 abonnés · Renaud Secq</div>
-              </div>
+            <div class="cf-field">
+              <label class="cf-label" for="cf-email">Email</label>
+              <input class="cf-input" id="cf-email" type="email" name="email" placeholder="sophie@entreprise.com" required/>
             </div>
-            <div class="cl-arrow">→</div>
-          </a>
-          <a href="tel:0664997359" class="contact-link">
-            <div class="cl-left">
-              <div class="cl-icon">📱</div>
-              <div>
-                <div class="cl-label">Téléphone</div>
-                <div class="cl-sub">06 64 99 73 59</div>
-              </div>
+          </div>
+          <div class="cf-field">
+            <label class="cf-label">Type de mission</label>
+            <div class="cf-select" id="cf-type">
+              <span class="cf-option" data-val="Projet forfait">Projet forfait</span>
+              <span class="cf-option" data-val="Mission régie">Mission régie</span>
+              <span class="cf-option" data-val="Audit conseil">Audit & conseil</span>
+              <span class="cf-option" data-val="Autre">Autre</span>
             </div>
-            <div class="cl-arrow">→</div>
-          </a>
+            <input type="hidden" name="type" id="cf-type-val"/>
+          </div>
+          <div class="cf-field">
+            <label class="cf-label" for="cf-msg">Votre message</label>
+            <textarea class="cf-textarea" id="cf-msg" name="message" placeholder="Décrivez votre projet, votre contexte, vos contraintes..." required></textarea>
+          </div>
+          <button class="cf-submit" type="submit" id="cf-btn">Envoyer →</button>
+          <div class="cf-success" id="cf-success">✓ Message envoyé — je vous réponds sous 24h.</div>
+        </form>
+        <div class="contact-linkedin">
+          <span style="font-size:12px;color:var(--m)">Ou directement sur</span>
+          <a href="https://www.linkedin.com/in/renaud-secq-5593832a/" target="_blank">LinkedIn →</a>
         </div>
       </div>
     </div>
@@ -575,6 +605,42 @@
 </footer>
 
 <script>
+  /* Contact form */
+  document.querySelectorAll('.cf-option').forEach(opt => {
+    opt.addEventListener('click', () => {
+      document.querySelectorAll('.cf-option').forEach(o => o.classList.remove('active'));
+      opt.classList.add('active');
+      document.getElementById('cf-type-val').value = opt.dataset.val;
+    });
+  });
+
+  const form = document.getElementById('contact-form');
+  form && form.addEventListener('submit', async (e) => {
+    e.preventDefault();
+    const btn = document.getElementById('cf-btn');
+    btn.disabled = true;
+    btn.textContent = 'Envoi en cours…';
+    try {
+      const res = await fetch(form.action, {
+        method: 'POST',
+        body: new FormData(form),
+        headers: { 'Accept': 'application/json' }
+      });
+      if (res.ok) {
+        form.reset();
+        document.querySelectorAll('.cf-option').forEach(o => o.classList.remove('active'));
+        document.getElementById('cf-success').style.display = 'block';
+        btn.style.display = 'none';
+      } else {
+        btn.textContent = 'Erreur — réessayez';
+        btn.disabled = false;
+      }
+    } catch {
+      btn.textContent = 'Erreur — réessayez';
+      btn.disabled = false;
+    }
+  });
+
   /* Nav scroll */
   const nav = document.getElementById('nav');
   window.addEventListener('scroll', () => nav.classList.toggle('s', scrollY > 60));
