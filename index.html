@@ -139,6 +139,47 @@
     /* ── DIVIDER ── */
     .divider { border: none; border-top: 1px solid var(--border); margin: 0; }
 
+    /* ── LOGOS ── */
+    .logos-section { padding: 48px 0; }
+    .logos-intro { font-size: 11px; font-weight: 600; letter-spacing: .12em; text-transform: uppercase; color: var(--m); margin-bottom: 32px; }
+    .logos-grid {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      gap: 8px;
+    }
+    .logo-item {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 12px 20px;
+      background: var(--bg2);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      transition: .3s var(--ease);
+      height: 52px;
+    }
+    .logo-item:hover { border-color: rgba(255,255,255,.14); background: #161616; }
+    .logo-item img {
+      height: 22px;
+      width: auto;
+      max-width: 100px;
+      filter: grayscale(1) brightness(0) invert(1);
+      opacity: .45;
+      transition: opacity .3s;
+      object-fit: contain;
+    }
+    .logo-item:hover img { opacity: .75; }
+    .logo-item .logo-txt {
+      font-family: 'Syne', sans-serif;
+      font-size: 13px;
+      font-weight: 700;
+      color: var(--m);
+      white-space: nowrap;
+      transition: color .3s;
+    }
+    .logo-item:hover .logo-txt { color: var(--m2); }
+
     /* ── ABOUT ── */
     #about { padding: 100px 0; }
     .about-grid { display: grid; grid-template-columns: 200px 1fr; gap: 80px; align-items: start; }
@@ -363,6 +404,53 @@
     </div>
   </div>
 </section>
+
+<hr class="divider"/>
+
+<!-- LOGOS -->
+<div class="logos-section">
+  <div class="c">
+    <div class="logos-intro">Ils m'ont fait confiance</div>
+    <div class="logos-grid">
+      <div class="logo-item">
+        <img src="https://logo.clearbit.com/decathlon.com" alt="Decathlon" onerror="this.style.display='none';this.nextElementSibling.style.display='block'"/>
+        <span class="logo-txt" style="display:none">Decathlon</span>
+      </div>
+      <div class="logo-item">
+        <img src="https://logo.clearbit.com/adeo.com" alt="Adeo" onerror="this.style.display='none';this.nextElementSibling.style.display='block'"/>
+        <span class="logo-txt" style="display:none">Adeo</span>
+      </div>
+      <div class="logo-item">
+        <img src="https://logo.clearbit.com/auchan.fr" alt="Auchan" onerror="this.style.display='none';this.nextElementSibling.style.display='block'"/>
+        <span class="logo-txt" style="display:none">Auchan</span>
+      </div>
+      <div class="logo-item">
+        <img src="https://logo.clearbit.com/fnac.com" alt="Fnac" onerror="this.style.display='none';this.nextElementSibling.style.display='block'"/>
+        <span class="logo-txt" style="display:none">Fnac</span>
+      </div>
+      <div class="logo-item">
+        <img src="https://logo.clearbit.com/laredoute.fr" alt="La Redoute" onerror="this.style.display='none';this.nextElementSibling.style.display='block'"/>
+        <span class="logo-txt" style="display:none">La Redoute</span>
+      </div>
+      <div class="logo-item">
+        <img src="https://logo.clearbit.com/oney.fr" alt="Oney" onerror="this.style.display='none';this.nextElementSibling.style.display='block'"/>
+        <span class="logo-txt" style="display:none">Oney</span>
+      </div>
+      <div class="logo-item">
+        <img src="https://logo.clearbit.com/publicis.com" alt="Publicis" onerror="this.style.display='none';this.nextElementSibling.style.display='block'"/>
+        <span class="logo-txt" style="display:none">Publicis</span>
+      </div>
+      <div class="logo-item">
+        <img src="https://logo.clearbit.com/altavia.com" alt="Altavia" onerror="this.style.display='none';this.nextElementSibling.style.display='block'"/>
+        <span class="logo-txt" style="display:none">Altavia</span>
+      </div>
+      <div class="logo-item">
+        <img src="https://logo.clearbit.com/experian.com" alt="Experian" onerror="this.style.display='none';this.nextElementSibling.style.display='block'"/>
+        <span class="logo-txt" style="display:none">Experian</span>
+      </div>
+    </div>
+  </div>
+</div>
 
 <hr class="divider"/>
 
