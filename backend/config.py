@@ -13,8 +13,11 @@ MIN_SCORE = 7.0
 # Scoring minimum pour générer un post LinkedIn
 MIN_SCORE_LINKEDIN = 8.0
 
-# Nombre max d'articles par jour
-MAX_ARTICLES_PER_DAY = 15
+# Nombre max d'articles par semaine
+MAX_ARTICLES_PER_WEEK = 15
+
+# Nombre de jours max pour un article (filtre fraîcheur)
+MAX_ARTICLE_AGE_DAYS = 7
 
 # Profil expert
 EXPERT_PROFILE = {
@@ -37,14 +40,14 @@ RSS_SOURCES = {
         "emoji": "🤖",
         "color": "#6c63ff",
         "sources": [
-            {"name": "Medium #llm", "url": "https://medium.com/feed/tag/llm", "weight": 1.0},
             {"name": "Google DeepMind", "url": "https://deepmind.google/blog/rss.xml", "weight": 1.2},
-            {"name": "Ars Technica AI", "url": "https://arstechnica.com/ai/feed/", "weight": 1.0},
-            {"name": "The Register AI", "url": "https://www.theregister.com/software/ai_ml/headlines.atom", "weight": 0.9},
-            {"name": "LangChain Blog", "url": "https://blog.langchain.dev/rss/", "weight": 1.0},
+            {"name": "Hugging Face Blog", "url": "https://huggingface.co/blog/feed.xml", "weight": 1.1},
+            {"name": "Simon Willison", "url": "https://simonwillison.net/atom/everything/", "weight": 1.2},
             {"name": "VentureBeat AI", "url": "https://venturebeat.com/category/ai/feed/", "weight": 1.0},
             {"name": "TechCrunch AI", "url": "https://techcrunch.com/category/artificial-intelligence/feed/", "weight": 0.9},
-            {"name": "a16z AI", "url": "https://a16z.com/tag/ai/feed/", "weight": 1.1},
+            {"name": "Ars Technica AI", "url": "https://arstechnica.com/ai/feed/", "weight": 1.0},
+            {"name": "Wired AI", "url": "https://www.wired.com/feed/tag/ai/latest/rss", "weight": 1.0},
+            {"name": "Medium #llm", "url": "https://medium.com/feed/tag/llm", "weight": 0.9},
         ]
     },
     "data_governance": {
@@ -53,9 +56,9 @@ RSS_SOURCES = {
         "color": "#00d4ff",
         "sources": [
             {"name": "Medium #ai-governance", "url": "https://medium.com/feed/tag/ai-governance", "weight": 1.2},
-            {"name": "Medium #data-catalog", "url": "https://medium.com/feed/tag/data-catalog", "weight": 1.0},
-            {"name": "Medium #data-governance", "url": "https://medium.com/feed/tag/data-governance", "weight": 1.0},
+            {"name": "Medium #data-governance", "url": "https://medium.com/feed/tag/data-governance", "weight": 1.1},
             {"name": "Medium #data-quality", "url": "https://medium.com/feed/tag/data-quality", "weight": 1.0},
+            {"name": "Medium #data-catalog", "url": "https://medium.com/feed/tag/data-catalog", "weight": 1.0},
             {"name": "Towards Data Science", "url": "https://towardsdatascience.com/feed", "weight": 0.9},
             {"name": "KDnuggets", "url": "https://www.kdnuggets.com/feed", "weight": 0.9},
             {"name": "Medium #data-mesh", "url": "https://medium.com/feed/tag/data-mesh", "weight": 0.8},
@@ -68,21 +71,21 @@ RSS_SOURCES = {
         "sources": [
             {"name": "EU AI Act", "url": "https://artificialintelligenceact.eu/feed/", "weight": 1.3},
             {"name": "CNIL", "url": "https://www.cnil.fr/fr/rss.xml", "weight": 1.2},
-            {"name": "IAPP", "url": "https://iapp.org/news/feed/", "weight": 1.1},
-            {"name": "Stanford HAI", "url": "https://hai.stanford.edu/news/rss.xml", "weight": 1.1},
+            {"name": "Commission EU Digital", "url": "https://digital-strategy.ec.europa.eu/en/rss.xml", "weight": 1.2},
+            {"name": "AI Snake Oil", "url": "https://www.aisnakeoil.com/feed", "weight": 1.2},
             {"name": "MIT Tech Review", "url": "https://www.technologyreview.com/topic/artificial-intelligence/feed/", "weight": 1.0},
+            {"name": "Stanford HAI", "url": "https://hai.stanford.edu/news/rss.xml", "weight": 1.1},
         ]
     },
-    "tendances": {
-        "label": "Tendances & Outils",
-        "emoji": "💡",
+    "business_strategie": {
+        "label": "Business & Stratégie IA",
+        "emoji": "�",
         "color": "#ff6b6b",
         "sources": [
-            {"name": "ZDNet AI", "url": "https://www.zdnet.com/topic/artificial-intelligence/rss.xml", "weight": 0.9},
-            {"name": "Hacker News AI", "url": "https://hnrss.org/newest?q=AI+agents", "weight": 0.8},
-            {"name": "Papers with Code", "url": "https://paperswithcode.com/latest/rss", "weight": 0.9},
-            {"name": "ArXiv cs.AI", "url": "http://export.arxiv.org/rss/cs.AI", "weight": 0.7},
-            {"name": "Reddit r/LocalLLaMA", "url": "https://www.reddit.com/r/LocalLLaMA/.rss", "weight": 0.7},
+            {"name": "ZDNet AI", "url": "https://www.zdnet.com/topic/artificial-intelligence/rss.xml", "weight": 1.0},
+            {"name": "a16z AI", "url": "https://a16z.com/tag/ai/feed/", "weight": 1.1},
+            {"name": "Import AI", "url": "https://jack-clark.net/feed/", "weight": 1.2},
+            {"name": "InfoQ AI/ML", "url": "https://feed.infoq.com/ai-ml-data-eng/", "weight": 1.0},
         ]
     }
 }

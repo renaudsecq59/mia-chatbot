@@ -9,7 +9,7 @@ from google.cloud import firestore
 from scraper import scrape_all_sources
 from ai_curator import process_articles
 from visual_generator import save_visual_html
-from config import GCP_PROJECT, MAX_ARTICLES_PER_DAY
+from config import GCP_PROJECT, MAX_ARTICLES_PER_WEEK
 
 logging.basicConfig(level=logging.INFO, format='%(asctime)s %(message)s')
 logger = logging.getLogger(__name__)
@@ -63,7 +63,7 @@ async def run_scrape():
     scored_articles = await process_articles(raw_articles)
     
     # 3. Limiter le nombre d'articles par jour
-    top_articles = scored_articles[:MAX_ARTICLES_PER_DAY]
+    top_articles = scored_articles[:MAX_ARTICLES_PER_WEEK]
     
     # 4. Générer les visuels HTML
     for article in top_articles:
