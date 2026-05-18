@@ -39,22 +39,31 @@ TENDANCES DÉTECTÉES : {trends}
 
 TYPE DE POST CETTE SEMAINE : {post_type}
 
+=== SI TYPE = REVUE_PRESSE (lundi - donne de la valeur) ===
+Structure :
+- Hook = "Cette semaine dans l'IA & Data : [tendance principale]"
+- 5-7 articles clés avec pour chacun : titre court + ton avis en 1 ligne (max 15 mots)
+- Format liste numérotée, très scannable
+- Conclusion : 1 phrase sur ce que ça change
+- Lien vers la veille complète
+- Max 150 mots TOTAL
+
 === SI TYPE = OBSERVATEUR (génère des partages) ===
 Structure :
-- Hook = observation terrain contre-intuitive que personne n'ose dire
+- Hook = observation terrain contre-intuitive inspirée d'un article de la semaine
 - 2-3 paragraphes : développement avec exemples concrets
 - Question ouverte finale pour créer le débat
 
 === SI TYPE = VULGARISATEUR (génère des saves) ===
 Structure :
-- Hook = concept complexe promis en version simple
+- Hook = concept complexe (vu dans les articles) promis en version simple
 - Analogie du quotidien
 - Application concrète
 - Une phrase à retenir
 
 === SI TYPE = QUESTIONNEUR (génère des commentaires) ===
 Structure :
-- Hook = question polarisante qui divise
+- Hook = question polarisante inspirée d'un sujet d'actualité de la semaine
 - Point de vue nuancé de Renaud
 - Invitation explicite à donner son avis
 
@@ -87,7 +96,7 @@ RÉPONDS EN JSON STRICT :
   "word_count": 0
 }}"""
 
-POST_TYPES = ["observateur", "vulgarisateur", "questionneur"]
+POST_TYPES = ["revue_presse", "observateur", "vulgarisateur", "questionneur"]
 
 
 def _pick_post_type() -> str:
@@ -237,8 +246,25 @@ def publish_to_linkedin(post_text: str) -> dict:
 
 
 def _mock_edito(articles: list[dict], trends: str, post_type: str = "observateur") -> dict:
-    """Édito simulé pour tests sans API key. 3 templates selon le type."""
+    """Édito simulé pour tests sans API key. 4 templates selon le type."""
     mock_posts = {
+        "revue_presse": {
+            "hook": "Cette semaine dans l'IA & Data : l'IA agentique accélère, la gouvernance suit (enfin).",
+            "post_text": f"""Cette semaine dans l'IA & Data : l'IA agentique accélère, la gouvernance suit (enfin).
+
+1. Google Cloud lance Gemini Live Agents → Les agents vocaux temps réel arrivent en prod.
+2. AWS Nova 2 Sonic pour les agents → Amazon rattrape son retard sur l'IA conversationnelle.
+3. Databricks Unity Catalog Open APIs → Enfin de l'interop entre catalogues. Game changer.
+4. Snowflake Cortex Code pour FP&A → L'IA générative s'attaque à la finance. Cas d'usage concret.
+5. OpenAI x Databricks : GPT-5.5 en entreprise → Les LLMs deviennent des briques d'infra.
+
+Ce qui change : l'IA passe de POC à plateforme. Les boîtes qui n'ont pas leur gouvernance vont souffrir.
+
+Détails et sources → {SITE_URL}
+
+#VeilleIA #AIAgents #DataGovernance""",
+            "hashtags": ["#VeilleIA", "#AIAgents", "#DataGovernance"],
+        },
         "observateur": {
             "hook": "On me demande souvent quel cloud choisir pour l'IA. La vraie réponse : ça n'a aucune importance.",
             "post_text": f"""On me demande souvent quel cloud choisir pour l'IA. La vraie réponse : ça n'a aucune importance.
