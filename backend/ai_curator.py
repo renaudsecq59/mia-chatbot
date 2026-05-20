@@ -134,7 +134,8 @@ async def score_article(article: dict) -> dict:
     """Score et enrichit un article avec Claude."""
     if not client:
         logger.warning("⚠️ ANTHROPIC_API_KEY non configurée, scoring simulé")
-        return _mock_score(article)
+        article.update(_mock_score(article))
+        return article
     
     try:
         prompt = SCORING_PROMPT.format(
@@ -262,7 +263,7 @@ def _mock_score(article: dict) -> dict:
             "partageabilite": random.randint(5, 10),
         },
         "score": score,
-        "summary": f"Résumé de l'article '{article['title'][:50]}...' — contenu pertinent pour les professionnels data et IA.",
+        "summary": f"Résumé de l'article '{article.get('title', 'IA & Data')[:50]}...' — contenu pertinent pour les professionnels data et IA.",
         "expert_opinion": "Un article à garder sous le coude pour les équipes qui structurent leur gouvernance IA.",
         "tags": ["IA", "Data Governance", "Tendances"],
         "reject_reason": None,
@@ -272,7 +273,7 @@ def _mock_score(article: dict) -> dict:
 def _mock_linkedin(article: dict) -> dict:
     """Post LinkedIn simulé pour les tests."""
     return {
-        "linkedin_post": f"""🔥 {article['title']}
+        "linkedin_post": f"""🔥 {article.get('title', 'Article IA & Data')}
 
 {article.get('summary', 'Un article qui mérite votre attention.')}
 
@@ -281,11 +282,11 @@ def _mock_linkedin(article: dict) -> dict:
 Et vous, qu'en pensez-vous ?
 
 #DataGovernance #IA #Freelance""",
-        "linkedin_hook": article["title"],
+        "linkedin_hook": article.get("title", "Article IA & Data"),
         "linkedin_suggested_day": "mercredi",
         "visual_type": "article_resume",
         "visual_data": {
-            "main_text": article["title"],
+            "main_text": article.get("title", "Article IA & Data"),
             "subtitle": article.get("source_name", ""),
             "stat": ""
         },

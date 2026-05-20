@@ -1,4 +1,5 @@
 """API FastAPI pour la veille Data & AI Governance."""
+import hashlib
 import logging
 import os
 from datetime import datetime, timezone
@@ -73,6 +74,9 @@ async def run_scrape():
     
     # 5. Sauvegarder dans Firestore
     saved_count = 0
+    for article in top_articles:
+        if "id" not in article:
+            article["id"] = hashlib.md5(article.get("title", "").encode()).hexdigest()[:12]
     if db:
         batch = db.batch()
         for article in top_articles:
@@ -96,10 +100,10 @@ async def run_scrape():
         "saved_articles": saved_count,
         "top_articles": [
             {
-                "title": a["title"],
-                "source": a["source_name"],
+                "title": a.get("title", "Sans titre"),
+                "source": a.get("source_name", ""),
                 "score": a.get("score", 0),
-                "category": a.get("category_label"),
+                "category": a.get("category_label", ""),
                 "has_linkedin": bool(a.get("linkedin_post")),
             }
             for a in top_articles[:5]
