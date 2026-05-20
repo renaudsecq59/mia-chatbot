@@ -14,8 +14,8 @@ import logging
 import os
 import httpx
 from datetime import datetime, timezone
-from anthropic import Anthropic
-from config import ANTHROPIC_API_KEY, EXPERT_PROFILE
+from google import genai
+from config import GCP_PROJECT, GCP_LOCATION, GEMINI_API_KEY, EXPERT_PROFILE
 
 logger = logging.getLogger(__name__)
 
@@ -24,7 +24,19 @@ LINKEDIN_PERSON_URN = os.getenv("LINKEDIN_PERSON_URN", "")  # Format: urn:li:per
 
 SITE_URL = "https://renaudsecq59.github.io/mia-chatbot/veille.html"
 
-claude = Anthropic(api_key=ANTHROPIC_API_KEY) if ANTHROPIC_API_KEY else None
+try:
+    if GEMINI_API_KEY:
+        gemini_client = genai.Client(api_key=GEMINI_API_KEY)
+    else:
+        gemini_client = genai.Client(
+            vertexai=True,
+            project=GCP_PROJECT,
+            location=GCP_LOCATION,
+        )
+    GEMINI_MODEL = "gemini-2.0-flash"
+except Exception:
+    gemini_client = None
+    GEMINI_MODEL = None
 
 
 EDITO_PROMPT = """Tu es le ghostwriter LinkedIn de {name}, {title}.
@@ -123,8 +135,8 @@ def generate_weekly_edito(articles: list[dict], trends: list[str] = None, post_t
 
     trends_str = ", ".join(trends[:8]) if trends else "IA agentique, data governance, LLM en production"
 
-    if not claude:
-        logger.warning("⚠️ ANTHROPIC_API_KEY non configurée, édito simulé")
+    if not gemini_client:
+        logger.warning("⚠️ GenAI non disponible, édito simulé")
         return _mock_edito(articles, trends_str, post_type)
 
     try:
@@ -137,13 +149,15 @@ def generate_weekly_edito(articles: list[dict], trends: list[str] = None, post_t
             site_url=SITE_URL,
         )
 
-        response = claude.messages.create(
-            model="claude-sonnet-4-20250514",
-            max_tokens=2000,
-            messages=[{"role": "user", "content": prompt}]
+        response = gemini_client.models.generate_content(
+            model=GEMINI_MODEL,
+            contents=prompt,
         )
+        raw_text = response.text.strip()
+        if raw_text.startswith("```"):
+            raw_text = raw_text.split("\n", 1)[1].rsplit("```", 1)[0].strip()
 
-        result = json.loads(response.content[0].text)
+        result = json.loads(raw_text)
         result["generated_at"] = datetime.now(timezone.utc).isoformat()
         result["article_count"] = len(articles)
         result["post_type"] = post_type

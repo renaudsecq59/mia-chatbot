@@ -1,11 +1,12 @@
 """Configuration des sources RSS et paramètres de l'application."""
 import os
 
-# Clé API Anthropic (Claude)
-ANTHROPIC_API_KEY = os.getenv("ANTHROPIC_API_KEY", "")
-
 # Projet Google Cloud
 GCP_PROJECT = os.getenv("GCP_PROJECT", "mia-chatbot-veille")
+GCP_LOCATION = os.getenv("GCP_LOCATION", "us-central1")
+
+# Gemini API Key (Google AI Studio - gratuit)
+GEMINI_API_KEY = os.getenv("GEMINI_API_KEY", "")
 
 # Scoring minimum pour garder un article
 MIN_SCORE = 7.0

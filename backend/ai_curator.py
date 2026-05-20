@@ -1,12 +1,27 @@
 """Module IA pour scorer, résumer et générer du contenu à partir des articles."""
 import json
 import logging
-from anthropic import Anthropic
-from config import ANTHROPIC_API_KEY, EXPERT_PROFILE, MIN_SCORE, MIN_SCORE_LINKEDIN
+from google import genai
+from config import GCP_PROJECT, GCP_LOCATION, EXPERT_PROFILE, MIN_SCORE, MIN_SCORE_LINKEDIN
 
 logger = logging.getLogger(__name__)
 
-client = Anthropic(api_key=ANTHROPIC_API_KEY) if ANTHROPIC_API_KEY else None
+try:
+    from config import GEMINI_API_KEY
+    if GEMINI_API_KEY:
+        client = genai.Client(api_key=GEMINI_API_KEY)
+    else:
+        client = genai.Client(
+            vertexai=True,
+            project=GCP_PROJECT,
+            location=GCP_LOCATION,
+        )
+    MODEL_ID = "gemini-2.0-flash"
+    logger.info("✅ Google GenAI initialisé")
+except Exception as e:
+    client = None
+    MODEL_ID = None
+    logger.warning(f"⚠️ GenAI non disponible: {e}")
 
 
 SCORING_PROMPT = """Tu es un curateur de contenu expert pour {name}, {title}.
@@ -131,7 +146,7 @@ RÉPONDS EN JSON STRICT :
 
 
 async def score_article(article: dict) -> dict:
-    """Score et enrichit un article avec Claude."""
+    """Score et enrichit un article avec Gemini."""
     if not client:
         article.update(_mock_score(article))
         return article
@@ -146,16 +161,17 @@ async def score_article(article: dict) -> dict:
             source=article["source_name"],
             category=article["category_label"],
             summary=article["summary_raw"],
-            # Fix template vars
         ).replace("{title}", article["title"]).replace("{source}", article["source_name"]).replace("{category}", article["category_label"]).replace("{summary}", article["summary_raw"])
         
-        response = client.messages.create(
-            model="claude-sonnet-4-20250514",
-            max_tokens=1000,
-            messages=[{"role": "user", "content": prompt}]
+        response = client.models.generate_content(
+            model=MODEL_ID,
+            contents=prompt,
         )
+        raw_text = response.text.strip()
+        if raw_text.startswith("```"):
+            raw_text = raw_text.split("\n", 1)[1].rsplit("```", 1)[0].strip()
         
-        result = json.loads(response.content[0].text)
+        result = json.loads(raw_text)
         
         # Appliquer le poids de la source
         result["score_final"] = round(
@@ -183,7 +199,7 @@ async def score_article(article: dict) -> dict:
 async def generate_linkedin_post(article: dict) -> dict:
     """Génère un post LinkedIn pour un article bien scoré."""
     if not client:
-        logger.warning("⚠️ ANTHROPIC_API_KEY non configurée, post LinkedIn simulé")
+        logger.warning("⚠️ GenAI non disponible, post LinkedIn simulé")
         return _mock_linkedin(article)
     
     try:
@@ -197,13 +213,15 @@ async def generate_linkedin_post(article: dict) -> dict:
             tags=", ".join(article.get("tags", [])),
         ).replace("{title}", article["title"]).replace("{source}", article["source_name"]).replace("{summary}", article.get("summary", "")).replace("{expert_opinion}", article.get("expert_opinion", "")).replace("{tags}", ", ".join(article.get("tags", [])))
         
-        response = client.messages.create(
-            model="claude-sonnet-4-20250514",
-            max_tokens=1500,
-            messages=[{"role": "user", "content": prompt}]
+        response = client.models.generate_content(
+            model=MODEL_ID,
+            contents=prompt,
         )
+        raw_text = response.text.strip()
+        if raw_text.startswith("```"):
+            raw_text = raw_text.split("\n", 1)[1].rsplit("```", 1)[0].strip()
         
-        result = json.loads(response.content[0].text)
+        result = json.loads(raw_text)
         
         article.update({
             "linkedin_post": result["full_post"],
