@@ -93,18 +93,39 @@ async def run_scrape():
     else:
         logger.warning("⚠️ Firestore offline — articles non sauvegardés")
     
+    # 6. Générer et publier le post LinkedIn automatiquement
+    linkedin_result = None
+    try:
+        trending = [a for a in raw_articles if a.get("is_trending")]
+        trend_keywords = set()
+        for a in trending:
+            trend_keywords.update(a.get("trending_keywords", []))
+        trends = list(trend_keywords)[:10]
+        
+        edito = generate_weekly_edito(top_articles, trends)
+        post_text = edito.get("post_text", "")
+        
+        if post_text:
+            linkedin_result = publish_to_linkedin(post_text)
+            logger.info(f"📣 LinkedIn: {linkedin_result.get('status')} — type={edito.get('post_type')}")
+        else:
+            logger.warning("⚠️ Édito vide, publication LinkedIn ignorée")
+    except Exception as e:
+        logger.error(f"❌ Erreur LinkedIn auto-publish: {e}")
+        linkedin_result = {"status": "error", "error": str(e)}
+    
     return {
         "status": "ok",
         "raw_articles": len(raw_articles),
         "scored_articles": len(scored_articles),
         "saved_articles": saved_count,
+        "linkedin": linkedin_result,
         "top_articles": [
             {
                 "title": a.get("title", "Sans titre"),
                 "source": a.get("source_name", ""),
                 "score": a.get("score", 0),
                 "category": a.get("category_label", ""),
-                "has_linkedin": bool(a.get("linkedin_post")),
             }
             for a in top_articles[:5]
         ]
