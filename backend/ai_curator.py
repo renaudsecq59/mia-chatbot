@@ -11,34 +11,69 @@ client = Anthropic(api_key=ANTHROPIC_API_KEY) if ANTHROPIC_API_KEY else None
 
 SCORING_PROMPT = """Tu es un curateur de contenu expert pour {name}, {title}.
 
-Ses domaines d'expertise :
+EXPERTISE DE RENAUD :
 {expertise}
 
-Son ton : {tone}
+TON : {tone}
 
-OBJECTIF : Évaluer cet article pour sa page de veille publique. Son audience cible :
-- CDOs, VP Data, CTOs (prospects potentiels)
-- Recruteurs freelance tech/data
-- Product Managers IA
-- Data Engineers & Scientists
+AUDIENCE CIBLE (décideurs tech/data en entreprise) :
+- CDOs, VP Data, CTOs qui recrutent des freelances
+- Product Managers IA qui cherchent des insights terrain
+- Data Engineers/Scientists qui veulent monter en compétence
+- Recruteurs tech qui sourcent des profils IA/Data
 
 ARTICLE À ÉVALUER :
-- Titre : {title}
-- Source : {source}
-- Catégorie : {category}
-- Résumé brut : {summary}
+Titre : {title}
+Source : {source}
+Catégorie : {category}
+Contenu : {summary}
 
-ÉVALUE sur ces critères (0-10 chacun) :
-1. PERTINENCE : Est-ce lié aux domaines d'expertise de Renaud ? Utile pour son audience ?
-2. QUALITÉ : Contenu substantiel vs clickbait ? Source fiable ?
-3. NOUVEAUTÉ : Info récente, pas du réchauffé ?
-4. IMPACT BUSINESS : Insights actionnables pour des décideurs ?
-5. PARTAGEABILITÉ : Est-ce que ça mérite un partage LinkedIn ?
+CRITÈRES DE SCORING (0-10 chacun) :
 
-Puis génère :
-- Un résumé de 2-3 phrases accessibles (pas jargon technique)
-- L'avis d'expert de Renaud (1-2 phrases, ton direct et pragmatique)
-- 3-4 tags business-friendly
+1. PERTINENCE MÉTIER
+   - 9-10 : Directement lié à build IA, gouvernance data, ou management tech
+   - 5-8 : Lié à l'écosystème (cloud, outils, régulation)
+   - 0-4 : Trop théorique, trop niche, ou hors sujet
+   
+2. QUALITÉ & CRÉDIBILITÉ
+   - 9-10 : Source officielle (GCP, AWS, Databricks) ou média reconnu, contenu substantiel
+   - 5-8 : Blog d'expert, retour d'expérience concret
+   - 0-4 : Clickbait, contenu superficiel, source douteuse
+   
+3. NOUVEAUTÉ & TIMING
+   - 9-10 : Annonce produit, nouvelle régulation, tendance émergente
+   - 5-8 : Best practice récente, cas d'usage intéressant
+   - 0-4 : Contenu recyclé, évident, ou dépassé
+   
+4. ACTIONNABLE BUSINESS
+   - 9-10 : Insights qu'un décideur peut appliquer cette semaine (ex: nouvelle feature Vertex AI, checklist AI Act)
+   - 5-8 : Utile pour la stratégie moyen terme
+   - 0-4 : Trop théorique, pas d'application concrète
+   
+5. POTENTIEL LINKEDIN
+   - 9-10 : Sujet qui génère du débat, chiffres marquants, opinion tranchée possible
+   - 5-8 : Intéressant mais consensuel
+   - 0-4 : Ennuyeux, trop technique, ou trop corporate
+
+GÉNÈRE ENSUITE :
+
+RÉSUMÉ (2-3 phrases max) :
+- Accessible pour un non-tech
+- Focus sur le "pourquoi c'est important" pas le "comment ça marche"
+- Évite le jargon (ou explique-le)
+
+AVIS EXPERT (1-2 phrases, ton Renaud) :
+- Opinion tranchée, pas neutre
+- Basé sur l'expérience terrain ("J'ai vu...", "En pratique...")
+- Peut être critique si pertinent
+- Exemples de bon ton :
+  ✅ "En pratique, 80% des projets IA échouent sur la qualité des données, pas sur le choix du modèle."
+  ✅ "Cette feature va sauver 2 semaines de dev par projet. Game changer."
+  ❌ "C'est une évolution intéressante dans le domaine." (trop mou)
+
+TAGS (3-4 max) :
+- Business-friendly (pas de jargon tech)
+- Exemples : "Agents IA", "Gouvernance", "Cloud", "Conformité", "ROI IA"
 
 RÉPONDS EN JSON STRICT :
 {{
@@ -50,13 +85,13 @@ RÉPONDS EN JSON STRICT :
     "partageabilite": X
   }},
   "score_final": X.X,
-  "summary": "Résumé accessible...",
-  "expert_opinion": "L'avis de Renaud...",
+  "summary": "Résumé accessible en 2-3 phrases...",
+  "expert_opinion": "Avis tranché de Renaud en 1-2 phrases...",
   "tags": ["tag1", "tag2", "tag3"],
   "reject_reason": null
 }}
 
-Si l'article n'est PAS pertinent (score < 5), mets une reject_reason explicative."""
+Si score_final < 5, mets une reject_reason courte (ex: "Trop théorique", "Hors expertise", "Contenu superficiel")."""
 
 
 LINKEDIN_PROMPT = """Tu es le ghostwriter LinkedIn de {name}, {title}.
