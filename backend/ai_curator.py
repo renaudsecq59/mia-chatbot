@@ -255,13 +255,10 @@ async def _linkedin_with_semaphore(article: dict) -> dict:
         return await generate_linkedin_post(article)
 
 
-MAX_LINKEDIN_ARTICLES = 15  # Top articles pour lesquels générer un post LinkedIn
-
-
 async def process_articles(articles: list[dict]) -> list[dict]:
-    """Pipeline : scoring mots-clés (instantané) → Gemini pour les posts LinkedIn du top 15."""
+    """Pipeline : scoring mots-clés (instantané). L'édito LinkedIn est généré séparément."""
     
-    # ÉTAPE 1 : Scoring par mots-clés (gratuit, instantané, ~0ms)
+    # Scoring par mots-clés (gratuit, instantané)
     logger.info(f"\n⚡ Scoring de {len(articles)} articles par mots-clés...")
     for article in articles:
         article.update(_mock_score(article))
@@ -271,17 +268,6 @@ async def process_articles(articles: list[dict]) -> list[dict]:
     good_articles.sort(key=lambda x: x.get("score", 0), reverse=True)
     
     logger.info(f"✅ {len(good_articles)} articles retenus (score >= {MIN_SCORE}) sur {len(articles)}")
-    
-    # ÉTAPE 2 : Gemini génère les posts LinkedIn uniquement pour le top
-    top_for_linkedin = good_articles[:MAX_LINKEDIN_ARTICLES]
-    if client and top_for_linkedin:
-        logger.info(f"🧠 Gemini génère {len(top_for_linkedin)} posts LinkedIn...")
-        await asyncio.gather(*[_linkedin_with_semaphore(a) for a in top_for_linkedin])
-        logger.info(f"📣 {len(top_for_linkedin)} posts LinkedIn générés")
-    else:
-        for a in top_for_linkedin:
-            a.update(_mock_linkedin(a))
-        logger.info(f"📣 {len(top_for_linkedin)} posts LinkedIn simulés (Gemini non dispo)")
     
     return good_articles
 
