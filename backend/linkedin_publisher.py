@@ -33,7 +33,7 @@ try:
             project=GCP_PROJECT,
             location=GCP_LOCATION,
         )
-    GEMINI_MODEL = "gemini-2.0-flash"
+    GEMINI_MODEL = "gemini-2.5-flash"
 except Exception:
     gemini_client = None
     GEMINI_MODEL = None

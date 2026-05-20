@@ -1,4 +1,5 @@
 """Module IA pour scorer, résumer et générer du contenu à partir des articles."""
+import asyncio
 import json
 import logging
 from google import genai
@@ -16,7 +17,7 @@ try:
             project=GCP_PROJECT,
             location=GCP_LOCATION,
         )
-    MODEL_ID = "gemini-2.0-flash"
+    MODEL_ID = "gemini-2.5-flash"
     logger.info("✅ Google GenAI initialisé")
 except Exception as e:
     client = None
@@ -240,29 +241,47 @@ async def generate_linkedin_post(article: dict) -> dict:
     return article
 
 
+# Semaphore pour limiter les appels Gemini concurrents (évite le rate limiting)
+_GEMINI_SEM = asyncio.Semaphore(5)
+
+
+async def _score_with_semaphore(article: dict) -> dict:
+    async with _GEMINI_SEM:
+        return await score_article(article)
+
+
+async def _linkedin_with_semaphore(article: dict) -> dict:
+    async with _GEMINI_SEM:
+        return await generate_linkedin_post(article)
+
+
+MAX_LINKEDIN_ARTICLES = 15  # Top articles pour lesquels générer un post LinkedIn
+
+
 async def process_articles(articles: list[dict]) -> list[dict]:
-    """Pipeline complet : scoring → filtrage → génération LinkedIn."""
-    logger.info(f"\n🧠 Scoring de {len(articles)} articles avec Claude...")
+    """Pipeline : scoring mots-clés (instantané) → Gemini pour les posts LinkedIn du top 15."""
     
-    scored = []
+    # ÉTAPE 1 : Scoring par mots-clés (gratuit, instantané, ~0ms)
+    logger.info(f"\n⚡ Scoring de {len(articles)} articles par mots-clés...")
     for article in articles:
-        scored_article = await score_article(article)
-        scored.append(scored_article)
+        article.update(_mock_score(article))
     
-    # Filtrer par score minimum
-    good_articles = [a for a in scored if a.get("score", 0) >= MIN_SCORE]
+    # Filtrer et trier
+    good_articles = [a for a in articles if a.get("score", 0) >= MIN_SCORE]
     good_articles.sort(key=lambda x: x.get("score", 0), reverse=True)
     
-    logger.info(f"✅ {len(good_articles)} articles retenus (score >= {MIN_SCORE})")
+    logger.info(f"✅ {len(good_articles)} articles retenus (score >= {MIN_SCORE}) sur {len(articles)}")
     
-    # Générer posts LinkedIn pour les meilleurs
-    linkedin_count = 0
-    for article in good_articles:
-        if article.get("score", 0) >= MIN_SCORE_LINKEDIN:
-            await generate_linkedin_post(article)
-            linkedin_count += 1
-    
-    logger.info(f"📣 {linkedin_count} posts LinkedIn générés (score >= {MIN_SCORE_LINKEDIN})")
+    # ÉTAPE 2 : Gemini génère les posts LinkedIn uniquement pour le top
+    top_for_linkedin = good_articles[:MAX_LINKEDIN_ARTICLES]
+    if client and top_for_linkedin:
+        logger.info(f"🧠 Gemini génère {len(top_for_linkedin)} posts LinkedIn...")
+        await asyncio.gather(*[_linkedin_with_semaphore(a) for a in top_for_linkedin])
+        logger.info(f"📣 {len(top_for_linkedin)} posts LinkedIn générés")
+    else:
+        for a in top_for_linkedin:
+            a.update(_mock_linkedin(a))
+        logger.info(f"📣 {len(top_for_linkedin)} posts LinkedIn simulés (Gemini non dispo)")
     
     return good_articles
 
