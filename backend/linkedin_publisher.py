@@ -79,6 +79,22 @@ Structure :
 - Point de vue nuancé de Renaud
 - Invitation explicite à donner son avis
 
+=== SI TYPE = VERTEX_AI (bonnes pratiques, actus Google Cloud AI) ===
+Structure :
+- Hook = annonce ou retour terrain sur Vertex AI / Google Cloud AI
+- 2-3 paragraphes : ce que ça change concrètement en prod, avec son expérience
+- Partage un tip/best practice que Renaud utilise en mission
+- Ton : praticien qui build, pas évangéliste Google
+- Hashtags : #VertexAI #GoogleCloud #MLOps
+
+=== SI TYPE = VIBE_CODING (dernières techniques de dev assisté par IA) ===
+Structure :
+- Hook = observation ou découverte récente sur le vibe coding / dév assisté par IA
+- 2-3 paragraphes : workflow concret, outils testés (Cursor, Windsurf, Claude Code, etc.)
+- Ce qui marche vraiment vs le hype, avec exemples personnels
+- Ton : développeur pragmatique qui teste tout
+- Hashtags : #VibeCoding #AIAssisted #DeveloperExperience
+
 RÈGLES ABSOLUES :
 - Max 150 mots. Phrases de max 15 mots.
 - Un paragraphe = une idée. Sauts de ligne entre chaque.
@@ -108,7 +124,7 @@ RÉPONDS EN JSON STRICT :
   "word_count": 0
 }}"""
 
-POST_TYPES = ["revue_presse", "observateur", "vulgarisateur", "questionneur"]
+POST_TYPES = ["revue_presse", "vertex_ai", "observateur", "vibe_coding", "vulgarisateur", "questionneur"]
 
 
 def _pick_post_type() -> str:
@@ -329,6 +345,38 @@ Et dans votre boîte, qui pilote l'IA ?
 
 #ManagementIA #DataStrategy #Leadership""",
             "hashtags": ["#ManagementIA", "#DataStrategy", "#Leadership"],
+        },
+        "vertex_ai": {
+            "hook": "Agent Executor de Google Cloud : le runtime distribué pour agents IA en prod.",
+            "post_text": f"""Agent Executor de Google Cloud : le runtime distribué pour agents IA en prod.
+
+J'ai testé la semaine dernière. Le concept : découpler l'orchestration de l'exécution. Chaque tool call est un job isolé.
+
+Pourquoi c'est important : les agents qui tournent 10+ minutes crashent. Avec Agent Executor, chaque étape est retry-able indépendamment.
+
+Mon tip : combinez avec Vertex AI Pipelines pour le monitoring. Un agent sans observabilité, c'est une boîte noire en prod.
+
+Détails dans ma veille → {SITE_URL}
+
+#VertexAI #GoogleCloud #MLOps #AgentsIA""",
+            "hashtags": ["#VertexAI", "#GoogleCloud", "#MLOps", "#AgentsIA"],
+        },
+        "vibe_coding": {
+            "hook": "J'ai codé un backend complet en 2h sans écrire une ligne moi-même. Voici ce que j'en retiens.",
+            "post_text": f"""J'ai codé un backend complet en 2h sans écrire une ligne moi-même. Voici ce que j'en retiens.
+
+Workflow : Cursor + Claude en mode agent. Je décris l'archi, l'agent code, je review.
+
+Ce qui marche : CRUD, intégrations API, tests unitaires. L'IA est un junior ultra-rapide.
+
+Ce qui ne marche pas encore : logique métier complexe, sécurité, optimisation perf. Là, il faut reprendre la main.
+
+Mon take : le vibe coding n'est pas du "no code". C'est du code à vitesse x10 pour ceux qui SAVENT déjà coder.
+
+Plus de détails → {SITE_URL}
+
+#VibeCoding #CursorAI #DeveloperExperience #IACode""",
+            "hashtags": ["#VibeCoding", "#CursorAI", "#DeveloperExperience", "#IACode"],
         },
     }
 

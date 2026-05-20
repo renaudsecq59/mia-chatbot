@@ -90,5 +90,18 @@ RSS_SOURCES = {
             {"name": "a16z AI", "url": "https://a16z.com/tag/ai/feed/", "weight": 1.1},
             {"name": "Wired AI", "url": "https://www.wired.com/feed/tag/ai/latest/rss", "weight": 0.9},
         ]
+    },
+    "vibe_coding": {
+        "label": "Vibe Coding & Dev IA",
+        "emoji": "⚡",
+        "color": "#ff9f43",
+        "sources": [
+            {"name": "Cursor Blog", "url": "https://www.cursor.com/blog/rss.xml", "weight": 1.4},
+            {"name": "Anthropic Blog", "url": "https://www.anthropic.com/blog/rss.xml", "weight": 1.3},
+            {"name": "GitHub Blog", "url": "https://github.blog/feed/", "weight": 1.2},
+            {"name": "Hacker News AI", "url": "https://hnrss.org/newest?q=vibe+coding+OR+cursor+OR+copilot+OR+ai+coding", "weight": 1.1},
+            {"name": "Dev.to #ai", "url": "https://dev.to/feed/tag/ai", "weight": 0.9},
+            {"name": "Codeium Blog", "url": "https://codeium.com/blog/rss.xml", "weight": 1.1},
+        ]
     }
 }

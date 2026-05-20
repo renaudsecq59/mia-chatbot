@@ -277,11 +277,14 @@ def _mock_score(article: dict) -> dict:
                "snowflake", "cloud run", "mlops", "deploy", "production", "enterprise",
                "compliance", "ai act", "regulation", "catalog", "quality", "pipeline",
                "rag", "llm", "genai", "generative", "platform", "multi-agent",
-               "orchestrat", "framework", "bedrock", "sagemaker", "cortex"]
+               "orchestrat", "framework", "bedrock", "sagemaker", "cortex",
+               "vibe coding", "cursor", "copilot", "ai coding", "code assist",
+               "windsurf", "claude code", "gemini", "vertex ai"]
     # Mots-clés moyens (écosystème)
     mid_kw = ["openai", "anthropic", "google", "aws", "azure", "startup", "strategy",
               "cto", "cdo", "leadership", "team", "roi", "adoption", "scale",
-              "fine-tun", "embedding", "vector", "retrieval", "benchmark"]
+              "fine-tun", "embedding", "vector", "retrieval", "benchmark",
+              "developer experience", "devtool", "ide", "autocomplete", "github"]
     # Mots-clés négatifs (bruit)
     neg_kw = ["tutorial", "beginner", "introduction to", "getting started",
               "earth observation", "climate", "biology", "medical imaging",
@@ -310,6 +313,10 @@ def _mock_score(article: dict) -> dict:
         opinion = "Les agents IA sont le sujet chaud de 2026. Ce type d'article aide à cadrer les projets clients."
     elif any(kw in title for kw in ["governance", "govern", "catalog", "quality"]):
         opinion = "Gouvernance et qualité des données : le socle indispensable avant tout projet IA sérieux."
+    elif any(kw in title for kw in ["vibe coding", "cursor", "copilot", "ai coding", "windsurf", "claude code"]):
+        opinion = "Le vibe coding transforme le métier de développeur. J'utilise ces outils au quotidien en mission."
+    elif any(kw in title for kw in ["vertex ai", "gemini", "google cloud ai"]):
+        opinion = "Vertex AI évolue vite. En tant que praticien Google Cloud, c'est un must-follow."
     elif any(kw in title for kw in ["cloud", "vertex", "bedrock", "sagemaker", "databricks", "snowflake"]):
         opinion = "Les plateformes cloud se différencient sur l'IA. Important de suivre pour le conseil client."
     elif neg_hits > 0:
@@ -323,12 +330,16 @@ def _mock_score(article: dict) -> dict:
         tags.append("Agents IA")
     if any(kw in title for kw in ["governance", "govern", "catalog", "quality"]):
         tags.append("Gouvernance")
-    if any(kw in title for kw in ["cloud", "vertex", "bedrock", "aws", "gcp", "azure"]):
+    if any(kw in title for kw in ["cloud", "vertex", "bedrock", "aws", "gcp", "azure", "gemini"]):
         tags.append("Cloud")
     if any(kw in title for kw in ["deploy", "production", "mlops", "pipeline"]):
         tags.append("MLOps")
     if any(kw in title for kw in ["regulation", "ai act", "compliance"]):
         tags.append("Conformité")
+    if any(kw in title for kw in ["vibe coding", "cursor", "copilot", "ai coding", "windsurf", "claude code", "code assist"]):
+        tags.append("Vibe Coding")
+    if any(kw in title for kw in ["vertex ai", "gemini", "google cloud ai", "vertex"]):
+        tags.append("Vertex AI")
     if not tags:
         tags = ["IA", "Tendances"]
 
