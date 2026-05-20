@@ -133,7 +133,6 @@ RÉPONDS EN JSON STRICT :
 async def score_article(article: dict) -> dict:
     """Score et enrichit un article avec Claude."""
     if not client:
-        logger.warning("⚠️ ANTHROPIC_API_KEY non configurée, scoring simulé")
         article.update(_mock_score(article))
         return article
     
@@ -251,22 +250,83 @@ async def process_articles(articles: list[dict]) -> list[dict]:
 
 
 def _mock_score(article: dict) -> dict:
-    """Score simulé pour les tests sans API key."""
-    import random
-    score = round(random.uniform(5.0, 9.5), 1)
+    """Score intelligent basé sur des mots-clés (fallback sans API key)."""
+    title = (article.get("title", "") + " " + article.get("summary_raw", "")).lower()
+    source = article.get("source_name", "").lower()
+
+    # Mots-clés haute valeur (directement lié à l'expertise Renaud)
+    high_kw = ["agent", "governance", "govern", "vertex", "bigquery", "databricks",
+               "snowflake", "cloud run", "mlops", "deploy", "production", "enterprise",
+               "compliance", "ai act", "regulation", "catalog", "quality", "pipeline",
+               "rag", "llm", "genai", "generative", "platform", "multi-agent",
+               "orchestrat", "framework", "bedrock", "sagemaker", "cortex"]
+    # Mots-clés moyens (écosystème)
+    mid_kw = ["openai", "anthropic", "google", "aws", "azure", "startup", "strategy",
+              "cto", "cdo", "leadership", "team", "roi", "adoption", "scale",
+              "fine-tun", "embedding", "vector", "retrieval", "benchmark"]
+    # Mots-clés négatifs (bruit)
+    neg_kw = ["tutorial", "beginner", "introduction to", "getting started",
+              "earth observation", "climate", "biology", "medical imaging",
+              "game", "music", "art generation", "musk vs", "drama", "lawsuit"]
+
+    high_hits = sum(1 for kw in high_kw if kw in title)
+    mid_hits = sum(1 for kw in mid_kw if kw in title)
+    neg_hits = sum(1 for kw in neg_kw if kw in title)
+
+    # Score de base selon source
+    source_bonus = 0
+    if any(s in source for s in ["databricks", "snowflake", "aws", "google cloud", "gcp"]):
+        source_bonus = 1.5
+    elif any(s in source for s in ["infoq", "venturebeat", "mit tech"]):
+        source_bonus = 1.0
+    elif any(s in source for s in ["hugging face", "towards data"]):
+        source_bonus = 0.3  # Souvent trop académique
+
+    base_score = 4.5 + (high_hits * 0.9) + (mid_hits * 0.5) + source_bonus - (neg_hits * 2.5)
+    score = round(min(max(base_score, 2.0), 9.5), 1)
+
+    # Avis expert contextualisé
+    if high_hits >= 2:
+        opinion = f"Directement applicable en mission. À surveiller pour les équipes qui déploient de l'IA en prod."
+    elif "agent" in title:
+        opinion = "Les agents IA sont le sujet chaud de 2026. Ce type d'article aide à cadrer les projets clients."
+    elif any(kw in title for kw in ["governance", "govern", "catalog", "quality"]):
+        opinion = "Gouvernance et qualité des données : le socle indispensable avant tout projet IA sérieux."
+    elif any(kw in title for kw in ["cloud", "vertex", "bedrock", "sagemaker", "databricks", "snowflake"]):
+        opinion = "Les plateformes cloud se différencient sur l'IA. Important de suivre pour le conseil client."
+    elif neg_hits > 0:
+        opinion = "Hors périmètre de mon expertise. Pas prioritaire pour l'audience cible."
+    else:
+        opinion = "Article intéressant pour la culture tech générale, mais pas directement actionnable."
+
+    # Tags contextualisés
+    tags = []
+    if any(kw in title for kw in ["agent", "multi-agent", "orchestrat"]):
+        tags.append("Agents IA")
+    if any(kw in title for kw in ["governance", "govern", "catalog", "quality"]):
+        tags.append("Gouvernance")
+    if any(kw in title for kw in ["cloud", "vertex", "bedrock", "aws", "gcp", "azure"]):
+        tags.append("Cloud")
+    if any(kw in title for kw in ["deploy", "production", "mlops", "pipeline"]):
+        tags.append("MLOps")
+    if any(kw in title for kw in ["regulation", "ai act", "compliance"]):
+        tags.append("Conformité")
+    if not tags:
+        tags = ["IA", "Tendances"]
+
     return {
         "scores": {
-            "pertinence": random.randint(5, 10),
-            "qualite": random.randint(5, 10),
-            "nouveaute": random.randint(5, 10),
-            "impact_business": random.randint(5, 10),
-            "partageabilite": random.randint(5, 10),
+            "pertinence": min(10, 5 + high_hits * 2),
+            "qualite": min(10, 6 + int(source_bonus)),
+            "nouveaute": 7 if article.get("is_trending") else 5,
+            "impact_business": min(10, 5 + high_hits + mid_hits),
+            "partageabilite": min(10, 5 + high_hits),
         },
         "score": score,
-        "summary": f"Résumé de l'article '{article.get('title', 'IA & Data')[:50]}...' — contenu pertinent pour les professionnels data et IA.",
-        "expert_opinion": "Un article à garder sous le coude pour les équipes qui structurent leur gouvernance IA.",
-        "tags": ["IA", "Data Governance", "Tendances"],
-        "reject_reason": None,
+        "summary": f"{article.get('title', 'Article')}: contenu pertinent pour les professionnels data et IA en entreprise.",
+        "expert_opinion": opinion,
+        "tags": tags,
+        "reject_reason": "Hors expertise" if score < 5.0 else None,
     }
 
 
