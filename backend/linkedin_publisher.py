@@ -33,7 +33,7 @@ try:
             project=GCP_PROJECT,
             location=GCP_LOCATION,
         )
-    GEMINI_MODEL = "gemini-2.5-flash"
+    GEMINI_MODEL = "gemini-2.5-pro"
 except Exception:
     gemini_client = None
     GEMINI_MODEL = None
@@ -215,23 +215,26 @@ Format: 1200x627px landscape, suitable for LinkedIn feed.
 IMPORTANT: No text, no words, no letters in the image. Pure visual illustration."""
 
     try:
-        from google.genai import types
-        response = gemini_client.models.generate_content(
-            model="gemini-2.5-flash-image",
-            contents=image_prompt,
-            config=types.GenerateContentConfig(
-                response_modalities=["IMAGE", "TEXT"],
-            ),
+        import vertexai
+        from vertexai.preview.vision_models import ImageGenerationModel
+
+        vertexai.init(project=GCP_PROJECT, location=GCP_LOCATION)
+        model = ImageGenerationModel.from_pretrained("imagen-3.0-generate-002")
+
+        response = model.generate_images(
+            prompt=image_prompt,
+            number_of_images=1,
+            aspect_ratio="16:9",
+            safety_filter_level="block_few",
+            person_generation="allow_adult",
         )
 
-        # Extraire l'image de la réponse
-        for part in response.candidates[0].content.parts:
-            if part.inline_data and part.inline_data.mime_type.startswith("image/"):
-                image_bytes = part.inline_data.data
-                logger.info(f"🎨 Visuel généré ({len(image_bytes)} bytes)")
-                return image_bytes
+        if response.images:
+            image_bytes = response.images[0]._image_bytes
+            logger.info(f"🎨 Visuel Imagen 3 généré ({len(image_bytes)} bytes)")
+            return image_bytes
 
-        logger.warning("⚠️ Aucune image dans la réponse Gemini")
+        logger.warning("⚠️ Aucune image dans la réponse Imagen")
         return None
 
     except Exception as e:
