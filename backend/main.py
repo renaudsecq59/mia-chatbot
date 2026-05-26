@@ -116,6 +116,17 @@ async def run_scrape():
             image_bytes = generate_visual(post_text, post_type)
             linkedin_result = publish_to_linkedin(post_text, image_bytes)
             logger.info(f"📣 LinkedIn: {linkedin_result.get('status')} — type={post_type} — image={linkedin_result.get('has_image')}")
+            
+            # Sauvegarder le post dans Firestore
+            if db and linkedin_result.get("status") == "published":
+                db.collection("linkedin_posts").add({
+                    "post_text": post_text,
+                    "post_type": post_type,
+                    "post_id": linkedin_result.get("post_id"),
+                    "has_image": linkedin_result.get("has_image", False),
+                    "published_at": datetime.now(timezone.utc).isoformat(),
+                    "hashtags": hashtags,
+                })
         else:
             logger.warning("⚠️ Édito vide, publication LinkedIn ignorée")
     except Exception as e:
@@ -251,6 +262,26 @@ async def publish_edito(post_text: str = None):
 
     result = publish_to_linkedin(post_text)
     return result
+
+
+@app.get("/api/linkedin/latest")
+async def get_latest_linkedin_post():
+    """Retourne le dernier post LinkedIn publié (depuis Firestore)."""
+    if not db:
+        return {"post_text": None, "message": "Firestore non disponible"}
+
+    try:
+        docs = (
+            db.collection("linkedin_posts")
+            .order_by("published_at", direction=firestore.Query.DESCENDING)
+            .limit(1)
+            .stream()
+        )
+        for doc in docs:
+            return doc.to_dict()
+        return {"post_text": None, "message": "Aucun post trouvé"}
+    except Exception as e:
+        return {"post_text": None, "message": str(e)}
 
 
 if __name__ == "__main__":

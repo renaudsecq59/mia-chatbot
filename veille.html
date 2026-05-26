@@ -177,10 +177,43 @@
       padding: 4px 10px;
       border-radius: 100px;
     }
-    .source-ia_entreprise { background: rgba(108,99,255,.1); color: #b3adff; border: 1px solid rgba(108,99,255,.2); }
-    .source-data_governance { background: rgba(0,212,255,.1); color: #00d4ff; border: 1px solid rgba(0,212,255,.2); }
-    .source-reglementation { background: rgba(200,255,0,.1); color: var(--accent); border: 1px solid rgba(200,255,0,.2); }
-    .source-business_strategie { background: rgba(255,107,107,.1); color: #ff6b6b; border: 1px solid rgba(255,107,107,.2); }
+    .source-ia_pratique { background: rgba(108,99,255,.1); color: #b3adff; border: 1px solid rgba(108,99,255,.2); }
+    .source-infra_mlops { background: rgba(0,212,255,.1); color: #00d4ff; border: 1px solid rgba(0,212,255,.2); }
+    .source-governance_regulation { background: rgba(200,255,0,.1); color: var(--accent); border: 1px solid rgba(200,255,0,.2); }
+    .source-vibe_coding { background: rgba(255,159,67,.1); color: #ff9f43; border: 1px solid rgba(255,159,67,.2); }
+
+    /* LINKEDIN POST */
+    .linkedin-section {
+      padding: 40px 0;
+      border-bottom: 1px solid var(--border);
+    }
+    .linkedin-card {
+      background: var(--bg2);
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      padding: 32px;
+      max-width: 720px;
+    }
+    .linkedin-header {
+      display: flex; align-items: center; gap: 12px;
+      margin-bottom: 20px;
+    }
+    .linkedin-avatar {
+      width: 44px; height: 44px; border-radius: 50%;
+      background: linear-gradient(135deg, var(--accent), #6c63ff);
+      display: flex; align-items: center; justify-content: center;
+      font-weight: 700; font-size: 16px; color: var(--bg);
+    }
+    .linkedin-author { font-size: 14px; font-weight: 600; }
+    .linkedin-date { font-size: 12px; color: var(--m); }
+    .linkedin-body {
+      font-size: 15px; line-height: 1.8; color: var(--m2);
+      white-space: pre-line;
+    }
+    .linkedin-label {
+      font-size: 11px; font-weight: 600; letter-spacing: .1em;
+      text-transform: uppercase; color: var(--accent); margin-bottom: 16px;
+    }
     .trending-badge {
       font-size: 11px;
       font-weight: 600;
@@ -311,11 +344,28 @@
       </p>
       <div class="header-filters">
         <button class="filter-btn active" data-filter="all">Tous</button>
-        <button class="filter-btn" data-filter="ia_entreprise">🤖 IA en entreprise</button>
-        <button class="filter-btn" data-filter="data_governance">📊 Data & Gouvernance</button>
-        <button class="filter-btn" data-filter="reglementation">⚖️ Réglementation</button>
-        <button class="filter-btn" data-filter="business_strategie">💼 Business & Stratégie</button>
+        <button class="filter-btn" data-filter="ia_pratique">🤖 IA en pratique</button>
+        <button class="filter-btn" data-filter="infra_mlops">⚙️ Infra & MLOps</button>
+        <button class="filter-btn" data-filter="governance_regulation">⚖️ Gouvernance</button>
+        <button class="filter-btn" data-filter="vibe_coding">⚡ Vibe Coding</button>
       </div>
+    </div>
+  </div>
+</section>
+
+<!-- LINKEDIN POST DE LA SEMAINE -->
+<section class="linkedin-section">
+  <div class="c">
+    <div class="linkedin-label">📣 Dernier post LinkedIn</div>
+    <div class="linkedin-card" id="linkedin-post">
+      <div class="linkedin-header">
+        <div class="linkedin-avatar">RS</div>
+        <div>
+          <div class="linkedin-author">Renaud Secq</div>
+          <div class="linkedin-date" id="linkedin-date">—</div>
+        </div>
+      </div>
+      <div class="linkedin-body" id="linkedin-body">Chargement...</div>
     </div>
   </div>
 </section>
@@ -369,196 +419,62 @@
 </footer>
 
 <script>
-// Configuration des sources RSS/API
-const SOURCES = [
-  // EU AI Act & Réglementation
-  {
-    name: 'EU AI Act Official',
-    type: 'regulation',
-    url: 'https://artificialintelligenceact.eu/feed/',
-    parser: 'rss'
-  },
-  {
-    name: 'CNIL',
-    type: 'regulation',
-    url: 'https://www.cnil.fr/fr/rss.xml',
-    parser: 'rss'
-  },
-  // Blogs Data Governance
-  {
-    name: 'Collibra Blog',
-    type: 'blog',
-    url: 'https://www.collibra.com/blog/feed/',
-    parser: 'rss'
-  },
-  {
-    name: 'Alation Blog',
-    type: 'blog',
-    url: 'https://www.alation.com/blog/feed/',
-    parser: 'rss'
-  },
-  // Tech News
-  {
-    name: 'VentureBeat AI',
-    type: 'news',
-    url: 'https://venturebeat.com/category/ai/feed/',
-    parser: 'rss'
-  }
-];
+const API_BASE = 'https://veille-backend-6lhk5fvt5q-ew.a.run.app';
 
-// Articles réels scrapés le 17 mai 2026 — 25 sources RSS
-const STATIC_ARTICLES = [
-  {
-    title: "Data readiness for agentic AI in financial services",
-    excerpt: "Le succès de l'IA agentique dans les services financiers dépend moins de la sophistication du modèle et plus de la qualité des données. Un article de fond sur la préparation des données pour les agents autonomes.",
-    expertOpinion: "C'est LA question que se posent tous les CDOs en ce moment. La réponse est claire : sans data governance solide, vos agents IA seront aussi fiables qu'un GPS sans carte.",
-    source: "reglementation",
-    sourceName: "MIT Tech Review",
-    date: "2026-05-14",
-    url: "https://www.technologyreview.com/2026/05/14/1137034/data-readiness-for-agentic-ai-in-financial-services/",
-    tags: ["IA Agentique", "Data Quality", "Finance"],
-    trending: true
-  },
-  {
-    title: "Establishing AI and data sovereignty in the age of autonomous systems",
-    excerpt: "Quand l'IA générative est passée des labos aux entreprises, un compromis tacite a été fait : capacité maintenant, contrôle plus tard. Vos données passent par des systèmes que vous ne possédez pas, sous une gouvernance que vous ne définissez pas.",
-    expertOpinion: "Souveraineté des données + IA autonome = le prochain grand défi réglementaire. Les entreprises qui ne structurent pas leur gouvernance maintenant le paieront cher.",
-    source: "reglementation",
-    sourceName: "MIT Tech Review",
-    date: "2026-05-14",
-    url: "https://www.technologyreview.com/2026/05/14/1137168/establishing-ai-and-data-sovereignty-in-the-age-of-autonomous-systems/",
-    tags: ["Souveraineté", "Data Governance", "IA Autonome"],
-    trending: true
-  },
-  {
-    title: "Neobank Monzo Builds Governed Data Mesh Across 100 Teams and 12000 dbt Models",
-    excerpt: "Monzo a repensé son data warehouse pour supporter plus de 100 équipes et 12 000 modèles dbt. Résultat : -40% de coûts et +25% de vitesse de livraison grâce à une approche 'meshy' gouvernée.",
-    expertOpinion: "12 000 modèles dbt, 100 équipes, et ça marche. La preuve que le Data Mesh n'est pas qu'un concept théorique — mais il faut une gouvernance forte pour que ça tienne.",
-    source: "business_strategie",
-    sourceName: "InfoQ AI/ML",
-    date: "2026-05-17",
-    url: "https://www.infoq.com/news/2026/05/monzo-data-mesh/?utm_campaign=infoq_content&utm_source=infoq&utm_medium=feed&utm_term=AI%2C+ML+%26+Data+Engineering",
-    tags: ["Data Mesh", "dbt", "Gouvernance"],
-    trending: true
-  },
-  {
-    title: "Three things in AI to watch, according to a Nobel-winning economist",
-    excerpt: "Daron Acemoglu, Nobel d'économie 2024, a publié un papier qui lui a valu peu de fans dans la Silicon Valley. Contrairement à ce que prétendent les Big Tech, l'IA ne transformera pas l'économie aussi vite qu'on le pense.",
-    expertOpinion: "Un Nobel qui dit 'calmez-vous sur l'IA' — ça vaut le détour. Son analyse sur le décalage entre promesses tech et impact business réel est rafraîchissante.",
-    source: "reglementation",
-    sourceName: "MIT Tech Review",
-    date: "2026-05-11",
-    url: "https://www.technologyreview.com/2026/05/11/1137090/three-things-in-ai-to-watch-according-to-a-nobel-winning-economist/",
-    tags: ["Économie", "IA", "Analyse"],
-    trending: true
-  },
-  {
-    title: "How We Reduced LLM Inference Costs by Shifting the Source of Truth",
-    excerpt: "Retour d'expérience concret sur la réduction des coûts d'inférence LLM en repensant l'architecture data. Un cas d'usage pertinent pour toute entreprise qui déploie de l'IA générative à l'échelle.",
-    expertOpinion: "L'optimisation des coûts LLM passe autant par l'architecture data que par le choix du modèle. Un article très actionnable pour les équipes qui déploient.",
-    source: "ia_entreprise",
-    sourceName: "Medium #llm",
-    date: "2026-05-17",
-    url: "https://medium.com/@priyansh1990_60788/how-we-reduced-llm-inference-costs-by-shifting-the-source-of-truth-2d76deac7a2f",
-    tags: ["LLM", "Coûts", "Architecture"],
-    trending: true
-  },
-  {
-    title: "Security in an LLM Observability Platform: Controls, Tradeoffs, and What Is Still Open",
-    excerpt: "5ème article d'une série pratique sur la construction d'une plateforme d'observabilité LLM. Focus sur la sécurité : quels contrôles mettre en place, quels compromis accepter.",
-    expertOpinion: "L'observabilité LLM est le prochain must-have pour les entreprises sérieuses sur l'IA. La sécurité de ces plateformes est un sujet encore trop ignoré.",
-    source: "ia_entreprise",
-    sourceName: "Medium #llm",
-    date: "2026-05-17",
-    url: "https://medium.com/@Manjunath-Hanmantgad/security-in-an-llm-observability-platform-controls-tradeoffs-and-what-is-still-open-5fa9a2961b09?source=rss------llm-5",
-    tags: ["LLM", "Observabilité", "Sécurité"],
-    trending: true
-  },
-  {
-    title: "Android 16 Quietly Embedded MCP Inside the OS — 25 Apps Are Already Ditching Cloud Servers",
-    excerpt: "L'annonce la plus marquante d'Android 16 n'est pas Gemini Intelligence, mais une annotation Kotlin qui transforme chaque app Android en serveur MCP local. 25 apps ont déjà migré.",
-    expertOpinion: "MCP embarqué dans l'OS mobile = les agents IA vont pouvoir interagir directement avec vos apps. C'est un changement de paradigme pour l'IA embarquée.",
-    source: "ia_entreprise",
-    sourceName: "Medium / Towards AI",
-    date: "2026-05-17",
-    url: "https://pub.towardsai.net/android-16-quietly-embedded-mcp-inside-the-os-25-apps-are-already-ditching-cloud-servers-ea7e0d7e0e29?source=rss------llm-5",
-    tags: ["MCP", "Android", "IA Embarquée"],
-    trending: true
-  },
-  {
-    title: "Unlocking Peak AI Performance: Why the 'Harness' Matters More Than the Model",
-    excerpt: "Analyse des derniers assistants IA (Devin, Claude Code, Perplexity) : la performance ne vient pas du modèle mais du 'harness' — l'architecture qui l'entoure.",
-    expertOpinion: "100% d'accord. En production, j'ai vu des modèles moyens surperformer grâce à un bon prompt engineering et une architecture solide. Le modèle c'est 30% du résultat.",
-    source: "ia_entreprise",
-    sourceName: "Medium #llm",
-    date: "2026-05-17",
-    url: "https://gokulraaj.medium.com/unlocking-peak-ai-performance-why-the-harness-matters-more-than-the-model-da5f1b4e95eb?source=rss------llm-5",
-    tags: ["Performance IA", "Architecture", "LLM"],
-    trending: true
-  },
-  {
-    title: "GDS weighs in on the NHS's decision to retreat from Open Source",
-    excerpt: "Le Government Digital Service britannique recommande de garder l'open source par défaut face à la décision controversée du NHS de fermer ses dépôts open source suite à des vulnérabilités.",
-    expertOpinion: "Open source vs sécurité : un faux dilemme. La bonne approche c'est open source + gouvernance des vulnérabilités, pas fermer les vannes.",
-    source: "ia_entreprise",
-    sourceName: "Simon Willison",
-    date: "2026-05-17",
-    url: "https://simonwillison.net/2026/May/17/gds-weighs-in/#atom-everything",
-    tags: ["Open Source", "Sécurité", "Gouvernance"],
-    trending: true
-  },
-  {
-    title: "Import AI 456: RSI and economic growth, radical optionality for AI regulation",
-    excerpt: "La newsletter hebdomadaire de référence sur l'IA par Jack Clark (co-fondateur d'Anthropic). Cette semaine : croissance économique et IA, régulation avec optionalité radicale, et un neural computer.",
-    expertOpinion: "Import AI est ma newsletter préférée. Jack Clark a le recul nécessaire pour séparer le signal du bruit dans l'actualité IA.",
-    source: "business_strategie",
-    sourceName: "Import AI",
-    date: "2026-05-15",
-    url: "https://jack-clark.net/2026/05/11/import-ai-456-rsi-and-economic-growth-radical-optionality-for-ai-regulation-and-a-neural-computer/",
-    tags: ["Agents IA", "Politique IA", "Newsletter"],
-    trending: false
-  },
-  {
-    title: "Pandas Isn't Going Anywhere: Why It's Still My Go-To for Data Wrangling",
-    excerpt: "Les milliards de lignes sont l'exception. Pour tout le reste, Pandas reste un outil hautement fiable. Analyse pragmatique de pourquoi Pandas domine encore le data wrangling.",
-    expertOpinion: "Dans la course aux nouveaux frameworks, on oublie que 90% des cas d'usage se traitent très bien avec Pandas. La simplicité est une feature.",
-    source: "data_governance",
-    sourceName: "Towards Data Science",
-    date: "2026-05-17",
-    url: "https://towardsdatascience.com/pandas-isnt-going-anywhere-why-its-still-my-go-to-for-data-wrangling/",
-    tags: ["Data Engineering", "Python", "Outils"],
-    trending: true
-  },
-  {
-    title: "CNIL : Nouvelles recommandations sur les systèmes d'IA générative",
-    excerpt: "La CNIL publie ses dernières recommandations pour les entreprises déployant de l'IA générative. Focus sur la transparence, la minimisation des données et les droits des personnes.",
-    expertOpinion: "La CNIL accélère sur l'IA générative. Si vous déployez des LLMs en entreprise, ces recommandations sont à lire en priorité — surtout sur la question du consentement.",
-    source: "reglementation",
-    sourceName: "CNIL",
-    date: "2026-05-15",
-    url: "https://www.cnil.fr/fr/intelligence-artificielle",
-    tags: ["CNIL", "IA Générative", "RGPD"],
-    trending: false
-  }
-];
-
-let allArticles = STATIC_ARTICLES;
+let allArticles = [];
 let currentFilter = 'all';
 
-// Initialisation
 document.addEventListener('DOMContentLoaded', () => {
-  renderArticles();
-  updateStats();
   setupFilters();
-  
-  // Tentative de chargement RSS (via proxy CORS)
-  // loadRSSFeeds();
+  loadArticles();
+  loadLinkedInPost();
 });
+
+async function loadArticles() {
+  try {
+    const response = await fetch(`${API_BASE}/api/articles?limit=30`);
+    if (!response.ok) throw new Error(`HTTP ${response.status}`);
+    const data = await response.json();
+    allArticles = (data.articles || []).map(a => ({
+      title: a.title || 'Sans titre',
+      excerpt: a.summary_raw || a.expert_opinion || '',
+      expertOpinion: a.expert_opinion || '',
+      source: a.category || 'ia_pratique',
+      sourceName: a.source_name || 'Source',
+      date: a.published || a.created_at || '',
+      url: a.url || '#',
+      tags: a.tags || [],
+      trending: a.is_trending || false,
+      score: a.score || 0,
+    }));
+    renderArticles();
+    updateStats();
+  } catch (e) {
+    console.error('Erreur chargement articles:', e);
+    document.getElementById('articles-container').innerHTML =
+      '<div class="loading"><p>Erreur de chargement. Réessayez plus tard.</p></div>';
+  }
+}
+
+async function loadLinkedInPost() {
+  try {
+    const response = await fetch(`${API_BASE}/api/linkedin/latest`);
+    if (!response.ok) throw new Error(`HTTP ${response.status}`);
+    const data = await response.json();
+    if (data.post_text) {
+      document.getElementById('linkedin-body').textContent = data.post_text;
+      document.getElementById('linkedin-date').textContent = data.published_at
+        ? formatDate(data.published_at) : 'Cette semaine';
+    }
+  } catch (e) {
+    document.getElementById('linkedin-body').textContent = 'Post LinkedIn à venir...';
+  }
+}
 
 function renderArticles() {
   const container = document.getElementById('articles-container');
-  const filtered = currentFilter === 'all' 
-    ? allArticles 
+  const filtered = currentFilter === 'all'
+    ? allArticles
     : allArticles.filter(a => a.source === currentFilter);
 
   if (filtered.length === 0) {
@@ -575,7 +491,7 @@ function renderArticles() {
       </div>
       <h3 class="article-title">${article.title}</h3>
       <p class="article-excerpt">${article.excerpt}</p>
-      ${article.expertOpinion ? `<div class="expert-opinion"><span class="expert-label">💬 L'avis de Renaud</span><p>${article.expertOpinion}</p></div>` : ''}
+      ${article.expertOpinion ? `<div class="expert-opinion"><span class="expert-label">💬 Avis</span><p>${article.expertOpinion}</p></div>` : ''}
       <div class="article-tags">
         ${article.tags.map(tag => `<span class="article-tag">${tag}</span>`).join('')}
       </div>
@@ -601,22 +517,16 @@ function setupFilters() {
 }
 
 function formatDate(dateStr) {
+  if (!dateStr) return '';
   const date = new Date(dateStr);
+  if (isNaN(date)) return dateStr;
   const now = new Date();
   const diffDays = Math.floor((now - date) / (1000 * 60 * 60 * 24));
-  
   if (diffDays === 0) return 'Aujourd\'hui';
   if (diffDays === 1) return 'Hier';
   if (diffDays < 7) return `Il y a ${diffDays} jours`;
-  if (diffDays < 30) return `Il y a ${Math.floor(diffDays / 7)} semaines`;
-  return date.toLocaleDateString('fr-FR', { day: 'numeric', month: 'long', year: 'numeric' });
-}
-
-// Fonction pour charger les flux RSS (nécessite un proxy CORS)
-async function loadRSSFeeds() {
-  // TODO: Implémenter avec un proxy CORS ou un backend
-  // Pour l'instant, on utilise les articles statiques
-  console.log('RSS feeds loading not implemented yet. Using static articles.');
+  if (diffDays < 30) return `Il y a ${Math.floor(diffDays / 7)} sem.`;
+  return date.toLocaleDateString('fr-FR', { day: 'numeric', month: 'long' });
 }
 </script>
 
