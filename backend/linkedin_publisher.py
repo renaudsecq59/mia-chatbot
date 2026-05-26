@@ -345,6 +345,8 @@ def publish_to_linkedin(post_text: str, image_bytes: bytes = None) -> dict:
                             {
                                 "status": "READY",
                                 "media": asset_urn,
+                                "title": {"text": "Veille IA & Data"},
+                                "description": {"text": "Illustration générée par IA"},
                             }
                         ]
                     }

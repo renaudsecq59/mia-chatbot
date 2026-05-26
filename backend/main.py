@@ -105,6 +105,11 @@ async def run_scrape():
         edito = generate_weekly_edito(top_articles, trends)
         post_text = edito.get("post_text", "")
         post_type = edito.get("post_type", "observateur")
+        hashtags = edito.get("hashtags", [])
+        
+        # S'assurer que les hashtags sont dans le post
+        if post_text and hashtags and not any(h in post_text for h in hashtags):
+            post_text = post_text.rstrip() + "\n\n" + " ".join(hashtags)
         
         if post_text:
             # Générer un visuel IA pour accompagner le post
