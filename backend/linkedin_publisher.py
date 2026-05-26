@@ -211,33 +211,62 @@ def generate_weekly_edito(articles: list[dict], trends: list[str] = None, post_t
         return _mock_edito(articles, trends_str, post_type)
 
 
+IMAGE_PROMPT_GENERATOR = """Tu es un directeur artistique expert en visuels LinkedIn.
+
+À partir du post LinkedIn ci-dessous, génère UN SEUL prompt en anglais pour un générateur d'images IA (Imagen).
+
+POST :
+{post_text}
+
+RÈGLES POUR LE PROMPT IMAGE :
+1. JAMAIS de texte, mots, lettres ou chiffres dans l'image
+2. Le visuel doit illustrer la MÉTAPHORE CENTRALE ou le CONCEPT CLÉ du post, pas juste le sujet
+3. Style : réaliste cinématique, éclairage dramatique, profondeur de champ
+4. Composition : format paysage 16:9, point focal décentré (règle des tiers)
+5. Palette : tons sombres (bleu nuit, noir) avec UN accent vif (cyan, doré, ou orange)
+6. PAS de clipart, PAS de flat design, PAS de stock photo générique
+7. Pense VISUEL ARRÊTANT dans un feed LinkedIn : contraste fort, sujet intrigant
+8. Inclure des éléments concrets et reconnaissables (objets, scènes, matières) — pas de formes abstraites vides
+
+EXEMPLES DE BONS PROMPTS :
+- "A single glowing neural pathway emerging from a dark server room, volumetric lighting, cinematic, depth of field, cyan accent light"
+- "An architect's hands assembling a complex mechanical clockwork made of data pipelines and gears, dark moody lighting, tilt-shift, golden accents"
+- "A lone lighthouse beam cutting through fog over a digital ocean of data streams, dramatic sky, aerial perspective, cyan and navy palette"
+
+MAUVAIS PROMPTS (à éviter) :
+- "Abstract geometric shapes on dark background" (trop vague, ennuyeux)
+- "AI technology concept illustration" (générique, insipide)
+- "Professional business visualization" (stock photo energy)
+
+Réponds UNIQUEMENT avec le prompt image, rien d'autre. Max 150 mots."""
+
+
+def _generate_image_prompt(post_text: str, post_type: str) -> str:
+    """Utilise Gemini Pro pour générer un prompt image riche et contextuel."""
+    try:
+        response = gemini_client.models.generate_content(
+            model=GEMINI_MODEL,
+            contents=IMAGE_PROMPT_GENERATOR.format(post_text=post_text[:800]),
+        )
+        prompt = response.text.strip().strip('"').strip("'")
+        # Ajouter les contraintes techniques
+        prompt += ". No text, no words, no letters, no numbers. Photorealistic, 16:9 landscape, cinematic lighting."
+        return prompt
+    except Exception as e:
+        logger.warning(f"⚠️ Fallback prompt image: {e}")
+        hook = post_text.split("\n")[0][:100]
+        return f"A dramatic cinematic illustration about {hook}. Dark navy background, cyan and gold accents, volumetric lighting, depth of field, no text no words no letters. Photorealistic, 16:9 landscape."
+
+
 def generate_visual(post_text: str, post_type: str) -> bytes | None:
     """Génère un visuel IA (Imagen 3) pour illustrer le post LinkedIn."""
     if not gemini_client:
         logger.warning("⚠️ GenAI non dispo, pas de visuel")
         return None
 
-    # Identité visuelle cohérente : palette sombre + accent cyan/doré + style géométrique épuré
-    # Chaque type a sa variation mais le style reste reconnaissable
-    BASE_STYLE = "Dark navy background (#0a1628), clean geometric shapes, minimal flat design, professional tech aesthetic, accent colors cyan (#00d4ff) and gold (#c8a951), subtle gradient, NO text NO words NO letters"
-    style_prompts = {
-        "revue_hebdo": f"{BASE_STYLE}, grid layout of 5 abstract icons representing different tech topics, dashboard feel, weekly digest concept",
-        "signal_faible": f"{BASE_STYLE}, single bright signal point radiating connections outward, radar/sonar aesthetic, one bright element emerging from noise",
-        "retour_terrain": f"{BASE_STYLE}, abstract construction/building metaphor, layers being assembled, hands-on engineering feel, blueprint aesthetic",
-        "comparatif": f"{BASE_STYLE}, split composition with two geometric forms side by side, balance scale concept, versus layout",
-        "chiffre_cle": f"{BASE_STYLE}, large abstract number/chart dominating the frame, bold data visualization, single impactful metric feel",
-        "decryptage": f"{BASE_STYLE}, complex mechanism being opened/revealed, layers peeling back, magnifying glass or lens concept, x-ray aesthetic",
-    }
-
-    style = style_prompts.get(post_type, style_prompts["signal_faible"])
-
-    # Extraire le sujet principal du post pour contextualiser l'image
-    hook = post_text.split("\n")[0][:100]
-    image_prompt = f"""Create a professional LinkedIn post illustration.
-Topic: {hook}
-Style: {style}
-Format: 1200x627px landscape, suitable for LinkedIn feed.
-IMPORTANT: No text, no words, no letters in the image. Pure visual illustration."""
+    # Étape 1 : Gemini Pro génère un prompt image pertinent à partir du post
+    image_prompt = _generate_image_prompt(post_text, post_type)
+    logger.info(f"🖼️ Prompt image: {image_prompt[:120]}...")
 
     try:
         import vertexai
