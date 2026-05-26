@@ -40,6 +40,7 @@ except Exception:
 
 
 EDITO_PROMPT = """Tu rédiges un post LinkedIn pour {name}, consultant IA & Data.
+DATE D'AUJOURD'HUI : {today}. Nous sommes en 2026. NE JAMAIS mentionner 2024 ou 2025 comme si c'était récent.
 
 OBJECTIF : Partager une INFO UTILE et CONCRÈTE. Pas du personal branding.
 Le lecteur doit apprendre quelque chose en 30 secondes de lecture.
@@ -158,6 +159,7 @@ def generate_weekly_edito(articles: list[dict], trends: list[str] = None, post_t
         prompt = EDITO_PROMPT.format(
             name=EXPERT_PROFILE["name"],
             title=EXPERT_PROFILE["title"],
+            today=datetime.now(timezone.utc).strftime("%d %B 2026"),
             articles_summary=articles_summary,
             trends=trends_str,
             post_type=post_type,
