@@ -113,21 +113,31 @@ RÉPONDS EN JSON STRICT :
   "word_count": 0
 }}"""
 
-POST_TYPES = ["revue_presse", "vertex_ai", "observateur", "vibe_coding", "vulgarisateur", "questionneur"]
+# Lundi = veille de la semaine, Jeudi = sujet de fond (alterne chaque semaine)
+THURSDAY_TYPES = ["vertex_ai", "vibe_coding", "observateur", "vulgarisateur", "questionneur"]
 
 
-def _pick_post_type() -> str:
-    """Alterne le type de post chaque semaine (observateur → vulgarisateur → questionneur)."""
-    week_number = datetime.now(timezone.utc).isocalendar()[1]
-    return POST_TYPES[week_number % len(POST_TYPES)]
+def pick_post_type_for_today() -> str:
+    """Retourne le type de post selon le jour : lundi=revue_presse, jeudi=fond."""
+    today = datetime.now(timezone.utc)
+    weekday = today.weekday()  # 0=lundi, 3=jeudi
+    if weekday == 0:  # Lundi
+        return "revue_presse"
+    elif weekday == 3:  # Jeudi
+        week_number = today.isocalendar()[1]
+        return THURSDAY_TYPES[week_number % len(THURSDAY_TYPES)]
+    else:
+        # Si appelé un autre jour, on choisit le plus proche
+        week_number = today.isocalendar()[1]
+        return THURSDAY_TYPES[week_number % len(THURSDAY_TYPES)]
 
 
 def generate_weekly_edito(articles: list[dict], trends: list[str] = None, post_type: str = None) -> dict:
-    """Génère l'édito LinkedIn hebdomadaire à partir des meilleurs articles."""
+    """Génère l'édito LinkedIn à partir des meilleurs articles."""
     if not articles:
         return {"error": "Aucun article pour générer l'édito"}
 
-    post_type = post_type or _pick_post_type()
+    post_type = post_type or pick_post_type_for_today()
 
     # Préparer le résumé des articles pour Claude
     articles_summary = ""
@@ -176,8 +186,123 @@ def generate_weekly_edito(articles: list[dict], trends: list[str] = None, post_t
         return _mock_edito(articles, trends_str, post_type)
 
 
-def publish_to_linkedin(post_text: str) -> dict:
-    """Publie un post sur LinkedIn via l'API REST v2."""
+def generate_visual(post_text: str, post_type: str) -> bytes | None:
+    """Génère un visuel IA (Imagen 3) pour illustrer le post LinkedIn."""
+    if not gemini_client:
+        logger.warning("⚠️ GenAI non dispo, pas de visuel")
+        return None
+
+    # Prompt adapté au type de post
+    style_prompts = {
+        "revue_presse": "Clean modern infographic style, abstract data visualization with flowing lines and nodes, blue and purple gradient, minimalist tech aesthetic, no text",
+        "vertex_ai": "Abstract cloud computing visualization, neural network connections in Google Cloud colors (blue, green, yellow, red), modern 3D render, no text",
+        "vibe_coding": "Developer workspace with AI assistance visualization, code floating in air with glowing highlights, dark theme with neon accents, futuristic IDE concept, no text",
+        "observateur": "Abstract thought leadership visualization, interconnected ideas as geometric shapes, warm earth tones with accent colors, modern art style, no text",
+        "vulgarisateur": "Educational diagram style, complex concept simplified into clean visual metaphor, friendly colors, whiteboard aesthetic with modern touch, no text",
+        "questionneur": "Two contrasting perspectives visualization, split composition, bold geometric shapes, debate concept in abstract form, no text",
+    }
+
+    style = style_prompts.get(post_type, style_prompts["observateur"])
+
+    # Extraire le sujet principal du post pour contextualiser l'image
+    hook = post_text.split("\n")[0][:100]
+    image_prompt = f"""Create a professional LinkedIn post illustration.
+Topic: {hook}
+Style: {style}
+Format: 1200x627px landscape, suitable for LinkedIn feed.
+IMPORTANT: No text, no words, no letters in the image. Pure visual illustration."""
+
+    try:
+        from google.genai import types
+        response = gemini_client.models.generate_content(
+            model="gemini-2.5-flash-image",
+            contents=image_prompt,
+            config=types.GenerateContentConfig(
+                response_modalities=["IMAGE", "TEXT"],
+            ),
+        )
+
+        # Extraire l'image de la réponse
+        for part in response.candidates[0].content.parts:
+            if part.inline_data and part.inline_data.mime_type.startswith("image/"):
+                image_bytes = part.inline_data.data
+                logger.info(f"🎨 Visuel généré ({len(image_bytes)} bytes)")
+                return image_bytes
+
+        logger.warning("⚠️ Aucune image dans la réponse Gemini")
+        return None
+
+    except Exception as e:
+        logger.error(f"❌ Erreur génération visuel: {e}")
+        return None
+
+
+def _upload_image_to_linkedin(image_bytes: bytes) -> str | None:
+    """Upload une image sur LinkedIn et retourne l'asset URN."""
+    if not LINKEDIN_ACCESS_TOKEN or not LINKEDIN_PERSON_URN:
+        return None
+
+    headers = {
+        "Authorization": f"Bearer {LINKEDIN_ACCESS_TOKEN}",
+        "Content-Type": "application/json",
+        "X-Restli-Protocol-Version": "2.0.0",
+        "LinkedIn-Version": "202405",
+    }
+
+    # Étape 1 : Enregistrer l'upload
+    register_payload = {
+        "registerUploadRequest": {
+            "recipes": ["urn:li:digitalmediaRecipe:feedshare-image"],
+            "owner": LINKEDIN_PERSON_URN,
+            "serviceRelationships": [
+                {"relationshipType": "OWNER", "identifier": "urn:li:userGeneratedContent"}
+            ]
+        }
+    }
+
+    try:
+        reg_response = httpx.post(
+            "https://api.linkedin.com/v2/assets?action=registerUpload",
+            headers=headers,
+            json=register_payload,
+            timeout=30,
+        )
+
+        if reg_response.status_code != 200:
+            logger.error(f"❌ LinkedIn register upload failed: {reg_response.status_code} {reg_response.text[:200]}")
+            return None
+
+        reg_data = reg_response.json()
+        upload_url = reg_data["value"]["uploadMechanism"]["com.linkedin.digitalmedia.uploading.MediaUploadHttpRequest"]["uploadUrl"]
+        asset_urn = reg_data["value"]["asset"]
+
+        # Étape 2 : Uploader le binaire
+        upload_headers = {
+            "Authorization": f"Bearer {LINKEDIN_ACCESS_TOKEN}",
+            "Content-Type": "image/png",
+        }
+
+        upload_response = httpx.put(
+            upload_url,
+            headers=upload_headers,
+            content=image_bytes,
+            timeout=60,
+        )
+
+        if upload_response.status_code in (200, 201):
+            logger.info(f"🖼️ Image uploadée sur LinkedIn: {asset_urn}")
+            return asset_urn
+        else:
+            logger.error(f"❌ LinkedIn image upload failed: {upload_response.status_code}")
+            return None
+
+    except Exception as e:
+        logger.error(f"❌ Erreur upload image LinkedIn: {e}")
+        return None
+
+
+def publish_to_linkedin(post_text: str, image_bytes: bytes = None) -> dict:
+    """Publie un post sur LinkedIn (avec ou sans image)."""
     if not LINKEDIN_ACCESS_TOKEN:
         logger.warning("⚠️ LINKEDIN_ACCESS_TOKEN non configuré")
         return {
@@ -202,34 +327,42 @@ def publish_to_linkedin(post_text: str) -> dict:
             "LinkedIn-Version": "202405",
         }
 
-        # API LinkedIn Posts (v2)
-        payload = {
-            "author": LINKEDIN_PERSON_URN,
-            "lifecycleState": "PUBLISHED",
-            "specificContent": {
-                "com.linkedin.ugc.ShareContent": {
-                    "shareCommentary": {
-                        "text": post_text
-                    },
-                    "shareMediaCategory": "ARTICLE",
-                    "media": [
-                        {
-                            "status": "READY",
-                            "originalUrl": SITE_URL,
-                            "title": {
-                                "text": "Veille IA & Data — Renaud Secq"
-                            },
-                            "description": {
-                                "text": "Ma sélection hebdomadaire sur l'IA en entreprise et la data governance"
+        # Upload de l'image si dispo
+        asset_urn = None
+        if image_bytes:
+            asset_urn = _upload_image_to_linkedin(image_bytes)
+
+        # Construire le payload selon qu'on a une image ou non
+        if asset_urn:
+            payload = {
+                "author": LINKEDIN_PERSON_URN,
+                "lifecycleState": "PUBLISHED",
+                "specificContent": {
+                    "com.linkedin.ugc.ShareContent": {
+                        "shareCommentary": {"text": post_text},
+                        "shareMediaCategory": "IMAGE",
+                        "media": [
+                            {
+                                "status": "READY",
+                                "media": asset_urn,
                             }
-                        }
-                    ]
-                }
-            },
-            "visibility": {
-                "com.linkedin.ugc.MemberNetworkVisibility": "PUBLIC"
+                        ]
+                    }
+                },
+                "visibility": {"com.linkedin.ugc.MemberNetworkVisibility": "PUBLIC"}
             }
-        }
+        else:
+            payload = {
+                "author": LINKEDIN_PERSON_URN,
+                "lifecycleState": "PUBLISHED",
+                "specificContent": {
+                    "com.linkedin.ugc.ShareContent": {
+                        "shareCommentary": {"text": post_text},
+                        "shareMediaCategory": "NONE",
+                    }
+                },
+                "visibility": {"com.linkedin.ugc.MemberNetworkVisibility": "PUBLIC"}
+            }
 
         response = httpx.post(
             "https://api.linkedin.com/v2/ugcPosts",
@@ -240,11 +373,12 @@ def publish_to_linkedin(post_text: str) -> dict:
 
         if response.status_code == 201:
             post_id = response.headers.get("X-RestLi-Id", "unknown")
-            logger.info(f"✅ Post LinkedIn publié ! ID: {post_id}")
+            logger.info(f"✅ Post LinkedIn publié ! ID: {post_id} (image: {bool(asset_urn)})")
             return {
                 "status": "published",
                 "post_id": post_id,
                 "post_text": post_text,
+                "has_image": bool(asset_urn),
                 "published_at": datetime.now(timezone.utc).isoformat(),
             }
         else:

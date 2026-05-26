@@ -10,7 +10,7 @@ from google.cloud import firestore
 from scraper import scrape_all_sources
 from ai_curator import process_articles
 from visual_generator import save_visual_html
-from linkedin_publisher import generate_weekly_edito, publish_to_linkedin
+from linkedin_publisher import generate_weekly_edito, generate_visual, publish_to_linkedin
 from config import GCP_PROJECT, MAX_ARTICLES_PER_WEEK
 
 logging.basicConfig(level=logging.INFO, format='%(asctime)s %(message)s')
@@ -104,10 +104,13 @@ async def run_scrape():
         
         edito = generate_weekly_edito(top_articles, trends)
         post_text = edito.get("post_text", "")
+        post_type = edito.get("post_type", "observateur")
         
         if post_text:
-            linkedin_result = publish_to_linkedin(post_text)
-            logger.info(f"📣 LinkedIn: {linkedin_result.get('status')} — type={edito.get('post_type')}")
+            # Générer un visuel IA pour accompagner le post
+            image_bytes = generate_visual(post_text, post_type)
+            linkedin_result = publish_to_linkedin(post_text, image_bytes)
+            logger.info(f"📣 LinkedIn: {linkedin_result.get('status')} — type={post_type} — image={linkedin_result.get('has_image')}")
         else:
             logger.warning("⚠️ Édito vide, publication LinkedIn ignorée")
     except Exception as e:
