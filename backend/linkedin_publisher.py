@@ -220,25 +220,27 @@ POST :
 
 RÈGLES POUR LE PROMPT IMAGE :
 1. JAMAIS de texte, mots, lettres ou chiffres dans l'image
-2. Le visuel doit illustrer la MÉTAPHORE CENTRALE du post avec une scène concrète, vivante et originale
-3. Style : coloré, lumineux, joyeux, avec une touche d'humour ou de décalage. Pense illustration éditoriale haut de gamme.
-4. Composition : format paysage 16:9, scène lisible en petit format (thumbnail LinkedIn)
-5. Palette : LUMINEUSE et SATURÉE. Couleurs vives (turquoise, corail, jaune, violet). Fond clair ou pastel.
-6. PAS de dark mode, PAS de tons sombres, PAS de server rooms sinistres
-7. PAS de clipart, PAS de stock photo — mais OK pour du style illustration 3D, isométrique, ou Pixar-like
-8. Inclure des objets du quotidien détournés ou des scènes décalées liées au sujet tech
+2. Le visuel doit illustrer la MÉTAPHORE CENTRALE du post avec une scène concrète et sophistiquée
+3. Style : ILLUSTRATION ÉDITORIALE haut de gamme. Pense couverture The Economist, Bloomberg Businessweek, ou MIT Technology Review. Mature, intelligent, frappant.
+4. Composition : format paysage 16:9, point focal fort, lisible même en petit
+5. Palette : riche et contrastée. Couleurs vives mais sophistiquées. Pas pastel bébé. OK pour des fonds sombres si le sujet émerge fort.
+6. Techniques visuelles autorisées : photomontage surréaliste, illustration vectorielle sophistiquée, rendu 3D réaliste stylisé, collage éditorial, photo-illustration conceptuelle
+7. PAS de style cartoon/Pixar/enfantin, PAS de robots mignons, PAS de personnages kawaii
+8. PAS de stock photo, PAS de formes géométriques abstraites vides
+9. Favoriser les MÉTAPHORES VISUELLES FORTES : objets réels détournés, perspectives impossibles, juxtapositions inattendues
 
 EXEMPLES DE BONS PROMPTS :
-- "A cheerful robot librarian organizing colorful floating books in a sunny open-air library, isometric 3D style, vibrant colors, warm lighting"
-- "A group of friendly cartoon animals having a strategy meeting around a holographic dashboard, Pixar style, bright pastel office, playful"
-- "A tiny astronaut surfing on a giant microchip through a colorful candy-like data stream, whimsical, saturated colors, joyful energy"
-- "An oversized magnifying glass revealing a hidden garden of circuits and flowers, watercolor meets tech, bright and airy"
+- "A massive ship's helm wheel made of circuit boards, steering through a sea of glowing data streams, dramatic golden hour lighting, editorial illustration style"
+- "A human hand and a robotic hand playing chess on a board where the pieces are skyscrapers and server racks, bird's eye view, rich warm tones, conceptual photo-illustration"
+- "An enormous antique telescope pointed at a sky full of constellations shaped like neural networks, observatory setting, moody blue and copper tones, editorial magazine cover style"
+- "A bridge being built from both sides — one side with traditional blueprints, the other with holographic AI projections — meeting in the middle, aerial perspective, golden light"
 
 MAUVAIS PROMPTS (à éviter) :
-- "Dark server room with glowing screens" (trop sinistre, LinkedIn n'est pas un film noir)
-- "Abstract geometric shapes on dark background" (ennuyeux, soporifique)
-- "Professional business visualization" (stock photo energy)
-- "Futuristic dark factory" (anxiogène, pas engageant)
+- "Cute robots playing music" (enfantin, pas crédible pour un expert)
+- "Colorful cartoon characters in an office" (Pixar, pas LinkedIn)
+- "Abstract geometric shapes" (ennuyeux, vide de sens)
+- "Dark server room" (cliché tech, vu 10000 fois)
+- "Stock photo of business people" (générique, invisible dans le feed)
 
 Réponds UNIQUEMENT avec le prompt image, rien d'autre. Max 150 mots."""
 
@@ -252,12 +254,12 @@ def _generate_image_prompt(post_text: str, post_type: str) -> str:
         )
         prompt = response.text.strip().strip('"').strip("'")
         # Ajouter les contraintes techniques
-        prompt += ". No text, no words, no letters, no numbers. Bright vibrant colors, 16:9 landscape, warm lighting, playful style."
+        prompt += ". No text, no words, no letters, no numbers. Editorial illustration style, 16:9 landscape, rich colors, high contrast."
         return prompt
     except Exception as e:
         logger.warning(f"⚠️ Fallback prompt image: {e}")
         hook = post_text.split("\n")[0][:100]
-        return f"A colorful playful 3D illustration about {hook}. Bright pastel background, turquoise and coral accents, warm lighting, isometric style, joyful energy, no text no words no letters. 16:9 landscape."
+        return f"Editorial magazine cover illustration about {hook}. Conceptual photo-illustration, rich warm tones, dramatic lighting, sophisticated visual metaphor, no text no words no letters. 16:9 landscape."
 
 
 def generate_visual(post_text: str, post_type: str) -> bytes | None:
