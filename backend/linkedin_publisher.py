@@ -238,48 +238,44 @@ IMPORTANT: No text, no words, no letters in the image. Pure visual illustration.
 
 
 def _upload_image_to_linkedin(image_bytes: bytes) -> str | None:
-    """Upload une image sur LinkedIn et retourne l'asset URN."""
+    """Upload une image sur LinkedIn via la nouvelle API Images et retourne l'image URN."""
     if not LINKEDIN_ACCESS_TOKEN or not LINKEDIN_PERSON_URN:
         return None
 
     headers = {
         "Authorization": f"Bearer {LINKEDIN_ACCESS_TOKEN}",
         "Content-Type": "application/json",
+        "LinkedIn-Version": "202506",
         "X-Restli-Protocol-Version": "2.0.0",
-        "LinkedIn-Version": "202405",
     }
 
-    # Étape 1 : Enregistrer l'upload
-    register_payload = {
-        "registerUploadRequest": {
-            "recipes": ["urn:li:digitalmediaRecipe:feedshare-image"],
+    # Étape 1 : Initialiser l'upload via la nouvelle API images
+    init_payload = {
+        "initializeUploadRequest": {
             "owner": LINKEDIN_PERSON_URN,
-            "serviceRelationships": [
-                {"relationshipType": "OWNER", "identifier": "urn:li:userGeneratedContent"}
-            ]
         }
     }
 
     try:
-        reg_response = httpx.post(
-            "https://api.linkedin.com/v2/assets?action=registerUpload",
+        init_response = httpx.post(
+            "https://api.linkedin.com/rest/images?action=initializeUpload",
             headers=headers,
-            json=register_payload,
+            json=init_payload,
             timeout=30,
         )
 
-        if reg_response.status_code != 200:
-            logger.error(f"❌ LinkedIn register upload failed: {reg_response.status_code} {reg_response.text[:200]}")
+        if init_response.status_code != 200:
+            logger.error(f"❌ LinkedIn init upload failed: {init_response.status_code} {init_response.text[:200]}")
             return None
 
-        reg_data = reg_response.json()
-        upload_url = reg_data["value"]["uploadMechanism"]["com.linkedin.digitalmedia.uploading.MediaUploadHttpRequest"]["uploadUrl"]
-        asset_urn = reg_data["value"]["asset"]
+        init_data = init_response.json()
+        upload_url = init_data["value"]["uploadUrl"]
+        image_urn = init_data["value"]["image"]
 
         # Étape 2 : Uploader le binaire
         upload_headers = {
             "Authorization": f"Bearer {LINKEDIN_ACCESS_TOKEN}",
-            "Content-Type": "image/png",
+            "Content-Type": "application/octet-stream",
         }
 
         upload_response = httpx.put(
@@ -290,8 +286,8 @@ def _upload_image_to_linkedin(image_bytes: bytes) -> str | None:
         )
 
         if upload_response.status_code in (200, 201):
-            logger.info(f"🖼️ Image uploadée sur LinkedIn: {asset_urn}")
-            return asset_urn
+            logger.info(f"🖼️ Image uploadée sur LinkedIn: {image_urn}")
+            return image_urn
         else:
             logger.error(f"❌ LinkedIn image upload failed: {upload_response.status_code}")
             return None
@@ -302,7 +298,7 @@ def _upload_image_to_linkedin(image_bytes: bytes) -> str | None:
 
 
 def publish_to_linkedin(post_text: str, image_bytes: bytes = None) -> dict:
-    """Publie un post sur LinkedIn (avec ou sans image)."""
+    """Publie un post sur LinkedIn via la nouvelle API Posts (/rest/posts)."""
     if not LINKEDIN_ACCESS_TOKEN:
         logger.warning("⚠️ LINKEDIN_ACCESS_TOKEN non configuré")
         return {
@@ -323,64 +319,51 @@ def publish_to_linkedin(post_text: str, image_bytes: bytes = None) -> dict:
         headers = {
             "Authorization": f"Bearer {LINKEDIN_ACCESS_TOKEN}",
             "Content-Type": "application/json",
+            "LinkedIn-Version": "202506",
             "X-Restli-Protocol-Version": "2.0.0",
-            "LinkedIn-Version": "202405",
         }
 
         # Upload de l'image si dispo
-        asset_urn = None
+        image_urn = None
         if image_bytes:
-            asset_urn = _upload_image_to_linkedin(image_bytes)
+            image_urn = _upload_image_to_linkedin(image_bytes)
 
-        # Construire le payload selon qu'on a une image ou non
-        if asset_urn:
-            payload = {
-                "author": LINKEDIN_PERSON_URN,
-                "lifecycleState": "PUBLISHED",
-                "specificContent": {
-                    "com.linkedin.ugc.ShareContent": {
-                        "shareCommentary": {"text": post_text},
-                        "shareMediaCategory": "IMAGE",
-                        "media": [
-                            {
-                                "status": "READY",
-                                "media": asset_urn,
-                                "title": {"text": "Veille IA & Data"},
-                                "description": {"text": "Illustration générée par IA"},
-                            }
-                        ]
-                    }
-                },
-                "visibility": {"com.linkedin.ugc.MemberNetworkVisibility": "PUBLIC"}
-            }
-        else:
-            payload = {
-                "author": LINKEDIN_PERSON_URN,
-                "lifecycleState": "PUBLISHED",
-                "specificContent": {
-                    "com.linkedin.ugc.ShareContent": {
-                        "shareCommentary": {"text": post_text},
-                        "shareMediaCategory": "NONE",
-                    }
-                },
-                "visibility": {"com.linkedin.ugc.MemberNetworkVisibility": "PUBLIC"}
+        # Construire le payload avec la nouvelle API Posts
+        payload = {
+            "author": LINKEDIN_PERSON_URN,
+            "commentary": post_text,
+            "visibility": "PUBLIC",
+            "distribution": {
+                "feedDistribution": "MAIN_FEED",
+                "targetEntities": [],
+                "thirdPartyDistributionChannels": [],
+            },
+            "lifecycleState": "PUBLISHED",
+        }
+
+        if image_urn:
+            payload["content"] = {
+                "media": {
+                    "id": image_urn,
+                    "title": "Veille IA & Data",
+                }
             }
 
         response = httpx.post(
-            "https://api.linkedin.com/v2/ugcPosts",
+            "https://api.linkedin.com/rest/posts",
             headers=headers,
             json=payload,
             timeout=30,
         )
 
-        if response.status_code == 201:
-            post_id = response.headers.get("X-RestLi-Id", "unknown")
-            logger.info(f"✅ Post LinkedIn publié ! ID: {post_id} (image: {bool(asset_urn)})")
+        if response.status_code in (200, 201):
+            post_id = response.headers.get("X-RestLi-Id", response.headers.get("x-restli-id", "unknown"))
+            logger.info(f"✅ Post LinkedIn publié ! ID: {post_id} (image: {bool(image_urn)})")
             return {
                 "status": "published",
                 "post_id": post_id,
                 "post_text": post_text,
-                "has_image": bool(asset_urn),
+                "has_image": bool(image_urn),
                 "published_at": datetime.now(timezone.utc).isoformat(),
             }
         else:
