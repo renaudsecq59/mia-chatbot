@@ -138,23 +138,22 @@ RÉPONDS EN JSON STRICT :
   "word_count": 0
 }}"""
 
-# Lundi = revue hebdo, Jeudi = sujet de fond (rotation)
-THURSDAY_TYPES = ["signal_faible", "retour_terrain", "comparatif", "chiffre_cle", "decryptage"]
+# 5 posts/semaine — chaque jour a son format signature
+DAILY_FORMAT = {
+    0: "revue_hebdo",      # Lundi : le rendez-vous veille
+    1: "decryptage",       # Mardi : vulgariser un concept complexe
+    2: "signal_faible",    # Mercredi : un signal que personne n'a connecté
+    3: "retour_terrain",   # Jeudi : du vécu en mission
+    4: "chiffre_cle",      # Vendredi : un chiffre percutant (format court)
+}
 
 
 def pick_post_type_for_today() -> str:
-    """Retourne le type de post selon le jour : lundi=revue_hebdo, jeudi=fond (rotation)."""
-    today = datetime.now(timezone.utc)
-    weekday = today.weekday()  # 0=lundi, 3=jeudi
-    if weekday == 0:  # Lundi
-        return "revue_hebdo"
-    elif weekday == 3:  # Jeudi
-        week_number = today.isocalendar()[1]
-        return THURSDAY_TYPES[week_number % len(THURSDAY_TYPES)]
-    else:
-        # Si appelé un autre jour, on choisit selon la semaine
-        week_number = today.isocalendar()[1]
-        return THURSDAY_TYPES[week_number % len(THURSDAY_TYPES)]
+    """Retourne le type de post selon le jour de la semaine (lun-ven, heure Paris)."""
+    from zoneinfo import ZoneInfo
+    today = datetime.now(ZoneInfo("Europe/Paris"))
+    weekday = today.weekday()  # 0=lundi ... 4=vendredi
+    return DAILY_FORMAT.get(weekday, "signal_faible")
 
 
 def generate_weekly_edito(articles: list[dict], trends: list[str] = None, post_type: str = None) -> dict:
