@@ -45,13 +45,16 @@ RSS_SOURCES = {
         "color": "#6c63ff",
         "sources": [
             {"name": "Simon Willison", "url": "https://simonwillison.net/atom/everything/", "weight": 1.5},
-            {"name": "Latent Space", "url": "https://www.latent.space/feed", "weight": 1.4},
+            {"name": "Latent Space", "url": "https://www.latent.space/feed", "weight": 1.5},
             {"name": "Chip Huyen", "url": "https://huyenchip.com/feed.xml", "weight": 1.4},
             {"name": "Lilian Weng", "url": "https://lilianweng.github.io/index.xml", "weight": 1.3},
-            {"name": "The Batch (Andrew Ng)", "url": "https://www.deeplearning.ai/the-batch/feed/", "weight": 1.3},
+            {"name": "Eugene Yan", "url": "https://eugeneyan.com/rss/", "weight": 1.4},
+            {"name": "Hamel Husain", "url": "https://hamel.dev/feed.xml", "weight": 1.4},
+            {"name": "The Batch (Andrew Ng)", "url": "https://www.deeplearning.ai/the-batch/feed/", "weight": 1.2},
             {"name": "Last Week in AI", "url": "https://lastweekin.ai/feed", "weight": 1.2},
             {"name": "AI Snake Oil", "url": "https://www.aisnakeoil.com/feed", "weight": 1.3},
             {"name": "Hugging Face Blog", "url": "https://huggingface.co/blog/feed.xml", "weight": 1.1},
+            {"name": "a16z AI", "url": "https://a16z.com/category/ai/feed/", "weight": 1.3},
         ]
     },
     "infra_mlops": {
@@ -61,8 +64,11 @@ RSS_SOURCES = {
         "sources": [
             {"name": "Google Cloud AI", "url": "https://cloudblog.withgoogle.com/products/ai-machine-learning/rss/", "weight": 1.1},
             {"name": "Databricks Blog", "url": "https://www.databricks.com/feed", "weight": 1.1},
+            {"name": "Snowflake Blog", "url": "https://www.snowflake.com/feed/", "weight": 1.1},
             {"name": "InfoQ AI/ML", "url": "https://feed.infoq.com/ai-ml-data-eng/", "weight": 1.2},
             {"name": "Pragmatic Engineer", "url": "https://newsletter.pragmaticengineer.com/feed", "weight": 1.3},
+            {"name": "W&B Blog", "url": "https://wandb.ai/fully-connected/rss.xml", "weight": 1.2},
+            {"name": "DeepMind Blog", "url": "https://deepmind.google/blog/rss.xml", "weight": 1.2},
             {"name": "HN Front Page AI", "url": "https://hnrss.org/newest?points=100&q=AI+OR+LLM+OR+agent+OR+MLOps", "weight": 1.2},
         ]
     },
@@ -76,6 +82,8 @@ RSS_SOURCES = {
             {"name": "MIT Tech Review", "url": "https://www.technologyreview.com/topic/artificial-intelligence/feed/", "weight": 1.1},
             {"name": "Stanford HAI", "url": "https://hai.stanford.edu/news/rss.xml", "weight": 1.1},
             {"name": "Ars Technica AI", "url": "https://arstechnica.com/ai/feed/", "weight": 1.0},
+            {"name": "VentureBeat AI", "url": "https://venturebeat.com/category/ai/feed/", "weight": 1.1},
+            {"name": "Le Journal de l'IA", "url": "https://www.journaldelai.com/feed/", "weight": 1.2},
         ]
     },
     "vibe_coding": {
@@ -84,10 +92,11 @@ RSS_SOURCES = {
         "color": "#ff9f43",
         "sources": [
             {"name": "Anthropic Blog", "url": "https://www.anthropic.com/blog/rss.xml", "weight": 1.4},
+            {"name": "OpenAI Blog", "url": "https://openai.com/blog/rss.xml", "weight": 1.2},
             {"name": "GitHub Blog", "url": "https://github.blog/feed/", "weight": 1.2},
             {"name": "HN Vibe Coding", "url": "https://hnrss.org/newest?points=50&q=vibe+coding+OR+cursor+OR+copilot+OR+claude+code+OR+windsurf", "weight": 1.3},
             {"name": "Dev.to #ai", "url": "https://dev.to/feed/tag/ai", "weight": 0.9},
-            {"name": "OpenAI Blog", "url": "https://openai.com/blog/rss.xml", "weight": 1.1},
+            {"name": "Cursor Blog", "url": "https://www.cursor.com/blog/rss.xml", "weight": 1.3},
         ]
     }
 }

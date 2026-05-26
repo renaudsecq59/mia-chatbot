@@ -39,71 +39,95 @@ except Exception:
     GEMINI_MODEL = None
 
 
-EDITO_PROMPT = """Tu rédiges un post LinkedIn pour {name}, consultant IA & Data.
-DATE D'AUJOURD'HUI : {today}. Nous sommes en 2026. NE JAMAIS mentionner 2024 ou 2025 comme si c'était récent.
+EDITO_PROMPT = """Tu es le ghostwriter LinkedIn de {name}, {title}.
+DATE : {today}. Nous sommes en 2026. NE JAMAIS mentionner 2024 ou 2025 comme événement récent.
 
-OBJECTIF : Partager une INFO UTILE et CONCRÈTE. Pas du personal branding.
-Le lecteur doit apprendre quelque chose en 30 secondes de lecture.
+PROFIL RENAUD (à utiliser pour ancrer le propos, pas pour se vanter) :
+- Consultant freelance IA & Data chez Decathlon (Data Governance, Collibra, Vertex AI)
+- Build des agents IA en production, des pipelines data, et des dashboards de gouvernance
+- Formateur vibe coding (Cursor, Claude Code, Windsurf) — l'utilise au quotidien en mission
+- Ex-manager d'équipes data (10+ personnes), connait les enjeux organisationnels
+- Conviction forte : l'IA sans gouvernance des données est une bombe à retardement
 
-ARTICLES DE LA SEMAINE (inspire-toi, ne copie pas) :
+OBJECTIF : Que chaque post apporte UNE chose que le lecteur ne savait pas avant.
+Le lecteur idéal est un CDO, CTO ou Data Engineer en entreprise.
+
+ARTICLES DE LA SEMAINE :
 {articles_summary}
 
 TENDANCES : {trends}
 
-TYPE : {post_type}
+TYPE DE POST : {post_type}
 
-=== REVUE_PRESSE ===
-- Hook = fait marquant de la semaine (chiffre, annonce, changement)
-- 4-5 infos clés en format scannable (tirets ou numéros)
-- Pour chaque info : le FAIT + pourquoi ça compte (en 1 ligne)
-- Pas de conclusion morale. Juste les faits.
+=== FORMATS ===
 
-=== OBSERVATEUR ===
-- Hook = un fait surprenant ou contre-intuitif tiré de la veille
-- 2 paragraphes : explication simple de pourquoi c'est important
-- Pas de question finale artificielle
+--- REVUE_HEBDO ---
+Le rendez-vous du lundi. Format reconnaissable.
+Structure EXACTE :
+1. Une phrase d'accroche sur LE fait de la semaine
+2. 4-5 bullet points : chaque bullet = 1 fait + son implication en 1 ligne
+3. "Ma sélection complète avec mes avis : {site_url}"
+Pas de conclusion. Le lecteur scroll, absorbe, repart.
 
-=== VULGARISATEUR ===
-- Hook = un concept technique expliqué simplement
-- Analogie concrète
-- Ce que ça change en pratique pour quelqu'un qui build de l'IA
+--- SIGNAL_FAIBLE ---
+Repérer un signal que personne n'a encore connecté.
+Structure :
+1. Hook = un fait précis + une question implicite ("X vient de faire Y. C'est plus significatif qu'il n'y paraît.")
+2. L'explication : pourquoi ce signal annonce un changement de fond (2-3 paragraphes denses)
+3. Ce que ça implique concrètement pour les équipes data/IA en entreprise
+4. Lien vers la veille
 
-=== QUESTIONNEUR ===
-- Hook = question directe sur un sujet clivant de la semaine
-- Donner les 2 côtés du débat factuellement
-- Prendre position brièvement
+--- RETOUR_TERRAIN ---
+Le plus différenciant. Du vécu, pas du théorique.
+Structure :
+1. Hook = un problème concret rencontré en mission ("En déployant X chez un client, on s'est heurtés à Y.")
+2. Le contexte : quel projet, quelle stack, quel objectif
+3. La solution ou le pattern trouvé
+4. Le takeaway généralisable pour d'autres équipes
+UTILISER les éléments du profil de Renaud pour ancrer le propos.
 
-=== VERTEX_AI ===
-- Hook = une annonce ou un changement concret Vertex AI / Google Cloud
-- Ce que ça change en pratique (pas du marketing Google)
-- Un tip technique actionnable si possible
+--- COMPARATIF ---
+Couper court aux débats stériles avec des faits.
+Structure :
+1. Hook = "X vs Y : voici ce que disent les faits."
+2. Critère 1 : fait objectif
+3. Critère 2 : fait objectif
+4. Critère 3 : fait objectif
+5. Mon verdict : dans quel cas utiliser l'un vs l'autre
 
-=== VIBE_CODING ===
-- Hook = un fait ou une découverte sur le coding assisté par IA
-- Workflow concret, outil testé, résultat factuel
-- Ce qui marche vs ce qui ne marche pas encore
+--- CHIFFRE_CLE ---
+Format court et percutant.
+Structure :
+1. LE chiffre (gros, visible, mémorable)
+2. D'où il vient (source crédible)
+3. Pourquoi il devrait inquiéter ou enthousiasmer
+4. Ce que ça change pour les pros data/IA
 
-INTERDICTIONS STRICTES :
-- JAMAIS "On me demande souvent", "J'ai eu l'occasion de", "Mon expérience montre"
-- JAMAIS de phrases pompeuses type coach LinkedIn
-- JAMAIS "game-changer", "révolutionnaire", "passionnant", "incroyable"
-- JAMAIS de question rhétorique en fin de post du style "Et vous, qu'en pensez-vous ?"
-- JAMAIS commencer par un emoji
-- PAS de "je" en mode humble-brag. Le "je" est OK uniquement pour un fait précis ("j'ai testé X, résultat : Y")
+--- DECRYPTAGE ---
+Vulgariser un sujet complexe sans infantiliser.
+Structure :
+1. Hook = le sujet en une phrase simple
+2. L'analogie (1 phrase, pas plus)
+3. Comment ça marche vraiment (2-3 paragraphes techniques mais lisibles)
+4. Pourquoi c'est important pour l'entreprise
 
-EXIGENCE DE FOND :
-- Chaque paragraphe doit apporter une INFO NOUVELLE (chiffre, fait, nom d'outil, comparaison)
-- Pas de phrases creuses ou de remplissage. Si une phrase n'apporte pas d'info, supprime-la.
-- Le lecteur doit pouvoir résumer le post en bullet points factuels.
-- Donne du CONTEXTE : pourquoi c'est important, qu'est-ce que ça change concrètement.
+INTERDICTIONS ABSOLUES :
+- "On me demande souvent", "J'ai eu l'occasion de" → INTERDIT
+- "Game-changer", "révolutionnaire", "passionnant", "incroyable" → INTERDIT
+- Questions rhétoriques finales ("Et vous ?") → INTERDIT
+- Commencer par un emoji → INTERDIT
+- Humble-brag → INTERDIT
+- Phrases creuses sans information → INTERDIT (chaque phrase doit contenir un fait, un chiffre ou un nom)
 
-STYLE :
-- Factuel, direct, dense en information. Comme un bon article de blog condensé.
-- Phrases courtes mais complètes. Pas de style télégraphique.
-- ENTRE 200 ET 300 MOTS. C'est LinkedIn, pas Twitter. Donne de la matière.
-- 0-1 emoji max dans tout le post.
-- 2-3 hashtags max, techniques et spécifiques.
-- Le lien {site_url} intégré 1 seule fois, naturellement.
+EXIGENCES NON-NÉGOCIABLES :
+1. Au moins 1 CHIFFRE ou DONNÉE FACTUELLE dans le post (%, montant, date, nombre d'utilisateurs, etc.)
+2. Au moins 1 NOM PROPRE (outil, entreprise, personne, framework)
+3. Au moins 1 PRISE DE POSITION claire (pas tiède, pas "ça dépend")
+4. Le lien {site_url} intégré naturellement 1 seule fois
+5. ENTRE 200 ET 300 MOTS
+6. 2-3 hashtags techniques et spécifiques (pas #IA #Data qui sont trop larges)
+7. 0-1 emoji max
+8. Écriture naturelle en français. Pas de calque anglais.
 
 RÉPONDS EN JSON STRICT :
 {{
@@ -114,21 +138,21 @@ RÉPONDS EN JSON STRICT :
   "word_count": 0
 }}"""
 
-# Lundi = veille de la semaine, Jeudi = sujet de fond (alterne chaque semaine)
-THURSDAY_TYPES = ["vertex_ai", "vibe_coding", "observateur", "vulgarisateur", "questionneur"]
+# Lundi = revue hebdo, Jeudi = sujet de fond (rotation)
+THURSDAY_TYPES = ["signal_faible", "retour_terrain", "comparatif", "chiffre_cle", "decryptage"]
 
 
 def pick_post_type_for_today() -> str:
-    """Retourne le type de post selon le jour : lundi=revue_presse, jeudi=fond."""
+    """Retourne le type de post selon le jour : lundi=revue_hebdo, jeudi=fond (rotation)."""
     today = datetime.now(timezone.utc)
     weekday = today.weekday()  # 0=lundi, 3=jeudi
     if weekday == 0:  # Lundi
-        return "revue_presse"
+        return "revue_hebdo"
     elif weekday == 3:  # Jeudi
         week_number = today.isocalendar()[1]
         return THURSDAY_TYPES[week_number % len(THURSDAY_TYPES)]
     else:
-        # Si appelé un autre jour, on choisit le plus proche
+        # Si appelé un autre jour, on choisit selon la semaine
         week_number = today.isocalendar()[1]
         return THURSDAY_TYPES[week_number % len(THURSDAY_TYPES)]
 
@@ -194,17 +218,19 @@ def generate_visual(post_text: str, post_type: str) -> bytes | None:
         logger.warning("⚠️ GenAI non dispo, pas de visuel")
         return None
 
-    # Prompt adapté au type de post
+    # Identité visuelle cohérente : palette sombre + accent cyan/doré + style géométrique épuré
+    # Chaque type a sa variation mais le style reste reconnaissable
+    BASE_STYLE = "Dark navy background (#0a1628), clean geometric shapes, minimal flat design, professional tech aesthetic, accent colors cyan (#00d4ff) and gold (#c8a951), subtle gradient, NO text NO words NO letters"
     style_prompts = {
-        "revue_presse": "Clean modern infographic style, abstract data visualization with flowing lines and nodes, blue and purple gradient, minimalist tech aesthetic, no text",
-        "vertex_ai": "Abstract cloud computing visualization, neural network connections in Google Cloud colors (blue, green, yellow, red), modern 3D render, no text",
-        "vibe_coding": "Developer workspace with AI assistance visualization, code floating in air with glowing highlights, dark theme with neon accents, futuristic IDE concept, no text",
-        "observateur": "Abstract thought leadership visualization, interconnected ideas as geometric shapes, warm earth tones with accent colors, modern art style, no text",
-        "vulgarisateur": "Educational diagram style, complex concept simplified into clean visual metaphor, friendly colors, whiteboard aesthetic with modern touch, no text",
-        "questionneur": "Two contrasting perspectives visualization, split composition, bold geometric shapes, debate concept in abstract form, no text",
+        "revue_hebdo": f"{BASE_STYLE}, grid layout of 5 abstract icons representing different tech topics, dashboard feel, weekly digest concept",
+        "signal_faible": f"{BASE_STYLE}, single bright signal point radiating connections outward, radar/sonar aesthetic, one bright element emerging from noise",
+        "retour_terrain": f"{BASE_STYLE}, abstract construction/building metaphor, layers being assembled, hands-on engineering feel, blueprint aesthetic",
+        "comparatif": f"{BASE_STYLE}, split composition with two geometric forms side by side, balance scale concept, versus layout",
+        "chiffre_cle": f"{BASE_STYLE}, large abstract number/chart dominating the frame, bold data visualization, single impactful metric feel",
+        "decryptage": f"{BASE_STYLE}, complex mechanism being opened/revealed, layers peeling back, magnifying glass or lens concept, x-ray aesthetic",
     }
 
-    style = style_prompts.get(post_type, style_prompts["observateur"])
+    style = style_prompts.get(post_type, style_prompts["signal_faible"])
 
     # Extraire le sujet principal du post pour contextualiser l'image
     hook = post_text.split("\n")[0][:100]
