@@ -39,88 +39,77 @@ except Exception:
     GEMINI_MODEL = None
 
 
-EDITO_PROMPT = """Tu es le ghostwriter LinkedIn de {name}, {title}.
+EDITO_PROMPT = """Tu rédiges un post LinkedIn pour {name}, consultant IA & Data.
 
-CONTEXTE : Chaque semaine, Renaud publie un post LinkedIn basé sur sa veille IA & Data.
-L'objectif : le positionner comme EXPERT reconnu, PAS comme curateur de contenu.
+OBJECTIF : Partager une INFO UTILE et CONCRÈTE. Pas du personal branding.
+Le lecteur doit apprendre quelque chose en 30 secondes de lecture.
 
-ARTICLES LUS CETTE SEMAINE (contexte, ne pas citer directement) :
+ARTICLES DE LA SEMAINE (inspire-toi, ne copie pas) :
 {articles_summary}
 
-TENDANCES DÉTECTÉES : {trends}
+TENDANCES : {trends}
 
-TYPE DE POST CETTE SEMAINE : {post_type}
+TYPE : {post_type}
 
-=== SI TYPE = REVUE_PRESSE (lundi - donne de la valeur) ===
-Structure :
-- Hook = "Cette semaine dans l'IA & Data : [tendance principale]"
-- 5-7 articles clés avec pour chacun : titre court + ton avis en 1 ligne (max 15 mots)
-- Format liste numérotée, très scannable
-- Conclusion : 1 phrase sur ce que ça change
-- Lien vers la veille complète
-- Max 150 mots TOTAL
+=== REVUE_PRESSE ===
+- Hook = fait marquant de la semaine (chiffre, annonce, changement)
+- 4-5 infos clés en format scannable (tirets ou numéros)
+- Pour chaque info : le FAIT + pourquoi ça compte (en 1 ligne)
+- Pas de conclusion morale. Juste les faits.
 
-=== SI TYPE = OBSERVATEUR (génère des partages) ===
-Structure :
-- Hook = observation terrain contre-intuitive inspirée d'un article de la semaine
-- 2-3 paragraphes : développement avec exemples concrets
-- Question ouverte finale pour créer le débat
+=== OBSERVATEUR ===
+- Hook = un fait surprenant ou contre-intuitif tiré de la veille
+- 2 paragraphes : explication simple de pourquoi c'est important
+- Pas de question finale artificielle
 
-=== SI TYPE = VULGARISATEUR (génère des saves) ===
-Structure :
-- Hook = concept complexe (vu dans les articles) promis en version simple
-- Analogie du quotidien
-- Application concrète
-- Une phrase à retenir
+=== VULGARISATEUR ===
+- Hook = un concept technique expliqué simplement
+- Analogie concrète
+- Ce que ça change en pratique pour quelqu'un qui build de l'IA
 
-=== SI TYPE = QUESTIONNEUR (génère des commentaires) ===
-Structure :
-- Hook = question polarisante inspirée d'un sujet d'actualité de la semaine
-- Point de vue nuancé de Renaud
-- Invitation explicite à donner son avis
+=== QUESTIONNEUR ===
+- Hook = question directe sur un sujet clivant de la semaine
+- Donner les 2 côtés du débat factuellement
+- Prendre position brièvement
 
-=== SI TYPE = VERTEX_AI (bonnes pratiques, actus Google Cloud AI) ===
-Structure :
-- Hook = annonce ou retour terrain sur Vertex AI / Google Cloud AI
-- 2-3 paragraphes : ce que ça change concrètement en prod, avec son expérience
-- Partage un tip/best practice que Renaud utilise en mission
-- Ton : praticien qui build, pas évangéliste Google
-- Hashtags : #VertexAI #GoogleCloud #MLOps
+=== VERTEX_AI ===
+- Hook = une annonce ou un changement concret Vertex AI / Google Cloud
+- Ce que ça change en pratique (pas du marketing Google)
+- Un tip technique actionnable si possible
 
-=== SI TYPE = VIBE_CODING (dernières techniques de dev assisté par IA) ===
-Structure :
-- Hook = observation ou découverte récente sur le vibe coding / dév assisté par IA
-- 2-3 paragraphes : workflow concret, outils testés (Cursor, Windsurf, Claude Code, etc.)
-- Ce qui marche vraiment vs le hype, avec exemples personnels
-- Ton : développeur pragmatique qui teste tout
-- Hashtags : #VibeCoding #AIAssisted #DeveloperExperience
+=== VIBE_CODING ===
+- Hook = un fait ou une découverte sur le coding assisté par IA
+- Workflow concret, outil testé, résultat factuel
+- Ce qui marche vs ce qui ne marche pas encore
 
-RÈGLES ABSOLUES :
-- Max 150 mots. Phrases de max 15 mots.
-- Un paragraphe = une idée. Sauts de ligne entre chaque.
-- Opinion TRANCHÉE. Quelqu'un doit pouvoir être en désaccord.
-- Ton direct : "Je pense", "J'ai vu", "Mon expérience". Pas de conditionnel.
-- ZÉRO auto-promo. NE PAS dire "ma veille", "ma sélection", "mon site".
-- 0 à 2 emojis max. JAMAIS en début de ligne.
-- Pas de "game-changer", "révolutionnaire", "incroyable". Préfère "utile", "concret", "j'ai testé".
-- Le lien {site_url} doit apparaître UNE SEULE fois, intégré naturellement (pas en CTA).
-- 3-4 hashtags max, spécifiques (pas #IA tout seul).
-- NE PAS lister les articles. Le post s'inspire de la veille sans la résumer.
+INTERDICTIONS STRICTES :
+- JAMAIS "On me demande souvent", "J'ai eu l'occasion de", "Mon expérience montre"
+- JAMAIS de phrases pompeuses type coach LinkedIn
+- JAMAIS "game-changer", "révolutionnaire", "passionnant", "incroyable"
+- JAMAIS de question rhétorique en fin de post du style "Et vous, qu'en pensez-vous ?"
+- JAMAIS commencer par un emoji
+- PAS de "je" en mode humble-brag. Le "je" est OK uniquement pour un fait précis ("j'ai testé X, résultat : Y")
 
-CHECKLIST AVANT DE RÉPONDRE :
-- [ ] Le hook arrêterait MON scroll si c'était quelqu'un d'autre ?
-- [ ] Pas de mention de produit/outil que Renaud vend ?
-- [ ] Opinion claire et assumée ?
-- [ ] Quelqu'un pourrait être en désaccord ?
-- [ ] Moins de 150 mots ?
-- [ ] Question finale qui invite au commentaire ?
+EXIGENCE DE FOND :
+- Chaque paragraphe doit apporter une INFO NOUVELLE (chiffre, fait, nom d'outil, comparaison)
+- Pas de phrases creuses ou de remplissage. Si une phrase n'apporte pas d'info, supprime-la.
+- Le lecteur doit pouvoir résumer le post en bullet points factuels.
+- Donne du CONTEXTE : pourquoi c'est important, qu'est-ce que ça change concrètement.
+
+STYLE :
+- Factuel, direct, dense en information. Comme un bon article de blog condensé.
+- Phrases courtes mais complètes. Pas de style télégraphique.
+- ENTRE 200 ET 300 MOTS. C'est LinkedIn, pas Twitter. Donne de la matière.
+- 0-1 emoji max dans tout le post.
+- 2-3 hashtags max, techniques et spécifiques.
+- Le lien {site_url} intégré 1 seule fois, naturellement.
 
 RÉPONDS EN JSON STRICT :
 {{
   "post_text": "Le post complet prêt à publier",
-  "hook": "La première ligne seule (sans emoji)",
+  "hook": "La première ligne seule",
   "post_type": "{post_type}",
-  "hashtags": ["#tag1", "#tag2", "#tag3"],
+  "hashtags": ["#tag1", "#tag2"],
   "word_count": 0
 }}"""
 

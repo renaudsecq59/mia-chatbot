@@ -37,71 +37,57 @@ EXPERT_PROFILE = {
 }
 
 # Sources RSS organisées par catégorie
+# PRINCIPE : des experts individuels > des blogs corporate marketing
 RSS_SOURCES = {
-    "ia_entreprise": {
-        "label": "IA & Plateformes Cloud",
+    "ia_pratique": {
+        "label": "IA en pratique (experts terrain)",
         "emoji": "🤖",
         "color": "#6c63ff",
         "sources": [
-            {"name": "Google Cloud AI", "url": "https://cloudblog.withgoogle.com/products/ai-machine-learning/rss/", "weight": 1.3},
-            {"name": "AWS ML Blog", "url": "https://aws.amazon.com/blogs/machine-learning/feed/", "weight": 1.2},
-            {"name": "Databricks Blog", "url": "https://www.databricks.com/feed", "weight": 1.3},
-            {"name": "Snowflake Blog", "url": "https://www.snowflake.com/feed/", "weight": 1.1},
+            {"name": "Simon Willison", "url": "https://simonwillison.net/atom/everything/", "weight": 1.5},
+            {"name": "Latent Space", "url": "https://www.latent.space/feed", "weight": 1.4},
+            {"name": "Chip Huyen", "url": "https://huyenchip.com/feed.xml", "weight": 1.4},
+            {"name": "Lilian Weng", "url": "https://lilianweng.github.io/index.xml", "weight": 1.3},
+            {"name": "The Batch (Andrew Ng)", "url": "https://www.deeplearning.ai/the-batch/feed/", "weight": 1.3},
+            {"name": "Last Week in AI", "url": "https://lastweekin.ai/feed", "weight": 1.2},
+            {"name": "AI Snake Oil", "url": "https://www.aisnakeoil.com/feed", "weight": 1.3},
             {"name": "Hugging Face Blog", "url": "https://huggingface.co/blog/feed.xml", "weight": 1.1},
-            {"name": "Google DeepMind", "url": "https://deepmind.google/blog/rss.xml", "weight": 1.1},
-            {"name": "Simon Willison", "url": "https://simonwillison.net/atom/everything/", "weight": 1.2},
-            {"name": "OpenAI Blog", "url": "https://openai.com/blog/rss.xml", "weight": 1.2},
         ]
     },
-    "data_governance": {
-        "label": "Data & Gouvernance",
-        "emoji": "📊",
+    "infra_mlops": {
+        "label": "Infra, MLOps & Plateformes",
+        "emoji": "⚙️",
         "color": "#00d4ff",
         "sources": [
-            {"name": "Medium #ai-governance", "url": "https://medium.com/feed/tag/ai-governance", "weight": 1.2},
-            {"name": "Medium #data-governance", "url": "https://medium.com/feed/tag/data-governance", "weight": 1.1},
-            {"name": "Medium #data-quality", "url": "https://medium.com/feed/tag/data-quality", "weight": 1.0},
-            {"name": "Towards Data Science", "url": "https://towardsdatascience.com/feed", "weight": 0.9},
-            {"name": "Ars Technica AI", "url": "https://arstechnica.com/ai/feed/", "weight": 0.9},
+            {"name": "Google Cloud AI", "url": "https://cloudblog.withgoogle.com/products/ai-machine-learning/rss/", "weight": 1.1},
+            {"name": "Databricks Blog", "url": "https://www.databricks.com/feed", "weight": 1.1},
+            {"name": "InfoQ AI/ML", "url": "https://feed.infoq.com/ai-ml-data-eng/", "weight": 1.2},
+            {"name": "Pragmatic Engineer", "url": "https://newsletter.pragmaticengineer.com/feed", "weight": 1.3},
+            {"name": "HN Front Page AI", "url": "https://hnrss.org/newest?points=100&q=AI+OR+LLM+OR+agent+OR+MLOps", "weight": 1.2},
         ]
     },
-    "reglementation": {
-        "label": "Réglementation & Éthique IA",
+    "governance_regulation": {
+        "label": "Gouvernance & Régulation IA",
         "emoji": "⚖️",
         "color": "#c8ff00",
         "sources": [
             {"name": "EU AI Act", "url": "https://artificialintelligenceact.eu/feed/", "weight": 1.3},
             {"name": "CNIL", "url": "https://www.cnil.fr/fr/rss.xml", "weight": 1.2},
-            {"name": "Commission EU Digital", "url": "https://digital-strategy.ec.europa.eu/en/rss.xml", "weight": 1.2},
-            {"name": "AI Snake Oil", "url": "https://www.aisnakeoil.com/feed", "weight": 1.2},
-            {"name": "MIT Tech Review", "url": "https://www.technologyreview.com/topic/artificial-intelligence/feed/", "weight": 1.0},
+            {"name": "MIT Tech Review", "url": "https://www.technologyreview.com/topic/artificial-intelligence/feed/", "weight": 1.1},
             {"name": "Stanford HAI", "url": "https://hai.stanford.edu/news/rss.xml", "weight": 1.1},
-        ]
-    },
-    "business_strategie": {
-        "label": "Business & Stratégie IA",
-        "emoji": "💼",
-        "color": "#ff6b6b",
-        "sources": [
-            {"name": "VentureBeat AI", "url": "https://venturebeat.com/category/ai/feed/", "weight": 1.0},
-            {"name": "TechCrunch AI", "url": "https://techcrunch.com/category/artificial-intelligence/feed/", "weight": 0.9},
-            {"name": "Import AI", "url": "https://jack-clark.net/feed/", "weight": 1.2},
-            {"name": "InfoQ AI/ML", "url": "https://feed.infoq.com/ai-ml-data-eng/", "weight": 1.0},
-            {"name": "a16z AI", "url": "https://a16z.com/tag/ai/feed/", "weight": 1.1},
-            {"name": "Wired AI", "url": "https://www.wired.com/feed/tag/ai/latest/rss", "weight": 0.9},
+            {"name": "Ars Technica AI", "url": "https://arstechnica.com/ai/feed/", "weight": 1.0},
         ]
     },
     "vibe_coding": {
-        "label": "Vibe Coding & Dev IA",
+        "label": "Vibe Coding & Dev assisté IA",
         "emoji": "⚡",
         "color": "#ff9f43",
         "sources": [
-            {"name": "Cursor Blog", "url": "https://www.cursor.com/blog/rss.xml", "weight": 1.4},
-            {"name": "Anthropic Blog", "url": "https://www.anthropic.com/blog/rss.xml", "weight": 1.3},
+            {"name": "Anthropic Blog", "url": "https://www.anthropic.com/blog/rss.xml", "weight": 1.4},
             {"name": "GitHub Blog", "url": "https://github.blog/feed/", "weight": 1.2},
-            {"name": "Hacker News AI", "url": "https://hnrss.org/newest?q=vibe+coding+OR+cursor+OR+copilot+OR+ai+coding", "weight": 1.1},
+            {"name": "HN Vibe Coding", "url": "https://hnrss.org/newest?points=50&q=vibe+coding+OR+cursor+OR+copilot+OR+claude+code+OR+windsurf", "weight": 1.3},
             {"name": "Dev.to #ai", "url": "https://dev.to/feed/tag/ai", "weight": 0.9},
-            {"name": "Codeium Blog", "url": "https://codeium.com/blog/rss.xml", "weight": 1.1},
+            {"name": "OpenAI Blog", "url": "https://openai.com/blog/rss.xml", "weight": 1.1},
         ]
     }
 }
