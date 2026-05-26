@@ -220,23 +220,25 @@ POST :
 
 RÈGLES POUR LE PROMPT IMAGE :
 1. JAMAIS de texte, mots, lettres ou chiffres dans l'image
-2. Le visuel doit illustrer la MÉTAPHORE CENTRALE ou le CONCEPT CLÉ du post, pas juste le sujet
-3. Style : réaliste cinématique, éclairage dramatique, profondeur de champ
-4. Composition : format paysage 16:9, point focal décentré (règle des tiers)
-5. Palette : tons sombres (bleu nuit, noir) avec UN accent vif (cyan, doré, ou orange)
-6. PAS de clipart, PAS de flat design, PAS de stock photo générique
-7. Pense VISUEL ARRÊTANT dans un feed LinkedIn : contraste fort, sujet intrigant
-8. Inclure des éléments concrets et reconnaissables (objets, scènes, matières) — pas de formes abstraites vides
+2. Le visuel doit illustrer la MÉTAPHORE CENTRALE du post avec une scène concrète, vivante et originale
+3. Style : coloré, lumineux, joyeux, avec une touche d'humour ou de décalage. Pense illustration éditoriale haut de gamme.
+4. Composition : format paysage 16:9, scène lisible en petit format (thumbnail LinkedIn)
+5. Palette : LUMINEUSE et SATURÉE. Couleurs vives (turquoise, corail, jaune, violet). Fond clair ou pastel.
+6. PAS de dark mode, PAS de tons sombres, PAS de server rooms sinistres
+7. PAS de clipart, PAS de stock photo — mais OK pour du style illustration 3D, isométrique, ou Pixar-like
+8. Inclure des objets du quotidien détournés ou des scènes décalées liées au sujet tech
 
 EXEMPLES DE BONS PROMPTS :
-- "A single glowing neural pathway emerging from a dark server room, volumetric lighting, cinematic, depth of field, cyan accent light"
-- "An architect's hands assembling a complex mechanical clockwork made of data pipelines and gears, dark moody lighting, tilt-shift, golden accents"
-- "A lone lighthouse beam cutting through fog over a digital ocean of data streams, dramatic sky, aerial perspective, cyan and navy palette"
+- "A cheerful robot librarian organizing colorful floating books in a sunny open-air library, isometric 3D style, vibrant colors, warm lighting"
+- "A group of friendly cartoon animals having a strategy meeting around a holographic dashboard, Pixar style, bright pastel office, playful"
+- "A tiny astronaut surfing on a giant microchip through a colorful candy-like data stream, whimsical, saturated colors, joyful energy"
+- "An oversized magnifying glass revealing a hidden garden of circuits and flowers, watercolor meets tech, bright and airy"
 
 MAUVAIS PROMPTS (à éviter) :
-- "Abstract geometric shapes on dark background" (trop vague, ennuyeux)
-- "AI technology concept illustration" (générique, insipide)
+- "Dark server room with glowing screens" (trop sinistre, LinkedIn n'est pas un film noir)
+- "Abstract geometric shapes on dark background" (ennuyeux, soporifique)
 - "Professional business visualization" (stock photo energy)
+- "Futuristic dark factory" (anxiogène, pas engageant)
 
 Réponds UNIQUEMENT avec le prompt image, rien d'autre. Max 150 mots."""
 
@@ -250,12 +252,12 @@ def _generate_image_prompt(post_text: str, post_type: str) -> str:
         )
         prompt = response.text.strip().strip('"').strip("'")
         # Ajouter les contraintes techniques
-        prompt += ". No text, no words, no letters, no numbers. Photorealistic, 16:9 landscape, cinematic lighting."
+        prompt += ". No text, no words, no letters, no numbers. Bright vibrant colors, 16:9 landscape, warm lighting, playful style."
         return prompt
     except Exception as e:
         logger.warning(f"⚠️ Fallback prompt image: {e}")
         hook = post_text.split("\n")[0][:100]
-        return f"A dramatic cinematic illustration about {hook}. Dark navy background, cyan and gold accents, volumetric lighting, depth of field, no text no words no letters. Photorealistic, 16:9 landscape."
+        return f"A colorful playful 3D illustration about {hook}. Bright pastel background, turquoise and coral accents, warm lighting, isometric style, joyful energy, no text no words no letters. 16:9 landscape."
 
 
 def generate_visual(post_text: str, post_type: str) -> bytes | None:
