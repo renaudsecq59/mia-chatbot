@@ -78,13 +78,19 @@ Structure :
 4. Lien vers la veille
 
 --- RETOUR_TERRAIN ---
-Le plus différenciant. Du vécu, pas du théorique.
+Partager un pattern ou une observation issue de la pratique terrain, ANCRÉ dans les ARTICLES DE LA SEMAINE.
 Structure :
-1. Hook = un problème concret rencontré en mission ("En déployant X chez un client, on s'est heurtés à Y.")
-2. Le contexte : quel projet, quelle stack, quel objectif
-3. La solution ou le pattern trouvé
-4. Le takeaway généralisable pour d'autres équipes
-UTILISER les éléments du profil de Renaud pour ancrer le propos.
+1. Hook = un problème technique ou organisationnel RÉEL cité dans les articles de la semaine
+2. Pourquoi ce problème est fréquent en entreprise (observation générique, sans citer de client)
+3. L'approche ou le pattern qui fonctionne (basé sur les articles + expertise générale du domaine)
+4. Le takeaway concret pour les équipes data/IA
+
+RÈGLES ABSOLUES POUR CE FORMAT :
+- NE JAMAIS citer Decathlon, ni aucun autre client ou employeur par son nom
+- NE JAMAIS inventer des chiffres (pertes, économies, délais) non cités dans les articles sources
+- Si tu utilises des chiffres, ils DOIVENT provenir d'un des articles fournis
+- Formuler avec "dans les équipes que je côtoie" ou "pattern fréquent en entreprise" — jamais de cas inventé
+- L'objectif est de partager un PATTERN GÉNÉRIQUE issu des articles, pas de raconter une anecdote personnelle
 
 --- COMPARATIF ---
 Couper court aux débats stériles avec des faits.
@@ -118,9 +124,11 @@ INTERDICTIONS ABSOLUES :
 - Commencer par un emoji → INTERDIT
 - Humble-brag → INTERDIT
 - Phrases creuses sans information → INTERDIT (chaque phrase doit contenir un fait, un chiffre ou un nom)
+- CITER "DECATHLON" ou tout autre nom de client/employeur → STRICTEMENT INTERDIT. Utiliser "un grand retailer" ou "en entreprise" à la place.
+- INVENTER des chiffres (montants, pertes, économies, délais, pourcentages) NON PRÉSENTS dans les articles fournis → STRICTEMENT INTERDIT. Tout chiffre utilisé doit être issu des articles de la semaine.
 
 EXIGENCES NON-NÉGOCIABLES :
-1. Au moins 1 CHIFFRE ou DONNÉE FACTUELLE dans le post (%, montant, date, nombre d'utilisateurs, etc.)
+1. Au moins 1 CHIFFRE ou DONNÉE FACTUELLE dans le post — UNIQUEMENT s'il est présent dans les articles fournis. Si aucun chiffre dans les articles, utilise une donnée de notoriété publique (statistique officielle). Ne jamais inventer.
 2. Au moins 1 NOM PROPRE (outil, entreprise, personne, framework)
 3. Au moins 1 PRISE DE POSITION claire (pas tiède, pas "ça dépend")
 4. Le lien {site_url} intégré naturellement 1 seule fois
