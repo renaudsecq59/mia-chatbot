@@ -112,9 +112,30 @@ async def run_scrape():
             post_text = post_text.rstrip() + "\n\n" + " ".join(hashtags)
         
         if post_text:
-            # Générer un visuel IA pour accompagner le post
-            image_bytes = generate_visual(post_text, post_type)
-            linkedin_result = publish_to_linkedin(post_text, image_bytes)
+            # Garde-fou anti-shadowban : max 1 post LinkedIn par jour
+            already_published_today = False
+            if db:
+                from zoneinfo import ZoneInfo
+                today_paris = datetime.now(ZoneInfo("Europe/Paris")).strftime("%Y-%m-%d")
+                recent = (
+                    db.collection("linkedin_posts")
+                    .order_by("published_at", direction=firestore.Query.DESCENDING)
+                    .limit(1)
+                    .stream()
+                )
+                for doc in recent:
+                    last_date = doc.to_dict().get("published_at", "")[:10]
+                    if last_date == today_paris:
+                        already_published_today = True
+                        logger.warning(f"⛔ Post déjà publié aujourd'hui ({last_date}) — publication bloquée pour éviter le shadowban")
+                        break
+
+            if already_published_today:
+                linkedin_result = {"status": "skipped", "reason": "Un post a déjà été publié aujourd'hui (limite 1/jour)"}
+            else:
+                # Générer un visuel IA pour accompagner le post
+                image_bytes = generate_visual(post_text, post_type)
+                linkedin_result = publish_to_linkedin(post_text, image_bytes)
             logger.info(f"📣 LinkedIn: {linkedin_result.get('status')} — type={post_type} — image={linkedin_result.get('has_image')}")
             
             # Sauvegarder le post dans Firestore
@@ -282,6 +303,104 @@ async def get_latest_linkedin_post():
         return {"post_text": None, "message": "Aucun post trouvé"}
     except Exception as e:
         return {"post_text": None, "message": str(e)}
+
+
+@app.get("/api/linkedin/posts")
+async def get_all_linkedin_posts():
+    """Retourne tous les posts LinkedIn publiés (depuis Firestore)."""
+    if not db:
+        return {"posts": [], "message": "Firestore non disponible"}
+    try:
+        docs = (
+            db.collection("linkedin_posts")
+            .order_by("published_at", direction=firestore.Query.DESCENDING)
+            .limit(50)
+            .stream()
+        )
+        posts = []
+        for doc in docs:
+            d = doc.to_dict()
+            posts.append({
+                "post_id": d.get("post_id"),
+                "post_type": d.get("post_type"),
+                "published_at": d.get("published_at"),
+                "has_image": d.get("has_image", False),
+                "hashtags": d.get("hashtags", []),
+                "post_text": d.get("post_text", "")[:200],
+            })
+        return {"posts": posts, "count": len(posts)}
+    except Exception as e:
+        return {"posts": [], "message": str(e)}
+
+
+@app.get("/api/linkedin/stats")
+async def get_linkedin_stats():
+    """Récupère les stats de tous les posts LinkedIn via l'API LinkedIn."""
+    import httpx
+    from linkedin_publisher import LINKEDIN_ACCESS_TOKEN, LINKEDIN_PERSON_URN
+
+    if not LINKEDIN_ACCESS_TOKEN:
+        raise HTTPException(status_code=400, detail="Token LinkedIn non configuré")
+
+    # Récupérer les post_ids depuis Firestore
+    post_ids = []
+    if db:
+        docs = (
+            db.collection("linkedin_posts")
+            .order_by("published_at", direction=firestore.Query.DESCENDING)
+            .limit(20)
+            .stream()
+        )
+        for doc in docs:
+            d = doc.to_dict()
+            if d.get("post_id") and d["post_id"] != "unknown":
+                post_ids.append({
+                    "post_id": d["post_id"],
+                    "post_type": d.get("post_type", "?"),
+                    "published_at": d.get("published_at", ""),
+                    "has_image": d.get("has_image", False),
+                })
+
+    if not post_ids:
+        return {"stats": [], "message": "Aucun post avec ID valide trouvé"}
+
+    headers = {
+        "Authorization": f"Bearer {LINKEDIN_ACCESS_TOKEN}",
+        "LinkedIn-Version": "202506",
+        "X-Restli-Protocol-Version": "2.0.0",
+    }
+
+    stats = []
+    async with httpx.AsyncClient(timeout=30) as client:
+        for post in post_ids:
+            share_id = post["post_id"]
+            try:
+                # Stats sociales (likes, comments, shares)
+                social_url = f"https://api.linkedin.com/rest/socialActions/{share_id}"
+                social_resp = await client.get(social_url, headers=headers)
+
+                likes = 0
+                comments = 0
+                shares = 0
+                if social_resp.status_code == 200:
+                    data = social_resp.json()
+                    likes = data.get("likesSummary", {}).get("totalLikes", 0)
+                    comments = data.get("commentsSummary", {}).get("totalFirstLevelComments", 0)
+                    shares = data.get("shareStatistics", {}).get("shareCount", 0)
+
+                stats.append({
+                    **post,
+                    "likes": likes,
+                    "comments": comments,
+                    "shares": shares,
+                    "engagement": likes + comments + shares,
+                })
+            except Exception as e:
+                stats.append({**post, "likes": 0, "comments": 0, "shares": 0, "engagement": 0, "error": str(e)})
+
+    # Trier par engagement
+    stats.sort(key=lambda x: x["engagement"], reverse=True)
+    return {"stats": stats, "total_posts": len(stats)}
 
 
 if __name__ == "__main__":
