@@ -449,7 +449,7 @@ async function loadArticles() {
     const data = await response.json();
     allArticles = (data.articles || []).map(a => ({
       title: a.title || 'Sans titre',
-      excerpt: a.summary_raw || a.expert_opinion || '',
+      excerpt: a.summary || a.expert_opinion || a.summary_raw || '',
       expertOpinion: a.expert_opinion || '',
       source: a.category || 'ia_pratique',
       sourceName: a.source_name || 'Source',

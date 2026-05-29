@@ -3,6 +3,7 @@ import asyncio
 import json
 import logging
 from google import genai
+from google.genai import types
 from config import GCP_PROJECT, GCP_LOCATION, EXPERT_PROFILE, MIN_SCORE, MIN_SCORE_LINKEDIN
 
 logger = logging.getLogger(__name__)
@@ -167,6 +168,10 @@ async def score_article(article: dict) -> dict:
         response = client.models.generate_content(
             model=MODEL_ID,
             contents=prompt,
+            config=types.GenerateContentConfig(
+                max_output_tokens=2048,
+                response_mime_type="application/json",
+            ),
         )
         raw_text = response.text.strip()
         if raw_text.startswith("```"):
@@ -217,6 +222,10 @@ async def generate_linkedin_post(article: dict) -> dict:
         response = client.models.generate_content(
             model=MODEL_ID,
             contents=prompt,
+            config=types.GenerateContentConfig(
+                max_output_tokens=3072,
+                response_mime_type="application/json",
+            ),
         )
         raw_text = response.text.strip()
         if raw_text.startswith("```"):
