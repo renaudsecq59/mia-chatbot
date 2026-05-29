@@ -219,55 +219,94 @@ def generate_weekly_edito(articles: list[dict], trends: list[str] = None, post_t
         return _mock_edito(articles, trends_str, post_type)
 
 
-IMAGE_PROMPT_GENERATOR = """Tu es un directeur artistique expert en visuels LinkedIn.
+INFOGRAPHIC_CONTENT_GENERATOR = """Tu es un expert en création d'infographics LinkedIn viraux sur la Data et l'IA.
 
-À partir du post LinkedIn ci-dessous, génère UN SEUL prompt en anglais pour un générateur d'images IA (Imagen).
+À partir du post LinkedIn ci-dessous, génère le CONTENU STRUCTURÉ d'un infographic éducatif en JSON.
 
 POST :
 {post_text}
 
-RÈGLES POUR LE PROMPT IMAGE :
-1. JAMAIS de texte, mots, lettres ou chiffres dans l'image
-2. Le visuel doit illustrer la MÉTAPHORE CENTRALE du post avec une scène concrète et sophistiquée
-3. Style : ILLUSTRATION ÉDITORIALE haut de gamme. Pense couverture The Economist, Bloomberg Businessweek, ou MIT Technology Review. Mature, intelligent, frappant.
-4. Composition : format paysage 16:9, point focal fort, lisible même en petit
-5. Palette : riche et contrastée. Couleurs vives mais sophistiquées. Pas pastel bébé. OK pour des fonds sombres si le sujet émerge fort.
-6. Techniques visuelles autorisées : photomontage surréaliste, illustration vectorielle sophistiquée, rendu 3D réaliste stylisé, collage éditorial, photo-illustration conceptuelle
-7. PAS de style cartoon/Pixar/enfantin, PAS de robots mignons, PAS de personnages kawaii
-8. PAS de stock photo, PAS de formes géométriques abstraites vides
-9. Favoriser les MÉTAPHORES VISUELLES FORTES : objets réels détournés, perspectives impossibles, juxtapositions inattendues
+L'infographic doit capturer l'ESSENTIEL du post sous forme visuelle et didactique.
+Pense au style "Save for later" de LinkedIn : un visuel que les gens bookmarkent parce qu'il résume parfaitement un concept.
 
-EXEMPLES DE BONS PROMPTS :
-- "A massive ship's helm wheel made of circuit boards, steering through a sea of glowing data streams, dramatic golden hour lighting, editorial illustration style"
-- "A human hand and a robotic hand playing chess on a board where the pieces are skyscrapers and server racks, bird's eye view, rich warm tones, conceptual photo-illustration"
-- "An enormous antique telescope pointed at a sky full of constellations shaped like neural networks, observatory setting, moody blue and copper tones, editorial magazine cover style"
-- "A bridge being built from both sides — one side with traditional blueprints, the other with holographic AI projections — meeting in the middle, aerial perspective, golden light"
+Réponds en JSON strict :
+{{
+  "title": "Titre principal en majuscules (5-7 mots max, percutant)",
+  "subtitle": "Sous-titre accrocheur (10-15 mots)",
+  "sections": [
+    {{
+      "number": "1",
+      "heading": "TITRE SECTION (3-4 mots)",
+      "body": "Explication courte et factuelle (15-20 mots max)"
+    }}
+  ],
+  "key_stat": "UN chiffre clé ou fait marquant (ex: '70% des projets IA échouent')",
+  "color_theme": "purple|blue|green|orange",
+  "author": "Renaud Secq"
+}}
 
-MAUVAIS PROMPTS (à éviter) :
-- "Cute robots playing music" (enfantin, pas crédible pour un expert)
-- "Colorful cartoon characters in an office" (Pixar, pas LinkedIn)
-- "Abstract geometric shapes" (ennuyeux, vide de sens)
-- "Dark server room" (cliché tech, vu 10000 fois)
-- "Stock photo of business people" (générique, invisible dans le feed)
-
-Réponds UNIQUEMENT avec le prompt image, rien d'autre. Max 150 mots."""
+Génère entre 4 et 6 sections. Chaque section doit apporter une information concrète, pas du blabla."""
 
 
 def _generate_image_prompt(post_text: str, post_type: str) -> str:
-    """Utilise Gemini Pro pour générer un prompt image riche et contextuel."""
+    """Utilise Gemini Pro pour générer le contenu d'un infographic, puis crée le prompt Imagen."""
     try:
-        response = gemini_client.models.generate_content(
+        # Étape 1 : Gemini génère le contenu structuré de l'infographic
+        content_response = gemini_client.models.generate_content(
             model=GEMINI_MODEL,
-            contents=IMAGE_PROMPT_GENERATOR.format(post_text=post_text[:800]),
+            contents=INFOGRAPHIC_CONTENT_GENERATOR.format(post_text=post_text[:1000]),
         )
-        prompt = response.text.strip().strip('"').strip("'")
-        # Ajouter les contraintes techniques
-        prompt += ". No text, no words, no letters, no numbers. Editorial illustration style, 16:9 landscape, rich colors, high contrast."
+        raw = content_response.text.strip()
+        # Nettoyer le JSON
+        if "```" in raw:
+            raw = raw.split("```")[1].replace("json", "").strip()
+
+        import json
+        data = json.loads(raw)
+
+        title = data.get("title", "DATA & AI INSIGHTS")
+        subtitle = data.get("subtitle", "")
+        sections = data.get("sections", [])[:6]
+        key_stat = data.get("key_stat", "")
+        color = data.get("color_theme", "purple")
+
+        color_map = {
+            "purple": "purple and violet (#6B46C1)",
+            "blue": "electric blue and indigo (#2563EB)",
+            "green": "emerald green (#059669)",
+            "orange": "deep orange (#EA580C)",
+        }
+        accent = color_map.get(color, color_map["purple"])
+
+        # Construire les sections pour le prompt
+        sections_text = " | ".join(
+            [f"Section {s['number']}: {s['heading']} — {s['body']}" for s in sections]
+        )
+
+        # Étape 2 : Prompt Imagen pour un infographic éducatif avec texte
+        prompt = (
+            f"A professional educational LinkedIn infographic with white background. "
+            f"Large bold title at top: \"{title}\". "
+            f"Subtitle below: \"{subtitle}\". "
+            f"Numbered sections with icons: {sections_text}. "
+            f"Highlighted stat box: \"{key_stat}\". "
+            f"Author credit at bottom: \"{data.get('author', 'Renaud Secq')}\". "
+            f"Color scheme: {accent} accents on white background. "
+            f"Clean modern flat design, professional icons, clear typography, "
+            f"structured grid layout, portrait format 4:5, "
+            f"high contrast readable text, LinkedIn viral infographic style."
+        )
+        logger.info(f"📊 Infographic: {title} | {len(sections)} sections")
         return prompt
+
     except Exception as e:
-        logger.warning(f"⚠️ Fallback prompt image: {e}")
-        hook = post_text.split("\n")[0][:100]
-        return f"Editorial magazine cover illustration about {hook}. Conceptual photo-illustration, rich warm tones, dramatic lighting, sophisticated visual metaphor, no text no words no letters. 16:9 landscape."
+        logger.warning(f"⚠️ Fallback infographic prompt: {e}")
+        hook = post_text.split("\n")[0][:80]
+        return (
+            f"A professional LinkedIn infographic with white background, large bold title \"{hook[:50]}\", "
+            f"5 numbered sections with purple accents and icons, clean flat design, "
+            f"readable typography, data visualization, structured grid layout, portrait format."
+        )
 
 
 def generate_visual(post_text: str, post_type: str) -> bytes | None:
@@ -290,7 +329,7 @@ def generate_visual(post_text: str, post_type: str) -> bytes | None:
         response = model.generate_images(
             prompt=image_prompt,
             number_of_images=1,
-            aspect_ratio="16:9",
+            aspect_ratio="4:5",
             safety_filter_level="block_few",
             person_generation="allow_adult",
         )
