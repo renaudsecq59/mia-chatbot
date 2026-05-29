@@ -278,23 +278,28 @@ def _generate_image_prompt(post_text: str, post_type: str) -> str:
         }
         accent = color_map.get(color, color_map["purple"])
 
-        # Construire les sections pour le prompt
-        sections_text = " | ".join(
-            [f"Section {s['number']}: {s['heading']} — {s['body']}" for s in sections]
+        # Construire les sections numérotées pour le prompt
+        sections_lines = "\n".join(
+            [f"{s['number']}. {s['heading']} — {s['body']}" for s in sections]
         )
 
-        # Étape 2 : Prompt Imagen pour un infographic éducatif avec texte
+        # Étape 2 : Prompt structuré pour Nano Banana Pro (Gemini 3 Pro Image)
         prompt = (
-            f"A professional educational LinkedIn infographic with white background. "
-            f"Large bold title at top: \"{title}\". "
-            f"Subtitle below: \"{subtitle}\". "
-            f"Numbered sections with icons: {sections_text}. "
-            f"Highlighted stat box: \"{key_stat}\". "
-            f"Author credit at bottom: \"{data.get('author', 'Renaud Secq')}\". "
-            f"Color scheme: {accent} accents on white background. "
-            f"Clean modern flat design, professional icons, clear typography, "
-            f"structured grid layout, portrait format 4:5, "
-            f"high contrast readable text, LinkedIn viral infographic style."
+            f"Create a professional LinkedIn infographic in portrait format (3:4 ratio).\n\n"
+            f"TITLE at top: {title}\n"
+            f"SUBTITLE: {subtitle}\n\n"
+            f"{len(sections)} numbered sections, each with a simple minimalist icon on the left "
+            f"and the text on the right:\n{sections_lines}\n\n"
+        )
+        if key_stat:
+            prompt += f"Highlighted key statistic box: {key_stat}\n\n"
+        prompt += (
+            f"Bottom credit: {data.get('author', 'Renaud Secq')} — Consultant IA & Data\n\n"
+            f"STYLE: clean modern flat design, white background, {accent} accents, "
+            f"professional minimalist line icons, clear bold sans-serif typography, "
+            f"well-structured grid with vertical connector line, plenty of whitespace. "
+            f"All text must be perfectly spelled and readable in French. "
+            f"LinkedIn viral 'save for later' infographic style."
         )
         logger.info(f"📊 Infographic: {title} | {len(sections)} sections")
         return prompt
@@ -303,43 +308,44 @@ def _generate_image_prompt(post_text: str, post_type: str) -> str:
         logger.warning(f"⚠️ Fallback infographic prompt: {e}")
         hook = post_text.split("\n")[0][:80]
         return (
-            f"A professional LinkedIn infographic with white background, large bold title \"{hook[:50]}\", "
-            f"5 numbered sections with purple accents and icons, clean flat design, "
-            f"readable typography, data visualization, structured grid layout, portrait format."
+            f"Create a professional LinkedIn infographic in portrait format (3:4 ratio) "
+            f"with white background and purple accents, large bold title \"{hook[:50]}\", "
+            f"4-5 numbered sections with minimalist icons, clean flat design, "
+            f"perfectly readable French text, structured grid layout."
         )
 
 
 def generate_visual(post_text: str, post_type: str) -> bytes | None:
-    """Génère un visuel IA (Imagen 3) pour illustrer le post LinkedIn."""
+    """Génère un infographic IA (Nano Banana Pro / Gemini 3 Pro Image) pour le post LinkedIn."""
     if not gemini_client:
         logger.warning("⚠️ GenAI non dispo, pas de visuel")
         return None
 
-    # Étape 1 : Gemini Pro génère un prompt image pertinent à partir du post
+    # Étape 1 : Gemini génère le contenu structuré + le prompt infographic
     image_prompt = _generate_image_prompt(post_text, post_type)
-    logger.info(f"🖼️ Prompt image: {image_prompt[:120]}...")
+    logger.info(f"🖼️ Prompt infographic: {image_prompt[:120]}...")
 
     try:
-        import vertexai
-        from vertexai.preview.vision_models import ImageGenerationModel
+        from google import genai as image_genai
+        from google.genai import types as genai_types
 
-        vertexai.init(project=GCP_PROJECT, location=GCP_LOCATION)
-        model = ImageGenerationModel.from_pretrained("imagen-3.0-generate-002")
-
-        response = model.generate_images(
-            prompt=image_prompt,
-            number_of_images=1,
-            aspect_ratio="4:5",
-            safety_filter_level="block_few",
-            person_generation="allow_adult",
+        # Nano Banana Pro requiert la location "global"
+        client = image_genai.Client(vertexai=True, project=GCP_PROJECT, location="global")
+        response = client.models.generate_content(
+            model="gemini-3-pro-image-preview",
+            contents=image_prompt,
+            config=genai_types.GenerateContentConfig(
+                response_modalities=["TEXT", "IMAGE"],
+            ),
         )
 
-        if response.images:
-            image_bytes = response.images[0]._image_bytes
-            logger.info(f"🎨 Visuel Imagen 3 généré ({len(image_bytes)} bytes)")
-            return image_bytes
+        for part in response.candidates[0].content.parts:
+            if part.inline_data and part.inline_data.data:
+                image_bytes = part.inline_data.data
+                logger.info(f"🎨 Infographic Nano Banana Pro généré ({len(image_bytes)} bytes)")
+                return image_bytes
 
-        logger.warning("⚠️ Aucune image dans la réponse Imagen")
+        logger.warning("⚠️ Aucune image dans la réponse Nano Banana Pro")
         return None
 
     except Exception as e:
