@@ -136,6 +136,7 @@ async def run_scrape():
                 # Générer un visuel IA pour accompagner le post
                 image_bytes = generate_visual(post_text, post_type)
                 linkedin_result = publish_to_linkedin(post_text, image_bytes)
+                linkedin_result["image_b64"] = __import__('base64').b64encode(image_bytes).decode() if image_bytes else None
             logger.info(f"📣 LinkedIn: {linkedin_result.get('status')} — type={post_type} — image={linkedin_result.get('has_image')}")
             
             # Sauvegarder le post dans Firestore
@@ -145,6 +146,7 @@ async def run_scrape():
                     "post_type": post_type,
                     "post_id": linkedin_result.get("post_id"),
                     "has_image": linkedin_result.get("has_image", False),
+                    "image_b64": linkedin_result.get("image_b64"),
                     "published_at": datetime.now(timezone.utc).isoformat(),
                     "hashtags": hashtags,
                 })
