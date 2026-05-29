@@ -1,0 +1,136 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Preview Infographics — Renaud</title>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body { font-family: system-ui, sans-serif; background: #0c0c0c; color: #f0f0f0; min-height: 100vh; padding: 40px 24px; }
+    h1 { font-size: 20px; font-weight: 700; margin-bottom: 8px; color: #c8ff00; }
+    p.sub { font-size: 13px; color: #666; margin-bottom: 32px; }
+
+    .btn {
+      display: inline-flex; align-items: center; gap: 8px;
+      background: #c8ff00; color: #000; font-weight: 700; font-size: 14px;
+      padding: 12px 28px; border-radius: 100px; border: none; cursor: pointer;
+      transition: .2s; margin-bottom: 40px;
+    }
+    .btn:hover { background: #aadd00; transform: translateY(-1px); }
+    .btn:disabled { background: #333; color: #666; cursor: not-allowed; transform: none; }
+
+    .spinner {
+      width: 18px; height: 18px; border: 2px solid #000; border-top-color: transparent;
+      border-radius: 50%; animation: spin .7s linear infinite; display: none;
+    }
+    .btn.loading .spinner { display: block; }
+    .btn.loading .btn-label { opacity: .5; }
+    @keyframes spin { to { transform: rotate(360deg); } }
+
+    .result { display: none; gap: 40px; align-items: flex-start; }
+    .result.visible { display: flex; flex-wrap: wrap; }
+
+    .infographic-col { flex: 0 0 420px; }
+    .infographic-col img {
+      width: 100%; border-radius: 16px; box-shadow: 0 20px 60px rgba(0,0,0,.6);
+    }
+    .no-image { width: 100%; height: 400px; background: #1a1a1a; border-radius: 16px;
+      display: flex; align-items: center; justify-content: center; color: #444; font-size: 13px; }
+
+    .post-col { flex: 1; min-width: 300px; }
+    .badge {
+      display: inline-block; font-size: 11px; font-weight: 700; letter-spacing: .08em;
+      text-transform: uppercase; background: rgba(200,255,0,.15); color: #c8ff00;
+      padding: 4px 12px; border-radius: 100px; margin-bottom: 16px;
+    }
+    .post-text {
+      font-size: 14px; line-height: 1.9; color: #ccc; white-space: pre-line;
+      background: #111; border: 1px solid #222; border-radius: 12px;
+      padding: 24px; margin-bottom: 16px;
+    }
+    .meta { font-size: 12px; color: #555; }
+
+    .regenerate-btn {
+      background: transparent; border: 1px solid #333; color: #666; font-size: 13px;
+      padding: 8px 20px; border-radius: 100px; cursor: pointer; margin-top: 12px;
+      transition: .2s;
+    }
+    .regenerate-btn:hover { border-color: #c8ff00; color: #c8ff00; }
+
+    .error { background: rgba(255,50,50,.1); border: 1px solid rgba(255,50,50,.3);
+      border-radius: 12px; padding: 20px; color: #f87171; font-size: 13px; display: none; }
+  </style>
+</head>
+<body>
+
+<h1>🎨 Preview Infographics LinkedIn</h1>
+<p class="sub">Génère un post + infographic sans publier sur LinkedIn. Page non indexée.</p>
+
+<button class="btn" id="generateBtn" onclick="generate()">
+  <div class="spinner"></div>
+  <span class="btn-label">Générer un infographic</span>
+</button>
+
+<div class="error" id="error"></div>
+
+<div class="result" id="result">
+  <div class="infographic-col">
+    <img id="infographicImg" src="" alt="Infographic" style="display:none"/>
+    <div class="no-image" id="noImage" style="display:none">Imagen 3 n'a pas retourné d'image</div>
+  </div>
+  <div class="post-col">
+    <div class="badge" id="postType"></div>
+    <div class="post-text" id="postText"></div>
+    <div class="meta" id="postMeta"></div>
+    <button class="regenerate-btn" onclick="generate()">↺ Régénérer</button>
+  </div>
+</div>
+
+<script>
+const API = 'https://veille-backend-6lhk5fvt5q-ew.a.run.app';
+
+async function generate() {
+  const btn = document.getElementById('generateBtn');
+  const errorEl = document.getElementById('error');
+  const resultEl = document.getElementById('result');
+
+  btn.disabled = true;
+  btn.classList.add('loading');
+  btn.querySelector('.btn-label').textContent = 'Génération en cours (~90s)…';
+  errorEl.style.display = 'none';
+  resultEl.classList.remove('visible');
+
+  try {
+    const res = await fetch(`${API}/api/linkedin/preview`, { method: 'POST' });
+    if (!res.ok) throw new Error(`Erreur ${res.status}`);
+    const data = await res.json();
+
+    document.getElementById('postType').textContent = (data.post_type || '').replace(/_/g, ' ');
+    document.getElementById('postText').textContent = data.post_text || '';
+    document.getElementById('postMeta').textContent =
+      `${data.word_count || '?'} mots · ${(data.hashtags || []).join(' ')}`;
+
+    const img = document.getElementById('infographicImg');
+    const noImg = document.getElementById('noImage');
+    if (data.image_b64) {
+      img.src = `data:image/png;base64,${data.image_b64}`;
+      img.style.display = 'block';
+      noImg.style.display = 'none';
+    } else {
+      img.style.display = 'none';
+      noImg.style.display = 'flex';
+    }
+
+    resultEl.classList.add('visible');
+  } catch (e) {
+    errorEl.textContent = `Erreur : ${e.message}`;
+    errorEl.style.display = 'block';
+  } finally {
+    btn.disabled = false;
+    btn.classList.remove('loading');
+    btn.querySelector('.btn-label').textContent = 'Générer un infographic';
+  }
+}
+</script>
+</body>
+</html>

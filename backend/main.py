@@ -307,6 +307,33 @@ async def get_latest_linkedin_post():
         return {"post_text": None, "message": str(e)}
 
 
+@app.post("/api/linkedin/preview")
+async def preview_linkedin_post():
+    """Génère un post LinkedIn avec image SANS publier. Pour valider le style."""
+    import base64
+    raw_articles = await scrape_all_sources()
+    top_articles = sorted(
+        raw_articles,
+        key=lambda x: (x.get("is_trending", False), x.get("source_weight", 1.0)),
+        reverse=True
+    )[:15]
+    trending_keywords = set()
+    for a in raw_articles:
+        if a.get("is_trending"):
+            trending_keywords.update(a.get("trending_keywords", []))
+    edito = generate_weekly_edito(top_articles, list(trending_keywords)[:10])
+    post_text = edito.get("post_text", "")
+    post_type = edito.get("post_type", "signal_faible")
+    image_bytes = generate_visual(post_text, post_type)
+    return {
+        "post_text": post_text,
+        "post_type": post_type,
+        "hashtags": edito.get("hashtags", []),
+        "word_count": edito.get("word_count", 0),
+        "image_b64": base64.b64encode(image_bytes).decode() if image_bytes else None,
+    }
+
+
 @app.get("/api/linkedin/posts")
 async def get_all_linkedin_posts():
     """Retourne tous les posts LinkedIn publiés (depuis Firestore)."""
