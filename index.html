@@ -220,7 +220,7 @@
     .at { font-size: 12px; font-weight: 500; padding: 5px 12px; border-radius: 100px; background: var(--bg2); border: 1px solid var(--border); color: var(--m2); }
 
     /* ── EXPERTISE ── */
-    #expertise { padding: 100px 0; }
+    #services { padding: 100px 0; }
     .exp-header { display: grid; grid-template-columns: 200px 1fr; gap: 80px; margin-bottom: 56px; }
     .exp-label { font-size: 11px; font-weight: 600; letter-spacing: .12em; text-transform: uppercase; color: var(--m); padding-top: 6px; }
     .exp-title { font-family: 'Bricolage Grotesque', sans-serif; font-size: clamp(26px, 3.5vw, 40px); font-weight: 800; letter-spacing: -.02em; line-height: 1.1; }
@@ -354,6 +354,29 @@
     .contact-linkedin a { font-size: 13px; color: var(--m2); text-decoration: none; transition: color .2s; }
     .contact-linkedin a:hover { color: var(--t); }
 
+    /* ── DOMAINES & OFFRE ── */
+    .domains-grid {
+      display: grid; grid-template-columns: 1fr 1fr; gap: 1px;
+      border: 1px solid var(--border); border-radius: 16px; overflow: hidden; margin-top: 56px;
+    }
+    .domain-card { background: var(--bg2); padding: 44px 40px; transition: background .3s var(--ease); position: relative; overflow: hidden; }
+    .domain-card::before { content: ''; position: absolute; left: 0; top: 0; bottom: 0; width: 3px; background: var(--dc, var(--accent)); opacity: 0; transition: opacity .3s; }
+    .domain-card:hover { background: var(--bg3); }
+    .domain-card:hover::before { opacity: 1; }
+    .dc-num { font-size: 11px; font-weight: 700; letter-spacing: .12em; text-transform: uppercase; color: var(--dc, var(--accent)); margin-bottom: 16px; }
+    .dc-title { font-family: 'Bricolage Grotesque', sans-serif; font-size: clamp(18px, 2vw, 22px); font-weight: 700; letter-spacing: -.02em; margin-bottom: 14px; line-height: 1.2; }
+    .dc-desc { font-size: 13px; color: var(--m2); line-height: 1.8; margin-bottom: 20px; max-width: 440px; }
+    .dc-tags { display: flex; flex-wrap: wrap; gap: 6px; }
+    .dc-tag { font-size: 11px; font-weight: 500; padding: 3px 9px; border-radius: 100px; background: rgba(255,255,255,.04); border: 1px solid var(--border); color: var(--m); }
+    #offre { padding: 100px 0; }
+    .situations-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; }
+    .sit-card { padding: 28px; background: var(--bg2); border: 1px solid var(--border); border-radius: 14px; transition: .3s var(--ease); }
+    .sit-card:hover { border-color: var(--border-h); background: var(--bg3); transform: translateY(-2px); }
+    .sit-label { font-size: 10px; font-weight: 700; letter-spacing: .1em; text-transform: uppercase; color: var(--dc, var(--accent)); margin-bottom: 10px; }
+    .sit-text { font-size: 15px; font-weight: 600; line-height: 1.45; color: var(--t); }
+    .sit-sub { font-size: 12px; color: var(--m); margin-top: 10px; line-height: 1.6; }
+    @media (max-width: 900px) { .domains-grid { grid-template-columns: 1fr; } .situations-grid { grid-template-columns: 1fr; } }
+
     /* ── PROCESS ── */
     #process { padding: 100px 0; }
 
@@ -420,7 +443,7 @@
     <a class="nav-name" href="#">Renaud Secq</a>
     <ul class="nav-links">
       <li><a href="#about">À propos</a></li>
-      <li><a href="#expertise">Expertise</a></li>
+      <li><a href="#services">Services</a></li>
       <li><a href="veille.html">Veille</a></li>
       <li><a href="#parcours">Parcours</a></li>
       <li><a href="#contact">Contact</a></li>
@@ -438,13 +461,12 @@
       <div class="hero-left rv">
         <div class="hero-eyebrow">
           <span class="eyebrow-dot"></span>
-          Disponible pour de nouvelles missions
+          Expert indépendant · Disponible pour de nouvelles missions
         </div>
         <h1 class="hero-name">Renaud<br/>Secq.</h1>
         <p class="hero-title">
-          Je cadre, prototype et déploie des systèmes IA<br/>
-          qui <em>passent en production — pas des POCs qui trainent</em>.<br/>
-          Agents autonomes · Gouvernance · Product IA. 8 ans grands comptes.
+          Data Governance · AI Governance · Développement agentique · Product IA.<br/>
+          <em>Quatre domaines. Un interlocuteur unique. De la stratégie à la production.</em>
         </p>
         <div class="hero-links">
           <a href="#contact" class="hl-btn hl-primary">Me contacter →</a>
@@ -531,10 +553,9 @@
     <div class="about-grid">
       <div class="about-label rv">À propos</div>
       <div class="about-body rv d1">
-        <h2>Je ne vends pas de l'IA.<br/><span>Je résous des problèmes — avec l'IA.</span></h2>
-        <p>Dans le digital depuis <strong>2004</strong>. Fondateur d'une agence revendue, puis Product Manager senior chez Adeo et Decathlon. J'ai construit une triple compétence — vision produit, gouvernance des données, systèmes IA en production. Pas une reconversion : une accumulation.</p>
-        <p>Chez Decathlon : <strong>4 agents IA en production en 3 mois</strong>. 350 utilisateurs actifs. +12 points de qualité sur les données critiques. Ce ne sont pas des slides — c'est de la valeur mesurée.</p>
-        <p>Mon filtre avant chaque projet : Désirabilité, Faisabilité, Viabilité. <em>Si le projet n'est pas prêt, je dis stop — et on réoriente sans facturer pour rien.</em></p>
+        <h2>Un expert indépendant.<br/><span>Pas une agence. Pas un junior.</span></h2>
+        <p>20 ans dans le digital. Fondateur d'agence, Product Manager grands comptes, maintenant spécialisé sur les sujets data et IA les plus complexes. Je combine vision stratégique et exécution technique — ce qui reste rare sur le marché.</p>
+        <p>Je travaille en direct avec les décideurs : DSI, CDO, directeurs produit. <strong>Réactivité d'un freelance. Expertise et engagement d'un partenaire.</strong></p>
         <div class="about-tags">
           <span class="at">Agents IA</span>
           <span class="at">Orchestration multi-agents</span>
@@ -554,49 +575,118 @@
 
 <hr class="divider"/>
 
-<!-- EXPERTISE -->
-<section id="expertise">
+<!-- SERVICES -->
+<section id="services">
   <div class="c">
     <div class="exp-header rv">
-      <div class="exp-label">Expertise</div>
-      <div class="exp-title">Trois domaines,<br/>une cohérence.</div>
+      <div class="exp-label">Services</div>
+      <div class="exp-title">Quatre casquettes,<br/>un interlocuteur.</div>
     </div>
-    <div class="exp-grid rv d1">
-      <div class="exp-card" style="--card-c: #6c63ff;">
-        <div class="exp-num">01</div>
-        <div class="exp-name">Développement agentique</div>
-        <p class="exp-desc">Conception et déploiement de systèmes multi-agents haute cadence. Orchestration de rôles, skills, RAG et MCP. Framework éprouvé : 4 produits en 3 mois.</p>
-        <div class="exp-tags">
-          <span class="etag">Multi-agents</span>
-          <span class="etag">Google ADK</span>
-          <span class="etag">LangChain</span>
-          <span class="etag">RAG / MCP</span>
-          <span class="etag">Claude · OpenAI · Gemini</span>
+    <div class="domains-grid rv d1">
+
+      <div class="domain-card" style="--dc: #7c6af4;">
+        <div class="dc-num">01 — Data Governance</div>
+        <h3 class="dc-title">Structurer votre capital données pour l'IA.</h3>
+        <p class="dc-desc">Operating model data, qualité des données, data contracts, catalogage métier. J'anime les communautés data et pilote la mise à niveau des données critiques pour qu'elles soient exploitables par vos systèmes IA.</p>
+        <div class="dc-tags">
+          <span class="dc-tag">Collibra</span>
+          <span class="dc-tag">Databricks</span>
+          <span class="dc-tag">Data Quality</span>
+          <span class="dc-tag">Data Contracts</span>
+          <span class="dc-tag">Operating Model</span>
         </div>
       </div>
-      <div class="exp-card" style="--card-c: #00d4ff;">
-        <div class="exp-num">02</div>
-        <div class="exp-name">Data & AI Governance</div>
-        <p class="exp-desc">Operating model data, data quality, data contracts. Conformité EU AI Act — classification des risques IA, documentation, plan d'actions réglementaire.</p>
-        <div class="exp-tags">
-          <span class="etag">Collibra</span>
-          <span class="etag">Databricks</span>
-          <span class="etag">EU AI Act</span>
-          <span class="etag">RGPD</span>
-          <span class="etag">Data Quality</span>
+
+      <div class="domain-card" style="--dc: #38bdf8;">
+        <div class="dc-num">02 — AI Governance</div>
+        <h3 class="dc-title">Rendre vos systèmes IA conformes et documentés.</h3>
+        <p class="dc-desc">Classification EU AI Act, documentation technique des modèles, registre IA, plan d'actions réglementaire. Je traduis les exigences légales en actions concrètes pour vos équipes produit et data.</p>
+        <div class="dc-tags">
+          <span class="dc-tag">EU AI Act</span>
+          <span class="dc-tag">RGPD</span>
+          <span class="dc-tag">AI Risk Classification</span>
+          <span class="dc-tag">Responsible AI</span>
+          <span class="dc-tag">Collibra AI Gov</span>
         </div>
       </div>
-      <div class="exp-card" style="--card-c: #818cf8;">
-        <div class="exp-num">03</div>
-        <div class="exp-name">Product Management IA</div>
-        <p class="exp-desc">Cadrage des opportunités IA par la valeur. Roadmap OKR, priorisation rigoureuse, pilotage d'équipes pluridisciplinaires data scientists, engineers, UX.</p>
-        <div class="exp-tags">
-          <span class="etag">OKR / Roadmap</span>
-          <span class="etag">SAFe / PI Planning</span>
-          <span class="etag">FinOps</span>
-          <span class="etag">Backlog</span>
+
+      <div class="domain-card" style="--dc: #fb923c;">
+        <div class="dc-num">03 — Développement Agentique</div>
+        <h3 class="dc-title">Concevoir et déployer vos agents IA en production.</h3>
+        <p class="dc-desc">Systèmes multi-agents, orchestration de rôles, RAG, MCP, intégrations API. Du prototype en 2 semaines à la mise en production réelle. 4 systèmes en prod en 3 mois chez Decathlon. 350 utilisateurs actifs.</p>
+        <div class="dc-tags">
+          <span class="dc-tag">Google ADK</span>
+          <span class="dc-tag">LangChain</span>
+          <span class="dc-tag">RAG / MCP</span>
+          <span class="dc-tag">Claude · Gemini · OpenAI</span>
+          <span class="dc-tag">GCP · AWS</span>
         </div>
       </div>
+
+      <div class="domain-card" style="--dc: #818cf8;">
+        <div class="dc-num">04 — Product Management IA</div>
+        <h3 class="dc-title">Piloter votre roadmap IA avec rigueur et vision.</h3>
+        <p class="dc-desc">Cadrage par la valeur, roadmap OKR, priorisation rigoureuse, animation d'équipes data scientists et engineers. Je pilote la vision produit sans perdre de vue l'exécution technique.</p>
+        <div class="dc-tags">
+          <span class="dc-tag">OKR / Roadmap</span>
+          <span class="dc-tag">SAFe / PI Planning</span>
+          <span class="dc-tag">FinOps</span>
+          <span class="dc-tag">Backlog</span>
+          <span class="dc-tag">Team Leadership</span>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</section>
+
+<hr class="divider"/>
+
+<!-- OFFRE -->
+<section id="offre">
+  <div class="c">
+    <div class="exp-header rv">
+      <div class="exp-label">Offre de service</div>
+      <div class="exp-title">Dans quelle situation<br/>je peux vous aider ?</div>
+    </div>
+    <div class="situations-grid rv d1">
+
+      <div class="sit-card" style="--dc: #7c6af4;">
+        <div class="sit-label">Data Governance</div>
+        <div class="sit-text">Vos données ne sont pas assez fiables pour lancer l'IA</div>
+        <div class="sit-sub">Audit de maturité data, roadmap qualité, mise en place des fondations Data Governance.</div>
+      </div>
+
+      <div class="sit-card" style="--dc: #38bdf8;">
+        <div class="sit-label">AI Governance</div>
+        <div class="sit-text">Vous devez prouver la conformité EU AI Act de vos systèmes</div>
+        <div class="sit-sub">Classification des risques, documentation technique, registre IA, plan d'actions réglementaire.</div>
+      </div>
+
+      <div class="sit-card" style="--dc: #fb923c;">
+        <div class="sit-label">Développement Agentique</div>
+        <div class="sit-text">Vous voulez automatiser un processus métier avec un agent IA</div>
+        <div class="sit-sub">Du cadrage au déploiement. Premier système fonctionnel en 2 semaines.</div>
+      </div>
+
+      <div class="sit-card" style="--dc: #818cf8;">
+        <div class="sit-label">Product Management IA</div>
+        <div class="sit-text">Vous avez besoin d'un PM qui comprend l'IA côté technique</div>
+        <div class="sit-sub">Cadrage par la valeur, roadmap, animation d'équipe. Je traduis la vision en backlog actionnable.</div>
+      </div>
+
+      <div class="sit-card" style="--dc: #fb923c;">
+        <div class="sit-label">Développement Agentique</div>
+        <div class="sit-text">Votre POC IA tourne depuis 6 mois mais n'est toujours pas en production</div>
+        <div class="sit-sub">Je reprends le projet, structure l'architecture et finalise le déploiement réel.</div>
+      </div>
+
+      <div class="sit-card" style="--dc: #7c6af4;">
+        <div class="sit-label">Data Governance</div>
+        <div class="sit-text">Vous démarrez votre stratégie data sur un nouveau domaine métier</div>
+        <div class="sit-sub">Operating model, communauté data, Business Objects pilotés. De 0 à 50 en quelques mois.</div>
+      </div>
+
     </div>
   </div>
 </section>
