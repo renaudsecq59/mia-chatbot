@@ -375,7 +375,15 @@
     .sit-label { font-size: 10px; font-weight: 700; letter-spacing: .1em; text-transform: uppercase; color: var(--dc, var(--accent)); margin-bottom: 10px; }
     .sit-text { font-size: 15px; font-weight: 600; line-height: 1.45; color: var(--t); }
     .sit-sub { font-size: 12px; color: var(--m); margin-top: 10px; line-height: 1.6; }
-    @media (max-width: 900px) { .domains-grid { grid-template-columns: 1fr; } .situations-grid { grid-template-columns: 1fr; } }
+    @media (max-width: 900px) { .domains-grid { grid-template-columns: 1fr; } .situations-grid { grid-template-columns: 1fr; } .results-grid { grid-template-columns: 1fr; } }
+
+    /* ── RÉSULTATS ── */
+    .results-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+    .result-card { padding: 40px; background: var(--bg2); border: 1px solid var(--border); border-radius: 16px; transition: .3s var(--ease); }
+    .result-card:hover { background: var(--bg3); border-color: var(--border-h); }
+    .rc-metric { font-family: 'Bricolage Grotesque', sans-serif; font-size: clamp(22px, 2.5vw, 28px); font-weight: 800; line-height: 1.15; letter-spacing: -.02em; margin-bottom: 16px; background: linear-gradient(135deg, #fff 30%, var(--accent) 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; }
+    .rc-context { font-size: 13px; color: var(--m2); line-height: 1.75; margin-bottom: 20px; }
+    .rc-source { font-size: 12px; color: var(--m); font-weight: 500; letter-spacing: .02em; }
 
     /* ── PROCESS ── */
     #process { padding: 100px 0; }
@@ -445,7 +453,7 @@
       <li><a href="#about">À propos</a></li>
       <li><a href="#services">Services</a></li>
       <li><a href="veille.html">Veille</a></li>
-      <li><a href="#parcours">Parcours</a></li>
+      <li><a href="#parcours">Résultats</a></li>
       <li><a href="#contact">Contact</a></li>
     </ul>
     <a href="#contact" class="nav-cta">Me contacter</a>
@@ -553,7 +561,7 @@
     <div class="about-grid">
       <div class="about-label rv">À propos</div>
       <div class="about-body rv d1">
-        <h2>Un expert indépendant.<br/><span>Pas une agence. Pas un junior.</span></h2>
+        <h2>Un expert indépendant.<br/><span>Vision stratégique et exécution technique.</span></h2>
         <p>20 ans dans le digital. Fondateur d'agence, Product Manager grands comptes, maintenant spécialisé sur les sujets data et IA les plus complexes. Je combine vision stratégique et exécution technique — ce qui reste rare sur le marché.</p>
         <p>Je travaille en direct avec les décideurs : DSI, CDO, directeurs produit. <strong>Réactivité d'un freelance. Expertise et engagement d'un partenaire.</strong></p>
         <div class="about-tags">
@@ -722,84 +730,37 @@
 
 <hr class="divider"/>
 
-<!-- PARCOURS -->
+<!-- RÉSULTATS -->
 <section id="parcours">
   <div class="c">
-    <div class="parc-header rv">
-      <div class="parc-label">Parcours</div>
-      <div class="parc-title">20 ans dans le digital,<br/>8 ans en freelance.</div>
+    <div class="exp-header rv">
+      <div class="exp-label">Résultats</div>
+      <div class="exp-title">Ce que j'ai livré.<br/>En production, pas sur des slides.</div>
     </div>
-    <div class="parc-list">
+    <div class="results-grid rv d1">
 
-      <div class="parc-item rv">
-        <div class="pi-meta">
-          <div class="pi-dates">Jan 2026 → aujourd'hui</div>
-          <div class="pi-company">Decathlon · COE Data</div>
-        </div>
-        <div class="pi-right">
-          <div class="pi-role">AI & Automation Specialist</div>
-          <p class="pi-desc">Conception et déploiement de solutions IA pour accélérer la gouvernance des données critiques. Agents connectés à Collibra et Databricks : analyse automatisée de Business Objects, assistant conformité EU AI Act, chatbot data dictionnaire, documentation technique auto-générée.</p>
-          <div class="pi-result">4 projets · 350 utilisateurs · +12 pts qualité documentation</div>
-        </div>
+      <div class="result-card">
+        <div class="rc-metric">4 agents IA en production en 3 mois</div>
+        <p class="rc-context">Agents connectés à Collibra et Databricks : analyse automatisée de Business Objects, assistant conformité EU AI Act, chatbot dictionnaire de données, documentation auto-générée. 350 utilisateurs actifs.</p>
+        <div class="rc-source">Decathlon · COE Data · 2026</div>
       </div>
 
-      <div class="parc-item rv">
-        <div class="pi-meta">
-          <div class="pi-dates">Avr 2023 → Jan 2026</div>
-          <div class="pi-company">Decathlon · Industry</div>
-        </div>
-        <div class="pi-right">
-          <div class="pi-role">Data Governance Manager & PM AI</div>
-          <p class="pi-desc">Gouvernance des données critiques sur 5 sous-domaines. Animation de 12 personnes. Plateforme GenAI 8 agents en production. De 0 à 50 Business Objects pilotés.</p>
-          <div class="pi-result">+20% productivité · 0 → 50 Business Objects</div>
-        </div>
+      <div class="result-card">
+        <div class="rc-metric">De 0 à 50 Business Objects gouvernés</div>
+        <p class="rc-context">Gouvernance des données critiques sur 5 sous-domaines. Animation de 12 personnes. Plateforme GenAI avec 8 agents en production. +20% productivité mesurée.</p>
+        <div class="rc-source">Decathlon · Industry · 2023–2026</div>
       </div>
 
-      <div class="parc-item rv">
-        <div class="pi-meta">
-          <div class="pi-dates">Août 2022 → Mai 2023</div>
-          <div class="pi-company">Adeo · Ronchin</div>
-        </div>
-        <div class="pi-right">
-          <div class="pi-role">Product Manager — Recommandation E-com</div>
-          <p class="pi-desc">Pilotage d'une équipe de 12 personnes. A/B tests algorithmiques vs knowledge graph. Multi-BU internationales.</p>
-          <div class="pi-result">+15% conversion · +22% ajout au panier</div>
-        </div>
+      <div class="result-card">
+        <div class="rc-metric">+15% conversion e-commerce</div>
+        <p class="rc-context">Pilotage d'une équipe de 12 sur la recommandation algorithmique. A/B tests knowledge graph vs collaborative filtering. Multi-BU internationales. +22% ajout au panier.</p>
+        <div class="rc-source">Adeo · 2022–2023</div>
       </div>
 
-      <div class="parc-item rv">
-        <div class="pi-meta">
-          <div class="pi-dates">Déc 2018 → Juil 2021</div>
-          <div class="pi-company">Adeo · Ronchin</div>
-        </div>
-        <div class="pi-right">
-          <div class="pi-role">Product Leader — Observability</div>
-          <p class="pi-desc">Création et pilotage d'une plateforme d'observabilité (Datadog, Dynatrace, Elasticsearch…). Organisateur des PI Planning SAFe (~100 participants). Animation de 20 Product Leaders.</p>
-          <div class="pi-result">2M€ budget géré · 200 équipes internes</div>
-        </div>
-      </div>
-
-      <div class="parc-item rv">
-        <div class="pi-meta">
-          <div class="pi-dates">2016 → 2018</div>
-          <div class="pi-company">Missions courtes</div>
-        </div>
-        <div class="pi-right">
-          <div class="pi-role">Product Owner & Chef de projet</div>
-          <p class="pi-desc">Plusieurs missions en Product Owner et chef de projet dans des contextes variés : <strong>Adeo</strong> — PO Gestion client / RGPD · <strong>Oney</strong> — PO Paiement · <strong>Auchan e-com</strong> — PO · <strong>Clic&Walk</strong> — PM & membre du CODIR · <strong>Experian</strong> — Chef de projet.</p>
-        </div>
-      </div>
-
-      <div class="parc-item rv">
-        <div class="pi-meta">
-          <div class="pi-dates">2010 → 2016</div>
-          <div class="pi-company">Yoo CI · Roubaix</div>
-        </div>
-        <div class="pi-right">
-          <div class="pi-role">Fondateur & CEO — Agence de stratégie digitale</div>
-          <p class="pi-desc">Création, développement et cession d'une agence digitale. 10 collaborateurs. Clients : La Redoute, Fnac, Oney. De la prospection à la vente.</p>
-          <div class="pi-result">Société revendue avec succès</div>
-        </div>
+      <div class="result-card">
+        <div class="rc-metric">Agence créée, développée et revendue</div>
+        <p class="rc-context">10 collaborateurs. Clients : La Redoute, Fnac, Oney. De la prospection au management en passant par la stratégie digitale. Cédée au groupe Generactiv.</p>
+        <div class="rc-source">Yoo CI · 2010–2016</div>
       </div>
 
     </div>
