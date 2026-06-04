@@ -375,7 +375,7 @@
     .sit-label { font-size: 10px; font-weight: 700; letter-spacing: .1em; text-transform: uppercase; color: var(--dc, var(--accent)); margin-bottom: 10px; }
     .sit-text { font-size: 15px; font-weight: 600; line-height: 1.45; color: var(--t); }
     .sit-sub { font-size: 12px; color: var(--m); margin-top: 10px; line-height: 1.6; }
-    @media (max-width: 900px) { .domains-grid { grid-template-columns: 1fr; } .situations-grid { grid-template-columns: 1fr; } .results-grid { grid-template-columns: 1fr; } }
+    @media (max-width: 900px) { .domains-grid { grid-template-columns: 1fr; } .offres-grid { grid-template-columns: 1fr; } .results-grid { grid-template-columns: 1fr; } .offre-card.pop { transform: none; } }
 
     /* ── RÉSULTATS ── */
     .results-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
@@ -406,6 +406,46 @@
     .vt-n { display: block; font-family: 'Bricolage Grotesque', sans-serif; font-size: 40px; font-weight: 800; color: var(--t); line-height: 1; margin-bottom: 4px; }
     .vt-l { font-size: 11px; color: var(--m); text-transform: uppercase; letter-spacing: .06em; }
     @media (max-width: 900px) { .veille-teaser-card { flex-direction: column; gap: 32px; padding: 36px; } .vt-stats { flex-direction: row; justify-content: flex-start; } }
+
+    /* ── OFFRES ── */
+    .offres-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px; }
+    .offre-card { background: var(--bg2); border: 1px solid var(--border); border-radius: 20px; padding: 40px; transition: .4s var(--ease); position: relative; }
+    .offre-card:hover { transform: translateY(-5px); border-color: var(--border-h); }
+    .offre-card.pop { background: linear-gradient(160deg, rgba(124,106,244,.12), rgba(56,189,248,.05)); border-color: rgba(124,106,244,.3); }
+    .pop-badge { position: absolute; top: 20px; right: 20px; font-size: 10px; font-weight: 800; letter-spacing: .1em; text-transform: uppercase; padding: 5px 12px; border-radius: 100px; background: linear-gradient(135deg, var(--accent), #4f46e5); color: #fff; }
+    .offre-type { font-size: 12px; font-weight: 700; letter-spacing: .08em; text-transform: uppercase; color: var(--m); margin-bottom: 8px; }
+    .offre-name { font-family: 'Bricolage Grotesque', sans-serif; font-size: 24px; font-weight: 800; margin-bottom: 6px; }
+    .offre-sub { font-size: 13px; color: var(--m); margin-bottom: 28px; }
+    .offre-features { display: flex; flex-direction: column; gap: 11px; margin-bottom: 32px; }
+    .of-item { display: flex; gap: 10px; align-items: flex-start; font-size: 14px; }
+    .of-dot { width: 18px; height: 18px; min-width: 18px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 9px; margin-top: 2px; }
+    .of-ok .of-dot { background: linear-gradient(135deg, #00ff87, #38bdf8); color: #000; }
+    .of-no .of-dot { background: rgba(255,255,255,.06); color: var(--m); }
+    .of-ok span { color: var(--t); }
+    .of-no span { color: var(--m); }
+
+    /* ── FAQ ── */
+    #faq { padding: 100px 0; }
+    .faq-header { text-align: center; margin-bottom: 56px; }
+    .faq-header .exp-label { display: block; text-align: center; margin-bottom: 16px; }
+    .faq-header .exp-title { text-align: center; }
+    .faq-list { max-width: 720px; margin: 0 auto; display: flex; flex-direction: column; gap: 12px; }
+    .faq-item { background: var(--bg2); border: 1px solid var(--border); border-radius: 14px; overflow: hidden; transition: .3s var(--ease); }
+    .faq-item.open { border-color: rgba(124,106,244,.25); }
+    .faq-q { display: flex; align-items: center; justify-content: space-between; padding: 22px 28px; cursor: pointer; font-weight: 600; font-size: 15px; gap: 16px; user-select: none; }
+    .faq-q:hover { background: rgba(255,255,255,.02); }
+    .faq-icon { width: 28px; height: 28px; border-radius: 50%; background: rgba(255,255,255,.05); border: 1px solid var(--border); display: flex; align-items: center; justify-content: center; font-size: 16px; flex-shrink: 0; transition: transform .3s var(--ease); }
+    .faq-item.open .faq-icon { transform: rotate(45deg); background: var(--accent); border-color: var(--accent); }
+    .faq-a { max-height: 0; overflow: hidden; transition: max-height .4s var(--ease); }
+    .faq-a-inner { padding: 0 28px 22px; font-size: 14px; color: var(--m2); line-height: 1.8; }
+    .faq-item.open .faq-a { max-height: 300px; }
+
+    /* ── STICKY CTA ── */
+    .sticky-cta { position: fixed; bottom: 28px; right: 28px; z-index: 300; animation: slideup .6s var(--ease) 2s both; }
+    @keyframes slideup { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: none; } }
+    .sticky-inner { display: flex; align-items: center; gap: 10px; background: linear-gradient(135deg, var(--accent), #4f46e5); padding: 14px 22px; border-radius: 100px; box-shadow: 0 8px 40px rgba(124,106,244,.4); font-weight: 700; font-size: 14px; color: #fff; text-decoration: none; transition: .3s var(--ease); }
+    .sticky-inner:hover { transform: translateY(-3px); box-shadow: 0 12px 60px rgba(124,106,244,.6); }
+    .sticky-pulse { width: 8px; height: 8px; background: #fff; border-radius: 50%; animation: pulse 1.5s infinite; opacity: .85; }
 
     /* ── FOOTER ── */
     footer {
@@ -444,6 +484,10 @@
 <!-- Grain overlay -->
 <svg style="position:absolute;width:0;height:0"><filter id="grain"><feTurbulence type="fractalNoise" baseFrequency="0.65" numOctaves="3" stitchTiles="stitch"/><feColorMatrix type="saturate" values="0"/></filter></svg>
 <div class="noise-layer"></div>
+
+<a href="#contact" class="sticky-cta">
+  <div class="sticky-inner"><div class="sticky-pulse"></div>Discutons de votre projet →</div>
+</a>
 
 <!-- NAV -->
 <nav id="nav">
@@ -650,49 +694,59 @@
 
 <hr class="divider"/>
 
-<!-- OFFRE -->
+<!-- OFFRES -->
 <section id="offre">
   <div class="c">
     <div class="exp-header rv">
       <div class="exp-label">Offre de service</div>
-      <div class="exp-title">Dans quelle situation<br/>je peux vous aider ?</div>
+      <div class="exp-title">Trois façons de<br/>travailler ensemble.</div>
     </div>
-    <div class="situations-grid rv d1">
+    <div class="offres-grid rv d1">
 
-      <div class="sit-card" style="--dc: #7c6af4;">
-        <div class="sit-label">Data Governance</div>
-        <div class="sit-text">Vos données ne sont pas assez fiables pour lancer l'IA</div>
-        <div class="sit-sub">Audit de maturité data, roadmap qualité, mise en place des fondations Data Governance.</div>
+      <div class="offre-card">
+        <div class="offre-type">Diagnostic</div>
+        <div class="offre-name">Audit IA & Data</div>
+        <div class="offre-sub">Livré en 1 semaine</div>
+        <div class="offre-features">
+          <div class="of-item of-ok"><div class="of-dot">✓</div><span>Analyse de vos données et processus</span></div>
+          <div class="of-item of-ok"><div class="of-dot">✓</div><span>Identification des opportunités IA prioritaires</span></div>
+          <div class="of-item of-ok"><div class="of-dot">✓</div><span>Évaluation "AI ready" vs "Data first"</span></div>
+          <div class="of-item of-ok"><div class="of-dot">✓</div><span>Roadmap chiffrée sur 12 mois</span></div>
+          <div class="of-item of-ok"><div class="of-dot">✓</div><span>Recommandations stack technique</span></div>
+          <div class="of-item of-no"><div class="of-dot">–</div><span>Développement inclus</span></div>
+        </div>
+        <a href="#contact" class="hl-btn hl-outline" style="width:100%;justify-content:center">Demander un audit →</a>
       </div>
 
-      <div class="sit-card" style="--dc: #38bdf8;">
-        <div class="sit-label">AI Governance</div>
-        <div class="sit-text">Vous devez prouver la conformité EU AI Act de vos systèmes</div>
-        <div class="sit-sub">Classification des risques, documentation technique, registre IA, plan d'actions réglementaire.</div>
+      <div class="offre-card pop">
+        <div class="pop-badge">Recommandé</div>
+        <div class="offre-type">Forfait</div>
+        <div class="offre-name">Mission Projet</div>
+        <div class="offre-sub">4 à 10 semaines</div>
+        <div class="offre-features">
+          <div class="of-item of-ok"><div class="of-dot">✓</div><span>Cadrage désirabilité / faisabilité / viabilité</span></div>
+          <div class="of-item of-ok"><div class="of-dot">✓</div><span>Développement agentique complet</span></div>
+          <div class="of-item of-ok"><div class="of-dot">✓</div><span>Déploiement GCP ou AWS en production</span></div>
+          <div class="of-item of-ok"><div class="of-dot">✓</div><span>Intégration à vos outils existants</span></div>
+          <div class="of-item of-ok"><div class="of-dot">✓</div><span>Formation de vos équipes</span></div>
+          <div class="of-item of-ok"><div class="of-dot">✓</div><span>Métriques de succès définies contractuellement</span></div>
+        </div>
+        <a href="#contact" class="hl-btn hl-primary" style="width:100%;justify-content:center">Discuter de mon projet →</a>
       </div>
 
-      <div class="sit-card" style="--dc: #fb923c;">
-        <div class="sit-label">Développement Agentique</div>
-        <div class="sit-text">Vous voulez automatiser un processus métier avec un agent IA</div>
-        <div class="sit-sub">Du cadrage au déploiement. Premier système fonctionnel en 2 semaines.</div>
-      </div>
-
-      <div class="sit-card" style="--dc: #818cf8;">
-        <div class="sit-label">Product Management IA</div>
-        <div class="sit-text">Vous avez besoin d'un PM qui comprend l'IA côté technique</div>
-        <div class="sit-sub">Cadrage par la valeur, roadmap, animation d'équipe. Je traduis la vision en backlog actionnable.</div>
-      </div>
-
-      <div class="sit-card" style="--dc: #fb923c;">
-        <div class="sit-label">Développement Agentique</div>
-        <div class="sit-text">Votre POC IA tourne depuis 6 mois mais n'est toujours pas en production</div>
-        <div class="sit-sub">Je reprends le projet, structure l'architecture et finalise le déploiement réel.</div>
-      </div>
-
-      <div class="sit-card" style="--dc: #7c6af4;">
-        <div class="sit-label">Data Governance</div>
-        <div class="sit-text">Vous démarrez votre stratégie data sur un nouveau domaine métier</div>
-        <div class="sit-sub">Operating model, communauté data, Business Objects pilotés. De 0 à 50 en quelques mois.</div>
+      <div class="offre-card">
+        <div class="offre-type">Régie</div>
+        <div class="offre-name">Mission longue</div>
+        <div class="offre-sub">TJM · Minimum 10 jours</div>
+        <div class="offre-features">
+          <div class="of-item of-ok"><div class="of-dot">✓</div><span>Intégration dans votre équipe produit / data</span></div>
+          <div class="of-item of-ok"><div class="of-dot">✓</div><span>Périmètre flexible et évolutif</span></div>
+          <div class="of-item of-ok"><div class="of-dot">✓</div><span>Full-remote ou sur site (Lille / France)</span></div>
+          <div class="of-item of-ok"><div class="of-dot">✓</div><span>Profil PI Planning SAFe si besoin</span></div>
+          <div class="of-item of-ok"><div class="of-dot">✓</div><span>Reporting OKR hebdomadaire</span></div>
+          <div class="of-item of-no"><div class="of-dot">–</div><span>Engagement durée fixe</span></div>
+        </div>
+        <a href="#contact" class="hl-btn hl-outline" style="width:100%;justify-content:center">Discuter du format →</a>
       </div>
 
     </div>
@@ -824,6 +878,62 @@
 
 <hr class="divider"/>
 
+<!-- FAQ -->
+<section id="faq">
+  <div class="c">
+    <div class="faq-header rv">
+      <div class="exp-label">Questions fréquentes</div>
+      <div class="exp-title">Ce que les clients<br/>me demandent toujours.</div>
+    </div>
+    <div class="faq-list">
+      <div class="faq-item rv">
+        <div class="faq-q" onclick="toggleFaq(this)">
+          <span>Vous travaillez sur quels types de projets ?</span>
+          <div class="faq-icon">+</div>
+        </div>
+        <div class="faq-a"><div class="faq-a-inner">Principalement du développement agentique (agents IA autonomes, chatbots connectés à vos données, automatisation de workflows), de la data governance et du product management IA. Ma zone de confort : les environnements complexes avec des données hétérogènes et des contraintes métier fortes — exactement le contexte Decathlon/Adeo dans lequel j'évolue depuis 8 ans.</div></div>
+      </div>
+      <div class="faq-item rv d1">
+        <div class="faq-q" onclick="toggleFaq(this)">
+          <span>Comment vous différenciez-vous d'une agence IA classique ?</span>
+          <div class="faq-icon">+</div>
+        </div>
+        <div class="faq-a"><div class="faq-a-inner">Je combine trois profils rares en un : entrepreneur (j'ai créé et revendu une agence), product manager senior (8 ans sur des backlogs data/IA chez des leaders du retail) et développeur IA (je code, je déploie, je monitore). Vous n'avez pas un chef de projet qui transmet à une équipe offshore — vous avez l'expert directement.</div></div>
+      </div>
+      <div class="faq-item rv d2">
+        <div class="faq-q" onclick="toggleFaq(this)">
+          <span>Qu'est-ce que l'EU AI Act change pour mon projet ?</span>
+          <div class="faq-icon">+</div>
+        </div>
+        <div class="faq-a"><div class="faq-a-inner">L'EU AI Act impose une classification des systèmes IA par niveau de risque et des obligations de documentation, de transparence et de supervision humaine. J'ai développé AI Compass chez Decathlon, un assistant de conformité EU AI Act. Je peux auditer vos projets IA existants, les classifier et établir un plan d'actions pour vous mettre en conformité avant les échéances réglementaires.</div></div>
+      </div>
+      <div class="faq-item rv">
+        <div class="faq-q" onclick="toggleFaq(this)">
+          <span>Vous êtes basé à Lille — vous travaillez aussi à distance ?</span>
+          <div class="faq-icon">+</div>
+        </div>
+        <div class="faq-a"><div class="faq-a-inner">Oui, majoritairement en remote. J'interviens sur des projets partout en France et en Europe. Des déplacements ponctuels sur site sont possibles pour les ateliers de cadrage ou les PI Planning. Mon expérience chez Adeo et Decathlon est entièrement en mode hybride.</div></div>
+      </div>
+      <div class="faq-item rv d1">
+        <div class="faq-q" onclick="toggleFaq(this)">
+          <span>Quelle est votre disponibilité actuelle ?</span>
+          <div class="faq-icon">+</div>
+        </div>
+        <div class="faq-a"><div class="faq-a-inner">Je suis actuellement en mission chez Decathlon, mais je reste disponible pour de nouveaux projets en parallèle ou à venir. La meilleure façon de le savoir : un appel de 30 minutes pour cadrer votre besoin et voir comment je peux m'organiser. Je travaille sur un nombre limité de projets simultanément pour garantir la qualité.</div></div>
+      </div>
+      <div class="faq-item rv d2">
+        <div class="faq-q" onclick="toggleFaq(this)">
+          <span>Mes données sont-elles en sécurité ?</span>
+          <div class="faq-icon">+</div>
+        </div>
+        <div class="faq-a"><div class="faq-a-inner">Absolument. Je signe systématiquement un NDA avant tout partage de données. J'ai l'habitude de travailler avec des données critiques dans des environnements sécurisés. Je suis RGPD-compliant et habitué aux contraintes de conformité des grands groupes.</div></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<hr class="divider"/>
+
 <!-- CONTACT -->
 <section id="contact">
   <div class="c">
@@ -924,6 +1034,14 @@
   /* Reveal */
   const io = new IntersectionObserver(e => e.forEach(x => x.isIntersecting && x.target.classList.add('in')), { threshold: .12 });
   document.querySelectorAll('.rv').forEach(el => io.observe(el));
+
+  /* FAQ */
+  function toggleFaq(btn) {
+    const item = btn.parentElement;
+    const open = item.classList.contains('open');
+    document.querySelectorAll('.faq-item.open').forEach(i => i.classList.remove('open'));
+    if (!open) item.classList.add('open');
+  }
 
   /* Counters */
   let done = false;
