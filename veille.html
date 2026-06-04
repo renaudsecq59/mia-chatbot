@@ -46,15 +46,46 @@
     .nav-links { display: flex; align-items: center; gap: 32px; list-style: none; }
     .nav-links a { font-size: 13px; color: var(--m); text-decoration: none; font-weight: 500; transition: color .2s; letter-spacing: .01em; }
     .nav-links a:hover { color: var(--t); }
-    .nav-cta { font-size: 13px; font-weight: 600; color: var(--bg); background: var(--t); padding: 8px 18px; border-radius: 100px; text-decoration: none; transition: .25s var(--ease); }
-    .nav-cta:hover { background: var(--accent); transform: translateY(-1px); }
+    .nav-cta { font-size: 13px; font-weight: 600; color: #fff; background: linear-gradient(135deg, var(--accent), #4f46e5); padding: 8px 20px; border-radius: 100px; text-decoration: none; transition: .25s var(--ease); box-shadow: 0 0 20px rgba(124,106,244,0.3); }
+    .nav-cta:hover { transform: translateY(-1px); box-shadow: 0 0 32px rgba(124,106,244,0.5); filter: brightness(1.1); }
 
     /* HEADER */
     .header-section {
-      padding: 120px 0 60px;
+      position: relative;
+      overflow: hidden;
+      padding: 140px 0 80px;
       border-bottom: 1px solid var(--border);
+      background-image: radial-gradient(rgba(255,255,255,0.035) 1px, transparent 1px);
+      background-size: 28px 28px;
     }
-    .header-content { max-width: 720px; }
+    .header-section::after {
+      content: '';
+      position: absolute; inset: 0; pointer-events: none; z-index: 1;
+      background: linear-gradient(to bottom, transparent 50%, var(--bg) 100%);
+    }
+    .header-content { position: relative; z-index: 2; max-width: 760px; }
+    /* Background orbs */
+    .orb {
+      position: absolute; border-radius: 50%; pointer-events: none;
+      filter: blur(100px); z-index: 0;
+    }
+    .orb-1 {
+      width: 700px; height: 600px; top: -280px; left: -150px;
+      background: radial-gradient(circle, rgba(124,106,244,0.22) 0%, transparent 65%);
+    }
+    .orb-2 {
+      width: 500px; height: 500px; top: -50px; right: -100px;
+      background: radial-gradient(circle, rgba(79,70,229,0.14) 0%, transparent 65%);
+    }
+    .orb-3 {
+      width: 400px; height: 300px; bottom: -100px; left: 40%;
+      background: radial-gradient(circle, rgba(124,106,244,0.08) 0%, transparent 65%);
+    }
+    /* Noise layer */
+    .noise-layer {
+      position: fixed; inset: 0; z-index: 998; pointer-events: none;
+      opacity: .04; background: white; filter: url(#grain);
+    }
     .header-eyebrow {
       display: flex; align-items: center; gap: 10px;
       font-size: 12px; font-weight: 500; color: var(--m2);
@@ -64,11 +95,15 @@
     @keyframes pulse { 0%,100% { opacity:1; transform:scale(1); } 50% { opacity:.5; transform:scale(1.4); } }
     .header-title {
       font-family: 'Bricolage Grotesque', sans-serif;
-      font-size: clamp(36px, 5vw, 56px);
+      font-size: clamp(44px, 6.5vw, 80px);
       font-weight: 800;
-      line-height: 1.05;
+      line-height: 1.0;
       letter-spacing: -.03em;
-      margin-bottom: 20px;
+      margin-bottom: 24px;
+      background: linear-gradient(135deg, #ffffff 25%, rgba(160,140,255,0.95) 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
     }
     .header-desc {
       font-size: 16px;
@@ -159,13 +194,16 @@
       background: var(--bg2);
       border: 1px solid var(--border);
       border-radius: 12px;
-      transition: .25s var(--ease);
+      transition: opacity .45s var(--ease), transform .45s var(--ease), border-color .25s, background .2s, box-shadow .25s;
       cursor: pointer;
       text-decoration: none;
       color: inherit;
       display: block;
       margin-bottom: 12px;
+      opacity: 0;
+      transform: translateY(10px);
     }
+    .article-card.visible { opacity: 1; transform: none; }
     .article-card[data-source="ia_pratique"] { --cat: #818cf8; }
     .article-card[data-source="infra_mlops"] { --cat: #38bdf8; }
     .article-card[data-source="governance_regulation"] { --cat: var(--accent); }
@@ -173,7 +211,7 @@
     .article-card:hover {
       border-color: var(--border-h);
       background: var(--bg3);
-      box-shadow: inset 3px 0 0 var(--cat, var(--accent));
+      box-shadow: 0 0 0 1px var(--border-h), 0 8px 32px rgba(124,106,244,0.1), inset 3px 0 0 var(--cat, var(--accent));
     }
     .article-meta {
       display: flex;
@@ -200,11 +238,11 @@
       border-bottom: 1px solid var(--border);
     }
     .linkedin-card {
-      background: var(--bg2);
-      border: 1px solid var(--border);
+      background: linear-gradient(160deg, rgba(124,106,244,0.07) 0%, var(--bg2) 50%);
+      border: 1px solid rgba(124,106,244,0.2);
       border-radius: 16px;
-      padding: 32px;
-      border-top: 1px solid rgba(124,106,244,0.3);
+      padding: 36px;
+      box-shadow: 0 0 60px rgba(124,106,244,0.06);
     }
     .linkedin-header {
       display: flex; align-items: center; gap: 12px;
@@ -425,8 +463,15 @@
   </div>
 </nav>
 
+<!-- Noise grain overlay -->
+<svg style="position:absolute;width:0;height:0"><filter id="grain"><feTurbulence type="fractalNoise" baseFrequency="0.65" numOctaves="3" stitchTiles="stitch"/><feColorMatrix type="saturate" values="0"/></filter></svg>
+<div class="noise-layer"></div>
+
 <!-- HEADER -->
 <section class="header-section">
+  <div class="orb orb-1"></div>
+  <div class="orb orb-2"></div>
+  <div class="orb orb-3"></div>
   <div class="c">
     <div class="header-content">
       <div class="header-eyebrow">
@@ -632,6 +677,15 @@ async function loadLinkedInPost() {
   }
 }
 
+const fadeObserver = new IntersectionObserver((entries) => {
+  entries.forEach(e => {
+    if (e.isIntersecting) {
+      e.target.classList.add('visible');
+      fadeObserver.unobserve(e.target);
+    }
+  });
+}, { threshold: 0.04 });
+
 function renderArticles() {
   const container = document.getElementById('articles-container');
   const filtered = currentFilter === 'all'
@@ -658,6 +712,11 @@ function renderArticles() {
       </div>
     </a>
   `).join('');
+
+  document.querySelectorAll('.article-card').forEach((card, i) => {
+    card.style.transitionDelay = `${Math.min(i * 55, 350)}ms`;
+    fadeObserver.observe(card);
+  });
 }
 
 function updateStats() {
