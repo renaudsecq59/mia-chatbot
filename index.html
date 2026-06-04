@@ -354,6 +354,28 @@
     .contact-linkedin a { font-size: 13px; color: var(--m2); text-decoration: none; transition: color .2s; }
     .contact-linkedin a:hover { color: var(--t); }
 
+    /* ── PROCESS ── */
+    #process { padding: 100px 0; }
+
+    /* ── VEILLE TEASER ── */
+    .veille-teaser-section { padding: 80px 0; }
+    .veille-teaser-card {
+      background: linear-gradient(135deg, rgba(124,106,244,0.08) 0%, var(--bg2) 60%);
+      border: 1px solid rgba(124,106,244,0.2);
+      border-radius: 20px; padding: 56px;
+      display: flex; align-items: center; justify-content: space-between; gap: 64px;
+      box-shadow: 0 0 60px rgba(124,106,244,0.05);
+    }
+    .vt-left { flex: 1; }
+    .vt-eyebrow { font-size: 11px; font-weight: 600; letter-spacing: .1em; text-transform: uppercase; color: var(--accent); margin-bottom: 14px; }
+    .vt-title { font-family: 'Bricolage Grotesque', sans-serif; font-size: clamp(20px, 2.5vw, 28px); font-weight: 700; line-height: 1.2; letter-spacing: -.02em; margin-bottom: 16px; }
+    .vt-desc { font-size: 14px; color: var(--m2); line-height: 1.8; max-width: 520px; }
+    .vt-stats { display: flex; gap: 48px; flex-shrink: 0; align-items: center; }
+    .vt-stat { text-align: center; }
+    .vt-n { display: block; font-family: 'Bricolage Grotesque', sans-serif; font-size: 40px; font-weight: 800; color: var(--t); line-height: 1; margin-bottom: 4px; }
+    .vt-l { font-size: 11px; color: var(--m); text-transform: uppercase; letter-spacing: .06em; }
+    @media (max-width: 900px) { .veille-teaser-card { flex-direction: column; gap: 32px; padding: 36px; } .vt-stats { flex-direction: row; justify-content: flex-start; } }
+
     /* ── FOOTER ── */
     footer {
       padding: 28px 0;
@@ -420,8 +442,9 @@
         </div>
         <h1 class="hero-name">Renaud<br/>Secq.</h1>
         <p class="hero-title">
-          Consultant freelance IA & Data.<br/>
-          <em>J'aide les entreprises à exploiter leur data et déployer des systèmes IA concrets — agents autonomes, gouvernance, product management.</em>
+          Je cadre, prototype et déploie des systèmes IA<br/>
+          qui <em>passent en production — pas des POCs qui trainent</em>.<br/>
+          Agents autonomes · Gouvernance · Product IA. 8 ans grands comptes.
         </p>
         <div class="hero-links">
           <a href="#contact" class="hl-btn hl-primary">Me contacter →</a>
@@ -508,10 +531,10 @@
     <div class="about-grid">
       <div class="about-label rv">À propos</div>
       <div class="about-body rv d1">
-        <h2>Entrepreneur, PM senior,<br/><span>bâtisseur d'IA.</span></h2>
-        <p>Dans le digital depuis <strong>2004</strong>. Après un parcours en agence (Publicis, Altavia) et chez les annonceurs (La Redoute), j'ai fondé <strong>Yoo CI</strong>, une agence de stratégie digitale revendue au groupe Generactiv. Depuis, je propose mes services en freelance.</p>
-        <p>Mes missions m'ont conduit chez <strong>Adeo</strong> puis <strong>Decathlon</strong> — deux leaders du retail où j'ai progressivement glissé vers la data, puis l'IA. Aujourd'hui, je combine vision produit et exécution technique pour déployer des systèmes IA qui créent de la valeur métier réelle.</p>
-        <p>Ma conviction : avant de coder, je cadre. Désirabilité, faisabilité, rentabilité. <em>Les projets non "AI ready" sont stoppés et réorientés — pas facturés pour rien.</em></p>
+        <h2>Je ne vends pas de l'IA.<br/><span>Je résous des problèmes — avec l'IA.</span></h2>
+        <p>Dans le digital depuis <strong>2004</strong>. Fondateur d'une agence revendue, puis Product Manager senior chez Adeo et Decathlon. J'ai construit une triple compétence — vision produit, gouvernance des données, systèmes IA en production. Pas une reconversion : une accumulation.</p>
+        <p>Chez Decathlon : <strong>4 agents IA en production en 3 mois</strong>. 350 utilisateurs actifs. +12 points de qualité sur les données critiques. Ce ne sont pas des slides — c'est de la valeur mesurée.</p>
+        <p>Mon filtre avant chaque projet : Désirabilité, Faisabilité, Viabilité. <em>Si le projet n'est pas prêt, je dis stop — et on réoriente sans facturer pour rien.</em></p>
         <div class="about-tags">
           <span class="at">Agents IA</span>
           <span class="at">Orchestration multi-agents</span>
@@ -563,7 +586,7 @@
           <span class="etag">Data Quality</span>
         </div>
       </div>
-      <div class="exp-card" style="--card-c: #c8ff00;">
+      <div class="exp-card" style="--card-c: #818cf8;">
         <div class="exp-num">03</div>
         <div class="exp-name">Product Management IA</div>
         <p class="exp-desc">Cadrage des opportunités IA par la valeur. Roadmap OKR, priorisation rigoureuse, pilotage d'équipes pluridisciplinaires data scientists, engineers, UX.</p>
@@ -573,6 +596,35 @@
           <span class="etag">FinOps</span>
           <span class="etag">Backlog</span>
         </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<hr class="divider"/>
+
+<!-- PROCESS -->
+<section id="process">
+  <div class="c">
+    <div class="exp-header rv">
+      <div class="exp-label">Méthode</div>
+      <div class="exp-title">Comment<br/>je travaille.</div>
+    </div>
+    <div class="exp-grid rv d1">
+      <div class="exp-card" style="--card-c: var(--accent);">
+        <div class="exp-num">01</div>
+        <div class="exp-name">Cadrage sans complaisance</div>
+        <p class="exp-desc">Désirabilité, faisabilité, viabilité. Si les données manquent, si le use case est flou ou si le ROI est fantaisiste — je le dis clairement et on réoriente. Les projets non "AI ready" sont stoppés dès cette étape.</p>
+      </div>
+      <div class="exp-card" style="--card-c: #38bdf8;">
+        <div class="exp-num">02</div>
+        <div class="exp-name">Premier système en 2 semaines</div>
+        <p class="exp-desc">Pas de tunnel de 6 mois. Un système fonctionnel testé par de vrais utilisateurs, avec une mesure d'impact dès le départ. Des boucles courtes, de l'apprentissage rapide, des décisions informées.</p>
+      </div>
+      <div class="exp-card" style="--card-c: #818cf8;">
+        <div class="exp-num">03</div>
+        <div class="exp-name">Production réelle, pas une démo</div>
+        <p class="exp-desc">Déploiement, monitoring, adoption. Je reste présent jusqu'à ce que le système soit utilisé. Un outil que personne n'ouvre n'a aucune valeur métier.</p>
       </div>
     </div>
   </div>
@@ -695,30 +747,24 @@
 
 <hr class="divider"/>
 
-<!-- FORMATIONS -->
-<div class="c">
-  <div class="formations-row rv">
-    <div class="about-label">Formations &<br/>certifications</div>
-    <div class="formations-list">
-      <div class="formation-item">
-        <div class="fi-badge ai">IA</div>
-        <div>
-          <div class="fi-name">Google AI Essential</div>
-          <div class="fi-org">Google · 2025</div>
-        </div>
+<!-- VEILLE TEASER -->
+<div class="veille-teaser-section">
+  <div class="c">
+    <div class="veille-teaser-card rv">
+      <div class="vt-left">
+        <div class="vt-eyebrow">Veille hebdomadaire</div>
+        <h3 class="vt-title">Les signaux faibles de l'IA en entreprise — avec un angle terrain.</h3>
+        <p class="vt-desc">Chaque semaine, je sélectionne les articles les plus utiles sur le déploiement de l'IA, la gouvernance des données et les stratégies qui fonctionnent vraiment. Avec mon avis d'expert — pas du contenu généré.</p>
+        <a href="veille.html" class="hl-btn hl-primary" style="margin-top:24px;display:inline-flex;">Voir la veille →</a>
       </div>
-      <div class="formation-item">
-        <div class="fi-badge agile">Agile</div>
-        <div>
-          <div class="fi-name">Professional Scrum Product Owner — PSPO I</div>
-          <div class="fi-org">Scrum.org · 2017</div>
+      <div class="vt-stats">
+        <div class="vt-stat">
+          <span class="vt-n">20k</span>
+          <span class="vt-l">abonnés LinkedIn</span>
         </div>
-      </div>
-      <div class="formation-item">
-        <div class="fi-badge edu">Bac +5</div>
-        <div>
-          <div class="fi-name">Master II Marketing & Communication</div>
-          <div class="fi-org">ISTC Lille · 2003</div>
+        <div class="vt-stat">
+          <span class="vt-n">100+</span>
+          <span class="vt-l">articles sélectionnés</span>
         </div>
       </div>
     </div>
