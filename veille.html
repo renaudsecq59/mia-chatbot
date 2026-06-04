@@ -7,18 +7,21 @@
   <meta name="description" content="Veille hebdomadaire sur l'IA en entreprise, la Data Governance et la réglementation. Sélection d'articles, avis d'expert et tendances clés."/>
   <link rel="preconnect" href="https://fonts.googleapis.com"/>
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:ital,wght@0,300;0,400;0,500;0,600;1,300&family=Syne:wght@700;800&display=swap" rel="stylesheet"/>
+  <link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,400;12..96,600;12..96,700;12..96,800&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet"/>
   <style>
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
     :root {
-      --bg: #0c0c0c;
-      --bg2: #111111;
+      --bg: #09090f;
+      --bg2: #0e0e18;
+      --bg3: #14142a;
       --border: rgba(255,255,255,0.07);
-      --t: #f0f0f0;
-      --m: #666;
-      --m2: #999;
-      --accent: #c8ff00;
+      --border-h: rgba(255,255,255,0.14);
+      --t: #f0eeff;
+      --m: #6b6880;
+      --m2: #9d99b0;
+      --accent: #7c6af4;
+      --accent-dim: rgba(124,106,244,0.14);
       --ease: cubic-bezier(0.16, 1, 0.3, 1);
     }
 
@@ -35,11 +38,11 @@
     nav {
       position: fixed; top: 0; left: 0; right: 0; z-index: 100;
       padding: 16px 0;
-      background: rgba(12,12,12,.95); backdrop-filter: blur(20px);
+      background: rgba(9,9,15,.96); backdrop-filter: blur(20px) saturate(180%);
       border-bottom: 1px solid var(--border);
     }
     .nav-inner { display: flex; align-items: center; justify-content: space-between; }
-    .nav-name { font-family: 'Syne', sans-serif; font-size: 16px; font-weight: 700; color: var(--t); text-decoration: none; letter-spacing: -.01em; }
+    .nav-name { font-family: 'Bricolage Grotesque', sans-serif; font-size: 16px; font-weight: 700; color: var(--t); text-decoration: none; letter-spacing: -.01em; }
     .nav-links { display: flex; align-items: center; gap: 32px; list-style: none; }
     .nav-links a { font-size: 13px; color: var(--m); text-decoration: none; font-weight: 500; transition: color .2s; letter-spacing: .01em; }
     .nav-links a:hover { color: var(--t); }
@@ -60,7 +63,7 @@
     .eyebrow-dot { width: 6px; height: 6px; background: var(--accent); border-radius: 50%; animation: pulse 2s infinite; }
     @keyframes pulse { 0%,100% { opacity:1; transform:scale(1); } 50% { opacity:.5; transform:scale(1.4); } }
     .header-title {
-      font-family: 'Syne', sans-serif;
+      font-family: 'Bricolage Grotesque', sans-serif;
       font-size: clamp(36px, 5vw, 56px);
       font-weight: 800;
       line-height: 1.05;
@@ -76,9 +79,14 @@
     }
     .header-filters {
       display: flex;
-      flex-wrap: wrap;
       gap: 8px;
+      overflow-x: auto;
+      -webkit-overflow-scrolling: touch;
+      scrollbar-width: none;
+      padding-bottom: 4px;
     }
+    .header-filters::-webkit-scrollbar { display: none; }
+    .filter-btn { flex-shrink: 0; }
     .filter-btn {
       font-size: 12px;
       font-weight: 500;
@@ -92,7 +100,7 @@
       font-family: 'Inter', sans-serif;
     }
     .filter-btn:hover { border-color: rgba(255,255,255,.2); color: var(--t); }
-    .filter-btn.active { background: var(--t); color: var(--bg); border-color: var(--t); }
+    .filter-btn.active { background: var(--accent); color: #fff; border-color: var(--accent); }
 
     /* CONTENT */
     .content-section {
@@ -128,7 +136,7 @@
       border-radius: 10px;
     }
     .stat-num {
-      font-family: 'Syne', sans-serif;
+      font-family: 'Bricolage Grotesque', sans-serif;
       font-size: 24px;
       font-weight: 800;
       color: var(--t);
@@ -151,17 +159,21 @@
       background: var(--bg2);
       border: 1px solid var(--border);
       border-radius: 12px;
-      transition: .3s var(--ease);
+      transition: .25s var(--ease);
       cursor: pointer;
       text-decoration: none;
       color: inherit;
       display: block;
       margin-bottom: 12px;
     }
+    .article-card[data-source="ia_pratique"] { --cat: #818cf8; }
+    .article-card[data-source="infra_mlops"] { --cat: #38bdf8; }
+    .article-card[data-source="governance_regulation"] { --cat: var(--accent); }
+    .article-card[data-source="vibe_coding"] { --cat: #fb923c; }
     .article-card:hover {
-      border-color: rgba(255,255,255,.14);
-      background: #161616;
-      transform: translateX(4px);
+      border-color: var(--border-h);
+      background: var(--bg3);
+      box-shadow: inset 3px 0 0 var(--cat, var(--accent));
     }
     .article-meta {
       display: flex;
@@ -179,7 +191,7 @@
     }
     .source-ia_pratique { background: rgba(108,99,255,.1); color: #b3adff; border: 1px solid rgba(108,99,255,.2); }
     .source-infra_mlops { background: rgba(0,212,255,.1); color: #00d4ff; border: 1px solid rgba(0,212,255,.2); }
-    .source-governance_regulation { background: rgba(200,255,0,.1); color: var(--accent); border: 1px solid rgba(200,255,0,.2); }
+    .source-governance_regulation { background: rgba(124,106,244,.1); color: var(--accent); border: 1px solid rgba(124,106,244,.2); }
     .source-vibe_coding { background: rgba(255,159,67,.1); color: #ff9f43; border: 1px solid rgba(255,159,67,.2); }
 
     /* LINKEDIN POST */
@@ -192,7 +204,7 @@
       border: 1px solid var(--border);
       border-radius: 16px;
       padding: 32px;
-      max-width: 720px;
+      border-top: 1px solid rgba(124,106,244,0.3);
     }
     .linkedin-header {
       display: flex; align-items: center; gap: 12px;
@@ -200,7 +212,7 @@
     }
     .linkedin-avatar {
       width: 44px; height: 44px; border-radius: 50%;
-      background: linear-gradient(135deg, var(--accent), #6c63ff);
+      background: linear-gradient(135deg, var(--accent), #4f46e5);
       display: flex; align-items: center; justify-content: center;
       font-weight: 700; font-size: 16px; color: var(--bg);
     }
@@ -219,7 +231,7 @@
       margin-top: 16px; display: flex; flex-wrap: wrap; gap: 6px;
     }
     .linkedin-hashtag {
-      font-size: 13px; color: #0a66c2; font-weight: 500;
+      font-size: 13px; color: #818cf8; font-weight: 500;
     }
     .linkedin-footer {
       margin-top: 20px; padding-top: 16px;
@@ -238,7 +250,7 @@
     .linkedin-post-type {
       display: inline-block; font-size: 11px; font-weight: 600;
       letter-spacing: .08em; text-transform: uppercase;
-      background: rgba(200,255,0,.12); color: var(--accent);
+      background: rgba(124,106,244,.12); color: var(--accent);
       padding: 3px 10px; border-radius: 100px; margin-bottom: 16px;
     }
     .linkedin-label {
@@ -274,7 +286,7 @@
       margin-bottom: 12px;
     }
     .expert-opinion {
-      background: rgba(200,255,0,.04);
+      background: rgba(124,106,244,.04);
       border-left: 3px solid var(--accent);
       padding: 12px 16px;
       margin-bottom: 14px;
@@ -310,22 +322,74 @@
       color: var(--m);
     }
 
-    /* LOADING */
+    /* SKELETON LOADER */
+    @keyframes shimmer {
+      0% { background-position: -400px 0; }
+      100% { background-position: 400px 0; }
+    }
+    .skeleton-card {
+      padding: 28px 32px;
+      background: var(--bg2);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      margin-bottom: 12px;
+    }
+    .sk {
+      background: linear-gradient(90deg, #14142a 25%, #1e1e38 50%, #14142a 75%);
+      background-size: 800px 100%;
+      animation: shimmer 1.6s infinite;
+      border-radius: 6px;
+    }
+    .sk-meta { height: 10px; width: 90px; margin-bottom: 18px; }
+    .sk-title { height: 17px; width: 75%; margin-bottom: 10px; }
+    .sk-text { height: 12px; width: 95%; margin-bottom: 8px; }
+    .sk-text.s { width: 55%; }
+    /* PROFILE CARD */
+    .profile-card-wrap {
+      background: var(--bg2);
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      padding: 20px;
+      margin-bottom: 16px;
+    }
+    .profile-top { display: flex; align-items: center; gap: 12px; margin-bottom: 12px; }
+    .profile-av {
+      width: 40px; height: 40px; border-radius: 50%; flex-shrink: 0;
+      background: linear-gradient(135deg, var(--accent), #4f46e5);
+      display: flex; align-items: center; justify-content: center;
+      font-size: 14px; font-weight: 700; color: #fff;
+    }
+    .profile-nm { font-size: 14px; font-weight: 600; color: var(--t); }
+    .profile-role { font-size: 12px; color: var(--m); margin-top: 2px; }
+    .profile-bio {
+      font-size: 13px; line-height: 1.6; color: var(--m2); margin-bottom: 14px;
+    }
+    .follow-cta {
+      display: block; text-align: center; padding: 9px 16px;
+      background: var(--accent-dim); border: 1px solid rgba(124,106,244,0.35);
+      border-radius: 100px; font-size: 13px; font-weight: 600;
+      color: var(--accent); text-decoration: none;
+      transition: .2s var(--ease);
+    }
+    .follow-cta:hover { background: var(--accent); color: #fff; }
+    .sidebar-counts {
+      display: flex; gap: 8px; margin-top: 12px;
+    }
+    .count-item {
+      flex: 1; padding: 10px 12px;
+      background: var(--bg2); border: 1px solid var(--border);
+      border-radius: 10px; text-align: center;
+    }
+    .count-n {
+      display: block; font-family: 'Bricolage Grotesque', sans-serif;
+      font-size: 20px; font-weight: 700; color: var(--t); line-height: 1;
+      margin-bottom: 3px;
+    }
+    .count-l { font-size: 10px; color: var(--m); text-transform: uppercase; letter-spacing: .06em; }
+    /* LOADING fallback */
     .loading {
-      text-align: center;
-      padding: 60px 0;
-      color: var(--m);
+      text-align: center; padding: 60px 0; color: var(--m);
     }
-    .spinner {
-      width: 40px;
-      height: 40px;
-      border: 3px solid var(--border);
-      border-top-color: var(--accent);
-      border-radius: 50%;
-      animation: spin 1s linear infinite;
-      margin: 0 auto 16px;
-    }
-    @keyframes spin { to { transform: rotate(360deg); } }
 
     /* FOOTER */
     footer {
@@ -340,7 +404,7 @@
     @media (max-width: 900px) {
       .content-grid { grid-template-columns: 1fr; gap: 32px; }
       .sidebar { position: static; }
-      .sidebar-stats { flex-direction: row; }
+      .sidebar-counts { flex-direction: row; }
       .nav-links { display: none; }
     }
   </style>
@@ -410,19 +474,25 @@
       
       <!-- SIDEBAR -->
       <aside class="sidebar">
-        <div class="sidebar-label">Statistiques</div>
-        <div class="sidebar-stats">
-          <div class="stat-item">
-            <div class="stat-num" id="total-articles">0</div>
-            <div class="stat-label">Articles</div>
+        <div class="profile-card-wrap">
+          <div class="profile-top">
+            <div class="profile-av">RS</div>
+            <div>
+              <div class="profile-nm">Renaud Secq</div>
+              <div class="profile-role">Consultant IA & Data</div>
+            </div>
           </div>
-          <div class="stat-item">
-            <div class="stat-num" id="sources-count">0</div>
-            <div class="stat-label">Sources</div>
+          <p class="profile-bio">Je sélectionne chaque semaine les signaux faibles sur l'IA en entreprise — avec un angle terrain.</p>
+          <a href="https://www.linkedin.com/in/renaud-secq-5593832a/" target="_blank" class="follow-cta">+ Suivre sur LinkedIn</a>
+        </div>
+        <div class="sidebar-counts">
+          <div class="count-item">
+            <span id="total-articles" class="count-n">—</span>
+            <span class="count-l">articles</span>
           </div>
-          <div class="stat-item">
-            <div class="stat-num" id="last-update">—</div>
-            <div class="stat-label">Dernière MAJ</div>
+          <div class="count-item">
+            <span id="sources-count" class="count-n">—</span>
+            <span class="count-l">sources</span>
           </div>
         </div>
       </aside>
@@ -430,10 +500,11 @@
       <!-- ARTICLES -->
       <main>
         <div id="articles-container" class="articles-list">
-          <div class="loading">
-            <div class="spinner"></div>
-            <p>Chargement des articles...</p>
-          </div>
+          <div class="skeleton-card"><div class="sk sk-meta"></div><div class="sk sk-title"></div><div class="sk sk-text"></div><div class="sk sk-text s"></div></div>
+          <div class="skeleton-card"><div class="sk sk-meta"></div><div class="sk sk-title"></div><div class="sk sk-text"></div><div class="sk sk-text s"></div></div>
+          <div class="skeleton-card"><div class="sk sk-meta"></div><div class="sk sk-title"></div><div class="sk sk-text"></div><div class="sk sk-text s"></div></div>
+          <div class="skeleton-card"><div class="sk sk-meta"></div><div class="sk sk-title"></div><div class="sk sk-text"></div><div class="sk sk-text s"></div></div>
+          <div class="skeleton-card"><div class="sk sk-meta"></div><div class="sk sk-title"></div><div class="sk sk-text"></div><div class="sk sk-text s"></div></div>
         </div>
       </main>
 
@@ -592,7 +663,6 @@ function renderArticles() {
 function updateStats() {
   document.getElementById('total-articles').textContent = allArticles.length;
   document.getElementById('sources-count').textContent = new Set(allArticles.map(a => a.sourceName)).size;
-  document.getElementById('last-update').textContent = 'Aujourd\'hui';
 }
 
 function setupFilters() {
