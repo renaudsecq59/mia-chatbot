@@ -131,7 +131,7 @@ EXIGENCES NON-NÉGOCIABLES :
 1. Au moins 1 CHIFFRE ou DONNÉE FACTUELLE dans le post — UNIQUEMENT s'il est présent dans les articles fournis. Si aucun chiffre dans les articles, utilise une donnée de notoriété publique (statistique officielle). Ne jamais inventer.
 2. Au moins 1 NOM PROPRE (outil, entreprise, personne, framework)
 3. Au moins 1 PRISE DE POSITION claire (pas tiède, pas "ça dépend")
-4. Le lien {site_url} intégré naturellement 1 seule fois
+4. NE PAS inclure de lien URL dans post_text — le lien sera ajouté automatiquement en fin de post
 5. ENTRE 200 ET 300 MOTS
 6. 2-3 hashtags techniques et spécifiques (pas #IA #Data qui sont trop larges)
 7. 0-1 emoji max
@@ -197,9 +197,14 @@ def generate_weekly_edito(articles: list[dict], trends: list[str] = None, post_t
             site_url=SITE_URL,
         )
 
+        from google.genai import types as genai_types
         response = gemini_client.models.generate_content(
             model=GEMINI_MODEL,
             contents=prompt,
+            config=genai_types.GenerateContentConfig(
+                response_mime_type="application/json",
+                max_output_tokens=4096,
+            ),
         )
         raw_text = response.text.strip()
         if raw_text.startswith("```"):
@@ -415,6 +420,19 @@ def _upload_image_to_linkedin(image_bytes: bytes) -> str | None:
 
 def publish_to_linkedin(post_text: str, image_bytes: bytes = None) -> dict:
     """Publie un post sur LinkedIn via la nouvelle API Posts (/rest/posts)."""
+    # LinkedIn /rest/posts API : limite réelle = 3000 chars (texte + image OK)
+    MAX_COMMENTARY_CHARS = 3000
+    if len(post_text) > MAX_COMMENTARY_CHARS:
+        # Troncature propre à la dernière phrase complète avant la limite
+        truncated = post_text[:MAX_COMMENTARY_CHARS]
+        last_period = max(truncated.rfind('. '), truncated.rfind('!\n'), truncated.rfind('?\n'), truncated.rfind('.\n'))
+        if last_period > 600:
+            post_text = truncated[:last_period + 1]
+        else:
+            post_text = truncated.rstrip()
+        logger.warning(f"⚠️ post_text tronqué à {len(post_text)} chars (original > {MAX_COMMENTARY_CHARS})")
+    logger.info(f"📤 Publication LinkedIn: {len(post_text)} chars")
+
     if not LINKEDIN_ACCESS_TOKEN:
         logger.warning("⚠️ LINKEDIN_ACCESS_TOKEN non configuré")
         return {
