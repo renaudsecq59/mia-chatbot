@@ -106,10 +106,17 @@ async def run_scrape():
         post_text = edito.get("post_text", "")
         post_type = edito.get("post_type", "observateur")
         hashtags = edito.get("hashtags", [])
-        
-        # S'assurer que les hashtags sont dans le post
-        if post_text and hashtags and not any(h in post_text for h in hashtags):
-            post_text = post_text.rstrip() + "\n\n" + " ".join(hashtags)
+
+        # Forcer l'URL en FIN de post pour éviter la troncature LinkedIn
+        # (LinkedIn tronque le commentary au niveau d'une URL inline quand il y a une image attachée)
+        from linkedin_publisher import SITE_URL as _SITE_URL
+        if post_text and _SITE_URL in post_text:
+            post_text = post_text.replace(_SITE_URL, "").rstrip()
+        # Reconstruire : contenu + URL + hashtags toujours en fin
+        if post_text:
+            url_line = f"\n\n{_SITE_URL}"
+            hashtag_line = ("\n\n" + " ".join(hashtags)) if hashtags and not any(h in post_text for h in hashtags) else ""
+            post_text = post_text.rstrip() + url_line + hashtag_line
         
         if post_text:
             # Garde-fou anti-shadowban : max 1 post LinkedIn par jour
@@ -134,9 +141,26 @@ async def run_scrape():
                 linkedin_result = {"status": "skipped", "reason": "Un post a déjà été publié aujourd'hui (limite 1/jour)"}
             else:
                 # Générer un visuel IA pour accompagner le post
+                logger.info(f"📤 post_text avant publication: {len(post_text)} chars — fin: {repr(post_text[-80:])}")
                 image_bytes = generate_visual(post_text, post_type)
                 linkedin_result = publish_to_linkedin(post_text, image_bytes)
-                linkedin_result["image_b64"] = __import__('base64').b64encode(image_bytes).decode() if image_bytes else None
+                # Compresser l'image en JPEG pour Firestore (< 200KB, limite 1MB)
+                image_b64_thumb = None
+                if image_bytes:
+                    try:
+                        from PIL import Image
+                        import io
+                        img = Image.open(io.BytesIO(image_bytes)).convert("RGB")
+                        img.thumbnail((800, 1067), Image.LANCZOS)  # ratio 3:4 max 800px
+                        buf = io.BytesIO()
+                        img.save(buf, format="JPEG", quality=65, optimize=True)
+                        compressed = buf.getvalue()
+                        image_b64_thumb = __import__('base64').b64encode(compressed).decode()
+                        logger.info(f"🖼️ Image compressée: {len(image_bytes)//1024}KB → {len(compressed)//1024}KB")
+                    except Exception as e:
+                        logger.warning(f"⚠️ Compression image échouée: {e}")
+                linkedin_result["image_b64"] = image_b64_thumb
+                linkedin_result["image_size_kb"] = round(len(image_bytes) / 1024) if image_bytes else 0
             logger.info(f"📣 LinkedIn: {linkedin_result.get('status')} — type={post_type} — image={linkedin_result.get('has_image')}")
             
             # Sauvegarder le post dans Firestore
@@ -147,6 +171,7 @@ async def run_scrape():
                     "post_id": linkedin_result.get("post_id"),
                     "has_image": linkedin_result.get("has_image", False),
                     "image_b64": linkedin_result.get("image_b64"),
+                    "image_size_kb": linkedin_result.get("image_size_kb", 0),
                     "published_at": datetime.now(timezone.utc).isoformat(),
                     "hashtags": hashtags,
                 })
@@ -334,6 +359,27 @@ async def preview_linkedin_post():
     }
 
 
+@app.get("/api/linkedin/check/{post_id:path}")
+async def check_linkedin_post(post_id: str):
+    """Vérifie le commentary réel d'un post LinkedIn via l'API (diagnostic troncature)."""
+    import httpx
+    from linkedin_publisher import LINKEDIN_ACCESS_TOKEN
+    if not LINKEDIN_ACCESS_TOKEN:
+        return {"error": "Token non configuré"}
+    headers = {
+        "Authorization": f"Bearer {LINKEDIN_ACCESS_TOKEN}",
+        "LinkedIn-Version": "202506",
+        "X-Restli-Protocol-Version": "2.0.0",
+    }
+    encoded_id = __import__('urllib.parse', fromlist=['quote']).quote(post_id, safe='')
+    r = httpx.get(f"https://api.linkedin.com/rest/posts/{encoded_id}", headers=headers, timeout=10)
+    if r.status_code == 200:
+        d = r.json()
+        commentary = d.get("commentary", "")
+        return {"post_id": post_id, "commentary_chars": len(commentary), "commentary_end": commentary[-100:], "full": commentary}
+    return {"error": f"HTTP {r.status_code}", "body": r.text[:300]}
+
+
 @app.get("/api/linkedin/posts")
 async def get_all_linkedin_posts():
     """Retourne tous les posts LinkedIn publiés (depuis Firestore)."""
@@ -355,7 +401,7 @@ async def get_all_linkedin_posts():
                 "published_at": d.get("published_at"),
                 "has_image": d.get("has_image", False),
                 "hashtags": d.get("hashtags", []),
-                "post_text": d.get("post_text", "")[:200],
+                "post_text": d.get("post_text", ""),
             })
         return {"posts": posts, "count": len(posts)}
     except Exception as e:
@@ -430,6 +476,80 @@ async def get_linkedin_stats():
     # Trier par engagement
     stats.sort(key=lambda x: x["engagement"], reverse=True)
     return {"stats": stats, "total_posts": len(stats)}
+
+
+@app.get("/auth/linkedin/callback")
+async def linkedin_oauth_callback(code: str = None, state: str = None, error: str = None):
+    """Échange le code OAuth LinkedIn contre un access token et le stocke dans Secret Manager."""
+    if error:
+        raise HTTPException(status_code=400, detail=f"LinkedIn OAuth error: {error}")
+    if not code:
+        raise HTTPException(status_code=400, detail="Paramètre 'code' manquant")
+
+    import httpx
+    from google.cloud import secretmanager
+
+    client_id = "78050rhmzifhz2"
+    sm = secretmanager.SecretManagerServiceClient()
+    secret_name = f"projects/{GCP_PROJECT}/secrets/LINKEDIN_CLIENT_SECRET/versions/latest"
+    client_secret = sm.access_secret_version(name=secret_name).payload.data.decode()
+
+    redirect_uri = "https://renaudsecq59.github.io/mia-chatbot/callback.html"
+    r = httpx.post(
+        "https://www.linkedin.com/oauth/v2/accessToken",
+        data={
+            "grant_type": "authorization_code",
+            "code": code,
+            "redirect_uri": redirect_uri,
+            "client_id": client_id,
+            "client_secret": client_secret,
+        },
+        headers={"Content-Type": "application/x-www-form-urlencoded"},
+        timeout=15,
+    )
+
+    if r.status_code != 200:
+        raise HTTPException(status_code=502, detail=f"LinkedIn token exchange failed: {r.text[:200]}")
+
+    token_data = r.json()
+    access_token = token_data.get("access_token", "")
+    expires_in = token_data.get("expires_in", 0)
+
+    if not access_token:
+        raise HTTPException(status_code=502, detail="Pas d'access_token dans la réponse LinkedIn")
+
+    # Stocker dans Secret Manager
+    sm_client = secretmanager.SecretManagerServiceClient()
+    secret_path = f"projects/{GCP_PROJECT}/secrets/LINKEDIN_ACCESS_TOKEN"
+    payload = access_token.encode("UTF-8")
+    sm_client.add_secret_version(
+        request={"parent": secret_path, "payload": {"data": payload}}
+    )
+
+    # Mettre à jour la variable d'env Cloud Run pour pointer sur latest
+    expires_days = round(expires_in / 86400)
+    logger.info(f"✅ Token LinkedIn renouvelé via OAuth — expire dans {expires_days} jours")
+
+    return {
+        "status": "ok",
+        "message": f"Token LinkedIn stocké dans Secret Manager. Expire dans {expires_days} jours.",
+        "expires_in_days": expires_days,
+    }
+
+
+@app.get("/auth/linkedin/authorize")
+async def linkedin_authorize():
+    """Retourne l'URL d'autorisation LinkedIn OAuth."""
+    import urllib.parse
+    params = urllib.parse.urlencode({
+        "response_type": "code",
+        "client_id": "78050rhmzifhz2",
+        "redirect_uri": "https://renaudsecq59.github.io/mia-chatbot/callback.html",
+        "state": "auto",
+        "scope": "openid profile w_member_social",
+    })
+    url = f"https://www.linkedin.com/oauth/v2/authorization?{params}"
+    return {"auth_url": url}
 
 
 if __name__ == "__main__":
