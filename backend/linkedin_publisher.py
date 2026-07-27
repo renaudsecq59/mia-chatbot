@@ -206,7 +206,11 @@ def generate_weekly_edito(articles: list[dict], trends: list[str] = None, post_t
                 max_output_tokens=4096,
             ),
         )
-        raw_text = response.text.strip()
+        raw_text = response.text
+        if raw_text is None and response.candidates:
+            parts = response.candidates[0].content.parts
+            raw_text = "".join(p.text for p in parts if p.text)
+        raw_text = (raw_text or "").strip()
         if raw_text.startswith("```"):
             raw_text = raw_text.split("\n", 1)[1].rsplit("```", 1)[0].strip()
 
@@ -261,7 +265,11 @@ def _generate_image_prompt(post_text: str, post_type: str) -> str:
             model=GEMINI_MODEL,
             contents=INFOGRAPHIC_CONTENT_GENERATOR.format(post_text=post_text[:1000]),
         )
-        raw = content_response.text.strip()
+        raw = content_response.text
+        if raw is None and content_response.candidates:
+            parts = content_response.candidates[0].content.parts
+            raw = "".join(p.text for p in parts if p.text)
+        raw = (raw or "").strip()
         # Nettoyer le JSON
         if "```" in raw:
             raw = raw.split("```")[1].replace("json", "").strip()
@@ -337,7 +345,7 @@ def generate_visual(post_text: str, post_type: str) -> bytes | None:
         # Nano Banana Pro requiert la location "global"
         client = image_genai.Client(vertexai=True, project=GCP_PROJECT, location="global")
         response = client.models.generate_content(
-            model="gemini-3-pro-image-preview",
+            model="gemini-3-pro-image",
             contents=image_prompt,
             config=genai_types.GenerateContentConfig(
                 response_modalities=["TEXT", "IMAGE"],
