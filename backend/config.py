@@ -31,7 +31,7 @@ EXPERT_PROFILE = {
         "Management d'équipes tech & data, pilotage de programmes",
         "Stratégie IA en entreprise (ROI, adoption, change management)",
     ],
-    "tone": "Expert terrain qui build ET qui gouverne. Parle autant code que stratégie. Avis tranchés, pas de bullshit.",
+    "tone": "Expert terrain qui build ET qui gouverne. Parle autant code que stratégie. Avis tranchés, pas de bullshit. Focus: AI Governance, Data Governance, Vibe Coding.",
     "linkedin_url": "https://www.linkedin.com/in/renaud-secq-5593832a/",
     "photo_url": "photo-000.jpg"
 }

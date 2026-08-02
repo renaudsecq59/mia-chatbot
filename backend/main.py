@@ -102,7 +102,7 @@ async def run_scrape():
             trend_keywords.update(a.get("trending_keywords", []))
         trends = list(trend_keywords)[:10]
         
-        edito = generate_weekly_edito(top_articles, trends)
+        edito = generate_weekly_edito(top_articles, trends, db=db)
         post_text = edito.get("post_text", "")
         post_type = edito.get("post_type", "observateur")
         hashtags = edito.get("hashtags", [])
@@ -174,7 +174,14 @@ async def run_scrape():
                     "image_size_kb": linkedin_result.get("image_size_kb", 0),
                     "published_at": datetime.now(timezone.utc).isoformat(),
                     "hashtags": hashtags,
+                    "hook": edito.get("hook", ""),
+                    "quality_gate": edito.get("quality_gate", {}),
+                    "dedup": edito.get("dedup", {}),
+                    "generation_attempt": edito.get("generation_attempt", 1),
                 })
+                # Stocker l'embedding pour la déduplication future
+                from post_memory import store_post_embedding
+                store_post_embedding(db, post_text, linkedin_result.get("post_id", ""))
         else:
             logger.warning("⚠️ Édito vide, publication LinkedIn ignorée")
     except Exception as e:

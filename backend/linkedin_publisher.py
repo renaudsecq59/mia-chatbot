@@ -12,10 +12,12 @@ Setup requis :
 import json
 import logging
 import os
+import re
 import httpx
 from datetime import datetime, timezone
 from google import genai
 from config import GCP_PROJECT, GCP_LOCATION, GEMINI_API_KEY, EXPERT_PROFILE
+from post_memory import get_post_history_summary, check_duplicate, store_post_embedding
 
 logger = logging.getLogger(__name__)
 
@@ -34,9 +36,11 @@ try:
             location=GCP_LOCATION,
         )
     GEMINI_MODEL = "gemini-2.5-pro"
+    GEMINI_FLASH_MODEL = "gemini-2.5-flash"
 except Exception:
     gemini_client = None
     GEMINI_MODEL = None
+    GEMINI_FLASH_MODEL = None
 
 
 EDITO_PROMPT = """Tu es le ghostwriter LinkedIn de {name}, {title}.
@@ -49,8 +53,17 @@ PROFIL RENAUD (à utiliser pour ancrer le propos, pas pour se vanter) :
 - Ex-manager d'équipes data (10+ personnes), connait les enjeux organisationnels
 - Conviction forte : l'IA sans gouvernance des données est une bombe à retardement
 
+3 PILIERS ÉDITORIAUX (prioriser ces sujets) :
+1. AI GOVERNANCE — EU AI Act, model governance, AI safety, compliance, risk management, régulation
+2. DATA GOVERNANCE — data quality, catalog, lineage, Collibra, data mesh, data contracts, stewardship
+3. VIBE CODING — cursor, claude code, copilot, windsurf, agent coding, vibe coding, dev assisté IA
+
 OBJECTIF : Que chaque post apporte UNE chose que le lecteur ne savait pas avant.
 Le lecteur idéal est un CDO, CTO ou Data Engineer en entreprise.
+
+{post_history}
+
+ANTI-RÉPÉTION ABSOLUE : Le post que tu vas écrire DOIT avoir un angle radicalement différent des posts précédents ci-dessus. Si un post précédent parlait d'un outil, parle d'un autre. Si un post précédent était une revue, fais une analyse profonde. Varie les exemples, les chiffres, les références. NE JAMAIS reprendre la même structure ni le même angle.
 
 ARTICLES DE LA SEMAINE :
 {articles_summary}
@@ -164,68 +177,183 @@ def pick_post_type_for_today() -> str:
     return DAILY_FORMAT.get(weekday, "signal_faible")
 
 
-def generate_weekly_edito(articles: list[dict], trends: list[str] = None, post_type: str = None) -> dict:
-    """Génère l'édito LinkedIn à partir des meilleurs articles."""
+def _quality_gate(post_text: str) -> dict:
+    """Vérifie la qualité du post selon les best practices LinkedIn 2026.
+
+    Returns:
+        {"passed": bool, "issues": list[str]}
+    """
+    issues = []
+
+    # Banned phrases (AI-slop detection)
+    BANNED = [
+        "game-changer", "game changer", "révolutionnaire", "passionnant", "incroyable",
+        "leverage", "dive in", "let's dive", "unpack this", "buckle up",
+        "in today's fast-paced", "now more than ever", "in an era of",
+        "Et vous ?", "Qu'en pensez-vous", "What would you add",
+        "The lesson?", "The takeaway is simple", "At the end of the day",
+        "supercharge", "unlock", "seamless", "robust", "transformative",
+        "delve", "harness",
+    ]
+    text_lower = post_text.lower()
+    for phrase in BANNED:
+        if phrase.lower() in text_lower:
+            issues.append(f"Banned phrase: '{phrase}'")
+
+    # Hook strength: first 210 chars should not start with a question or filler
+    first_line = post_text.split("\n")[0]
+    if len(first_line) < 20:
+        issues.append("Hook trop court (< 20 chars)")
+    if first_line.startswith(("👍", "🔥", "💡", "✅", "❌", "⚡", "🚀")):
+        issues.append("Hook commence par un emoji")
+
+    # Word count: 200-350 words sweet spot
+    word_count = len(post_text.split())
+    if word_count < 150:
+        issues.append(f"Post trop court ({word_count} mots, min 150)")
+    if word_count > 500:
+        issues.append(f"Post trop long ({word_count} mots, max 500)")
+
+    # Must contain at least 1 proper noun / tool name (heuristic: capitalized word > 3 chars)
+    has_proper_noun = bool(re.search(r'\b[A-Z][a-z]{3,}\b', post_text))
+    if not has_proper_noun:
+        issues.append("Pas de nom propre détecté")
+
+    return {"passed": len(issues) == 0, "issues": issues}
+
+
+def score_articles_by_pillar(articles: list[dict]) -> list[dict]:
+    """Score chaque article sur sa pertinence vs les 3 piliers éditoriaux.
+
+    Utilise Gemini Flash pour un scoring rapide et économique.
+    Ajoute un champ 'pillar_score' (0-10) et 'pillar' (nom du pilier) à chaque article.
+    """
+    if not gemini_client or not articles:
+        return articles
+
+    PILLAR_KEYWORDS = {
+        "ai_governance": ["AI act", "model governance", "AI safety", "compliance", "risk", "regulation", "EU AI", "AI ethics", "algorithmic"],
+        "data_governance": ["data quality", "catalog", "lineage", "Collibra", "data mesh", "data contract", "stewardship", "data governance", "metadata"],
+        "vibe_coding": ["cursor", "claude code", "copilot", "windsurf", "vibe coding", "agent coding", "code assistant", "IDE", "coding agent"],
+    }
+
+    for article in articles:
+        text = f"{article.get('title', '')} {article.get('summary', '')}".lower()
+        best_pillar = None
+        best_score = 0
+
+        for pillar, keywords in PILLAR_KEYWORDS.items():
+            hits = sum(1 for kw in keywords if kw.lower() in text)
+            score = min(hits * 2, 10)  # 2 points par match, max 10
+            if score > best_score:
+                best_score = score
+                best_pillar = pillar
+
+        article["pillar"] = best_pillar or "general"
+        article["pillar_score"] = best_score
+
+    # Trier par pillar_score décroissant
+    articles.sort(key=lambda a: a.get("pillar_score", 0), reverse=True)
+    logger.info(f"📊 Articles scorés par pilier — top: {articles[0].get('pillar', '?')} ({articles[0].get('pillar_score', 0)}/10)" if articles else "📊 Aucun article à scorer")
+    return articles
+
+
+def generate_weekly_edito(articles: list[dict], trends: list[str] = None, post_type: str = None, db=None) -> dict:
+    """Génère l'édito LinkedIn à partir des meilleurs articles.
+
+    Args:
+        db: Firestore client pour la mémoire des posts passés et la déduplication.
+    """
     if not articles:
         return {"error": "Aucun article pour générer l'édito"}
 
     post_type = post_type or pick_post_type_for_today()
 
-    # Préparer le résumé des articles pour Claude
+    # Scorer les articles par pertinence vs les 3 piliers
+    articles = score_articles_by_pillar(articles)
+
+    # Préparer le résumé des articles pour le LLM
     articles_summary = ""
     for i, a in enumerate(articles[:10], 1):
-        articles_summary += f"{i}. [{a.get('category_label', 'IA')}] {a['title']} ({a.get('source_name', 'Source')})\n"
+        pillar_tag = f"[{a.get('pillar', 'general')}:{a.get('pillar_score', 0)}/10]" if a.get('pillar_score') else ""
+        articles_summary += f"{i}. {pillar_tag} {a['title']} ({a.get('source_name', 'Source')})\n"
         if a.get('summary'):
             articles_summary += f"   → {a['summary'][:150]}\n"
         if a.get('expert_opinion'):
             articles_summary += f"   💬 {a['expert_opinion'][:120]}\n"
 
-    trends_str = ", ".join(trends[:8]) if trends else "IA agentique, data governance, LLM en production"
+    trends_str = ", ".join(trends[:8]) if trends else "AI governance, data governance, vibe coding"
+
+    # Récupérer l'historique des posts pour l'anti-répétition
+    post_history = get_post_history_summary(db, limit=5) if db else "Aucun historique disponible."
 
     if not gemini_client:
         logger.warning("⚠️ GenAI non disponible, édito simulé")
         return _mock_edito(articles, trends_str, post_type)
 
-    try:
-        prompt = EDITO_PROMPT.format(
-            name=EXPERT_PROFILE["name"],
-            title=EXPERT_PROFILE["title"],
-            today=datetime.now(timezone.utc).strftime("%d %B 2026"),
-            articles_summary=articles_summary,
-            trends=trends_str,
-            post_type=post_type,
-            site_url=SITE_URL,
-        )
+    max_retries = 3
+    for attempt in range(max_retries):
+        try:
+            prompt = EDITO_PROMPT.format(
+                name=EXPERT_PROFILE["name"],
+                title=EXPERT_PROFILE["title"],
+                today=datetime.now(timezone.utc).strftime("%d %B 2026"),
+                articles_summary=articles_summary,
+                trends=trends_str,
+                post_type=post_type,
+                site_url=SITE_URL,
+                post_history=post_history,
+            )
 
-        from google.genai import types as genai_types
-        response = gemini_client.models.generate_content(
-            model=GEMINI_MODEL,
-            contents=prompt,
-            config=genai_types.GenerateContentConfig(
-                response_mime_type="application/json",
-                max_output_tokens=4096,
-            ),
-        )
-        raw_text = response.text
-        if raw_text is None and response.candidates:
-            parts = response.candidates[0].content.parts
-            raw_text = "".join(p.text for p in parts if p.text)
-        raw_text = (raw_text or "").strip()
-        if raw_text.startswith("```"):
-            raw_text = raw_text.split("\n", 1)[1].rsplit("```", 1)[0].strip()
+            from google.genai import types as genai_types
+            response = gemini_client.models.generate_content(
+                model=GEMINI_MODEL,
+                contents=prompt,
+                config=genai_types.GenerateContentConfig(
+                    response_mime_type="application/json",
+                    max_output_tokens=4096,
+                ),
+            )
+            raw_text = response.text
+            if raw_text is None and response.candidates:
+                parts = response.candidates[0].content.parts
+                raw_text = "".join(p.text for p in parts if p.text)
+            raw_text = (raw_text or "").strip()
+            if raw_text.startswith("```"):
+                raw_text = raw_text.split("\n", 1)[1].rsplit("```", 1)[0].strip()
 
-        result = json.loads(raw_text)
-        result["generated_at"] = datetime.now(timezone.utc).isoformat()
-        result["article_count"] = len(articles)
-        result["post_type"] = post_type
-        result["status"] = "generated"
+            result = json.loads(raw_text)
+            result["generated_at"] = datetime.now(timezone.utc).isoformat()
+            result["article_count"] = len(articles)
+            result["post_type"] = post_type
+            result["status"] = "generated"
+            result["generation_attempt"] = attempt + 1
 
-        logger.info(f"📝 Édito LinkedIn [{post_type}] généré ({len(result['post_text'])} chars, {result.get('word_count', '?')} mots)")
-        return result
+            # Quality gate
+            qg = _quality_gate(result.get("post_text", ""))
+            result["quality_gate"] = qg
+            if not qg["passed"]:
+                logger.warning(f"⚠️ Quality gate issues (attempt {attempt+1}): {qg['issues']}")
 
-    except Exception as e:
-        logger.error(f"❌ Erreur génération édito: {e}")
-        return _mock_edito(articles, trends_str, post_type)
+            # Dedup check (skip on last attempt to always return something)
+            if db and attempt < max_retries - 1:
+                dup = check_duplicate(db, result.get("post_text", ""))
+                result["dedup"] = dup
+                if dup["is_duplicate"]:
+                    logger.warning(f"🔄 Duplicate détecté (sim={dup['max_similarity']}) — regénération attempt {attempt+2}")
+                    post_history += f"\n⚠️ ATTENTION: La tentative précédente était trop similaire à un post existant (similarity={dup['max_similarity']}). Change complètement d'angle."
+                    continue
+
+            logger.info(f"📝 Édito LinkedIn [{post_type}] généré (attempt {attempt+1}, {len(result['post_text'])} chars, {result.get('word_count', '?')} mots)")
+            return result
+
+        except Exception as e:
+            logger.error(f"❌ Erreur génération édito (attempt {attempt+1}): {e}")
+            if attempt < max_retries - 1:
+                continue
+            return _mock_edito(articles, trends_str, post_type)
+
+    return _mock_edito(articles, trends_str, post_type)
 
 
 INFOGRAPHIC_CONTENT_GENERATOR = """Tu es un expert en création d'infographics LinkedIn viraux sur la Data et l'IA.
