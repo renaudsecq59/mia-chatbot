@@ -805,14 +805,8 @@ if (form) {
   });
 }
 
-// Veille: load 3 latest articles
+// Veille: load 3 latest LinkedIn posts
 (function(){
-  var catMap = {
-    'ia_pratique': 'IA_EN_PRATIQUE',
-    'infra_mlops': 'INFRA_&_MLOPS',
-    'governance_regulation': 'AI_GOVERNANCE',
-    'vibe_coding': 'VIBE_CODING'
-  };
   function escapeHtml(s){if(!s)return'';return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');}
   function formatDate(s){
     if(!s)return'';
@@ -823,23 +817,28 @@ if (form) {
     if(diff<30)return'Il y a '+Math.floor(diff/7)+' sem.';
     return d.toLocaleDateString('fr-FR',{day:'numeric',month:'short'});
   }
-  fetch('https://veille-backend-6lhk5fvt5q-ew.a.run.app/api/articles?limit=30')
+  function getExcerpt(text,maxLines){
+    if(!text)return'';
+    var lines=text.split('\n').filter(function(l){return l.trim()&&!/^(#\w+\s*)+$/.test(l.trim());});
+    return lines.slice(0,maxLines||3).join(' ').replace(/\*\*/g,'').replace(/\*/g,'');
+  }
+  fetch('https://veille-backend-6lhk5fvt5q-ew.a.run.app/api/linkedin/posts')
     .then(function(r){if(!r.ok)throw new Error('HTTP '+r.status);return r.json();})
     .then(function(data){
-      var articles=(data.articles||[]).slice(0,3);
-      articles.sort(function(a,b){return (b.published||b.created_at||'').localeCompare(a.published||a.created_at||'');});
-      articles=articles.slice(0,3);
-      if(articles.length===0){document.getElementById('veille-grid').style.display='none';return;}
-      document.getElementById('veille-grid').innerHTML=articles.map(function(a){
-        var cat=catMap[a.category]||a.category||'ARTICLE';
-        var href=a.id?'article.html?id='+encodeURIComponent(a.id):'veille.html';
-        return '<a href="'+href+'" class="veille-article">'+
+      var posts=(data.posts||[]).slice(0,3);
+      if(posts.length===0){document.getElementById('veille-grid').style.display='none';return;}
+      document.getElementById('veille-grid').innerHTML=posts.map(function(p){
+        var href=p.post_id&&p.post_id!=='unknown'
+         ?'https://www.linkedin.com/feed/update/'+p.post_id+'/'
+          :'https://www.linkedin.com/in/renaud-secq-5593832a/';
+        var typeLabel=(p.post_type||'post').replace(/_/g,' ');
+        return '<a href="'+href+'" target="_blank" class="veille-article">'+
           '<div class="veille-article-meta">'+
-            '<span class="veille-article-tag">'+escapeHtml(cat)+'</span>'+
-            '<span class="veille-article-date">'+formatDate(a.published||a.created_at)+'</span>'+
+            '<span class="veille-article-tag">'+escapeHtml(typeLabel)+'</span>'+
+            '<span class="veille-article-date">'+formatDate(p.published_at)+'</span>'+
           '</div>'+
-          '<h4 class="veille-article-h4">'+escapeHtml(a.title||'Sans titre')+'</h4>'+
-          '<span class="veille-article-read">→ lire()</span>'+
+          '<h4 class="veille-article-h4">'+escapeHtml(getExcerpt(p.post_text,2))+'</h4>'+
+          '<span class="veille-article-read">→ voir_sur_linkedin()</span>'+
         '</a>';
       }).join('');
     })
