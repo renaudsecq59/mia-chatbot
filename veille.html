@@ -267,6 +267,7 @@ function loadArticles() {
           trending: a.is_trending || false
         };
       });
+      allArticles.sort(function(a, b) { return (b.date || '').localeCompare(a.date || ''); });
       renderArticles();
     })
     .catch(function(e) {
