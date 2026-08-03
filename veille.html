@@ -287,18 +287,18 @@ function loadAllPosts() {
         return;
       }
       document.getElementById('posts-container').innerHTML = posts.map(function(p) {
-        var postUrl = p.post_id && p.post_id !== 'unknown'
-          ? 'https://www.linkedin.com/feed/update/' + p.post_id + '/'
+        var articleHref = p.post_id && p.post_id !== 'unknown'
+          ? 'article.html?id=' + encodeURIComponent(p.post_id)
           : 'https://www.linkedin.com/in/renaud-secq-5593832a/';
         var typeLabel = (p.post_type || 'post').replace(/_/g, ' ');
         var excerpt = escapeHtml(getPostExcerpt(p.post_text, 4));
-        return '<a href="' + postUrl + '" target="_blank" class="post-card">' +
+        return '<a href="' + articleHref + '" class="post-card">' +
           '<div class="post-meta">' +
             '<span class="post-type">' + escapeHtml(typeLabel) + '</span>' +
             '<span class="post-date">' + formatDate(p.published_at) + '</span>' +
           '</div>' +
           '<p class="post-excerpt">' + excerpt + '</p>' +
-          '<span class="post-read">→ voir_sur_linkedin()</span>' +
+          '<span class="post-read">→ lire()</span>' +
         '</a>';
       }).join('');
       document.querySelectorAll('.post-card').forEach(function(card, i) {

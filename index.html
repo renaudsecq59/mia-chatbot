@@ -829,16 +829,16 @@ if (form) {
       if(posts.length===0){document.getElementById('veille-grid').style.display='none';return;}
       document.getElementById('veille-grid').innerHTML=posts.map(function(p){
         var href=p.post_id&&p.post_id!=='unknown'
-         ?'https://www.linkedin.com/feed/update/'+p.post_id+'/'
+          ?'article.html?id='+encodeURIComponent(p.post_id)
           :'https://www.linkedin.com/in/renaud-secq-5593832a/';
         var typeLabel=(p.post_type||'post').replace(/_/g,' ');
-        return '<a href="'+href+'" target="_blank" class="veille-article">'+
+        return '<a href="'+href+'" class="veille-article">'+
           '<div class="veille-article-meta">'+
             '<span class="veille-article-tag">'+escapeHtml(typeLabel)+'</span>'+
             '<span class="veille-article-date">'+formatDate(p.published_at)+'</span>'+
           '</div>'+
           '<h4 class="veille-article-h4">'+escapeHtml(getExcerpt(p.post_text,2))+'</h4>'+
-          '<span class="veille-article-read">→ voir_sur_linkedin()</span>'+
+          '<span class="veille-article-read">→ lire()</span>'+
         '</a>';
       }).join('');
     })

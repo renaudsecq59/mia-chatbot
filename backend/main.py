@@ -101,7 +101,19 @@ async def run_scrape():
         for a in trending:
             trend_keywords.update(a.get("trending_keywords", []))
         trends = list(trend_keywords)[:10]
-        
+
+        # Mettre à jour les métriques d'engagement des posts passés (feedback loop)
+        if db:
+            try:
+                from post_memory import update_post_engagement, update_source_scores
+                updated = update_post_engagement(db, max_posts=10)
+                if updated:
+                    logger.info(f"📊 {updated} posts ont eu leurs métriques mises à jour")
+                    # MÉCANISME 3: Mettre à jour les scores des sources RSS
+                    update_source_scores(db)
+            except Exception as e:
+                logger.warning(f"⚠️ Update engagement échoué: {e}")
+
         edito = generate_weekly_edito(top_articles, trends, db=db)
         post_text = edito.get("post_text", "")
         post_type = edito.get("post_type", "observateur")
@@ -142,7 +154,7 @@ async def run_scrape():
             else:
                 # Générer un visuel IA pour accompagner le post
                 logger.info(f"📤 post_text avant publication: {len(post_text)} chars — fin: {repr(post_text[-80:])}")
-                image_bytes = generate_visual(post_text, post_type)
+                image_bytes = generate_visual(post_text, post_type, db=db)
                 linkedin_result = publish_to_linkedin(post_text, image_bytes)
                 # Compresser l'image en JPEG pour Firestore (< 200KB, limite 1MB)
                 image_b64_thumb = None
@@ -177,6 +189,8 @@ async def run_scrape():
                     "hook": edito.get("hook", ""),
                     "quality_gate": edito.get("quality_gate", {}),
                     "dedup": edito.get("dedup", {}),
+                    "critic": edito.get("critic", {}),
+                    "batch_variety": edito.get("batch_variety", {}),
                     "generation_attempt": edito.get("generation_attempt", 1),
                 })
                 # Stocker l'embedding pour la déduplication future
@@ -299,7 +313,7 @@ async def generate_edito():
     )[:15]
 
     # 4. Générer l'édito
-    edito = generate_weekly_edito(top_articles, trends)
+    edito = generate_weekly_edito(top_articles, trends, db=db)
 
     return edito
 
@@ -356,7 +370,7 @@ async def preview_linkedin_post():
     edito = generate_weekly_edito(top_articles, list(trending_keywords)[:10])
     post_text = edito.get("post_text", "")
     post_type = edito.get("post_type", "signal_faible")
-    image_bytes = generate_visual(post_text, post_type)
+    image_bytes = generate_visual(post_text, post_type, db=db)
     return {
         "post_text": post_text,
         "post_type": post_type,
@@ -375,7 +389,7 @@ async def check_linkedin_post(post_id: str):
         return {"error": "Token non configuré"}
     headers = {
         "Authorization": f"Bearer {LINKEDIN_ACCESS_TOKEN}",
-        "LinkedIn-Version": "202506",
+        "LinkedIn-Version": "202607",
         "X-Restli-Protocol-Version": "2.0.0",
     }
     encoded_id = __import__('urllib.parse', fromlist=['quote']).quote(post_id, safe='')
@@ -415,6 +429,25 @@ async def get_all_linkedin_posts():
         return {"posts": [], "message": str(e)}
 
 
+@app.get("/api/linkedin/posts/{post_id:path}")
+async def get_linkedin_post_by_id(post_id: str):
+    """Récupère un post LinkedIn par son post_id (depuis Firestore)."""
+    if not db:
+        return {"post_text": None, "message": "Firestore non disponible"}
+    try:
+        docs = (
+            db.collection("linkedin_posts")
+            .where("post_id", "==", post_id)
+            .limit(1)
+            .stream()
+        )
+        for doc in docs:
+            return doc.to_dict()
+        return {"post_text": None, "message": "Post non trouvé"}
+    except Exception as e:
+        return {"post_text": None, "message": str(e)}
+
+
 @app.get("/api/linkedin/stats")
 async def get_linkedin_stats():
     """Récupère les stats de tous les posts LinkedIn via l'API LinkedIn."""
@@ -448,7 +481,7 @@ async def get_linkedin_stats():
 
     headers = {
         "Authorization": f"Bearer {LINKEDIN_ACCESS_TOKEN}",
-        "LinkedIn-Version": "202506",
+        "LinkedIn-Version": "202607",
         "X-Restli-Protocol-Version": "2.0.0",
     }
 
@@ -483,6 +516,18 @@ async def get_linkedin_stats():
     # Trier par engagement
     stats.sort(key=lambda x: x["engagement"], reverse=True)
     return {"stats": stats, "total_posts": len(stats)}
+
+
+@app.post("/api/linkedin/update-engagement")
+async def update_linkedin_engagement():
+    """Met à jour les métriques d'engagement des derniers posts dans Firestore."""
+    if not db:
+        raise HTTPException(status_code=503, detail="Firestore non disponible")
+    from post_memory import update_post_engagement, update_source_scores
+    updated = update_post_engagement(db, max_posts=20)
+    if updated:
+        update_source_scores(db)
+    return {"status": "ok", "updated": updated}
 
 
 @app.get("/auth/linkedin/callback")
@@ -557,6 +602,101 @@ async def linkedin_authorize():
     })
     url = f"https://www.linkedin.com/oauth/v2/authorization?{params}"
     return {"auth_url": url}
+
+
+@app.get("/llms.txt")
+async def llms_txt():
+    """llms.txt — carte machine-readable du site pour les agents IA.
+
+    Format proposé par Jeremy Howard (Answer.AI) pour rendre le site
+    consommable par les LLMs et agents sans parser le HTML.
+    """
+    from fastapi.responses import PlainTextResponse
+    content = """# MIA Veille — Data & AI Governance
+
+> Veille automatisée sur l'AI Governance, la Data Governance et le Vibe Coding.
+> Curatée par Renaud Secq, Consultant Freelance IA & Data.
+
+## API Endpoints
+- /api/articles: Liste des articles scorés par pertinence (JSON, paramètres: category, limit)
+- /api/linkedin/posts: Historique des posts LinkedIn publiés (JSON)
+- /api/linkedin/stats: Métriques d'engagement des posts (JSON)
+- /api/linkedin/edito: Génération d'édito LinkedIn (POST, JSON)
+- /api/linkedin/update-engagement: Mise à jour des métriques d'engagement (POST)
+- /api/scrape: Déclenche le scraping complet + génération + publication (POST)
+
+## JSON Feed
+- /api/feed.json: Flux JSON des derniers articles au format JSON Feed 1.1
+
+## Topics
+- AI Governance: EU AI Act, model governance, AI safety, compliance, risk management
+- Data Governance: data quality, catalog, lineage, Collibra, data mesh, data contracts
+- Vibe Coding: cursor, claude code, copilot, windsurf, agent coding, dev assisté IA
+
+## Sources
+- 50+ feeds RSS (Medium, Substack, ArXiv, blogs d'experts, HN, Dev.to)
+- Scoring automatique par pertinence thématique (0-10)
+- Déduplication sémantique via embeddings Gemini
+
+## Auteur
+- Renaud Secq — Consultant Freelance IA & Data
+- LinkedIn: https://www.linkedin.com/in/renaud-secq-5593832a/
+- Site: https://renaudsecq59.github.io/mia-chatbot/veille.html
+"""
+    return PlainTextResponse(content=content, media_type="text/plain")
+
+
+@app.get("/api/feed.json")
+async def json_feed(limit: int = 20):
+    """JSON Feed 1.1 — flux agent-readable des derniers articles.
+
+    Format standardisé https://www.jsonfeed.org/version/1.1/
+    Consommable par les agents IA, les lecteurs RSS modernes, et les pipelines RAG.
+    """
+    if not db:
+        raise HTTPException(status_code=503, detail="Firestore non disponible")
+
+    try:
+        docs = (
+            db.collection("articles")
+            .order_by("score", direction=firestore.Query.DESCENDING)
+            .limit(limit)
+            .stream()
+        )
+
+        items = []
+        for doc in docs:
+            d = doc.to_dict()
+            items.append({
+                "id": d.get("id", doc.id),
+                "url": d.get("url", ""),
+                "title": d.get("title", ""),
+                "content_text": d.get("summary", "")[:500],
+                "date_published": d.get("created_at", ""),
+                "authors": [{"name": d.get("source_name", "Unknown")}],
+                "tags": [d.get("category_label", ""), d.get("pillar", "")],
+                "_meta": {
+                    "score": d.get("score", 0),
+                    "pillar": d.get("pillar", ""),
+                    "pillar_score": d.get("pillar_score", 0),
+                    "expert_opinion": d.get("expert_opinion", ""),
+                },
+            })
+
+        return {
+            "version": "https://www.jsonfeed.org/version/1.1",
+            "title": "MIA Veille — Data & AI Governance",
+            "description": "Veille automatisée sur l'AI Governance, Data Governance et Vibe Coding",
+            "home_page_url": "https://renaudsecq59.github.io/mia-chatbot/veille.html",
+            "feed_url": "https://veille-backend-791183172510.europe-west1.run.app/api/feed.json",
+            "author": {
+                "name": "Renaud Secq",
+                "url": "https://www.linkedin.com/in/renaud-secq-5593832a/",
+            },
+            "items": items,
+        }
+    except Exception as e:
+        return {"version": "https://www.jsonfeed.org/version/1.1", "items": [], "error": str(e)}
 
 
 if __name__ == "__main__":
