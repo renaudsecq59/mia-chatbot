@@ -699,6 +699,76 @@ async def json_feed(limit: int = 20):
         return {"version": "https://www.jsonfeed.org/version/1.1", "items": [], "error": str(e)}
 
 
+# ─── Newsletter ───────────────────────────────────────────────────────────────
+from pydantic import BaseModel
+
+
+class NewsletterSubscribe(BaseModel):
+    email: str
+
+
+@app.post("/api/newsletter/subscribe")
+async def newsletter_subscribe(data: NewsletterSubscribe):
+    """Inscription à la newsletter (stockage dans Firestore)."""
+    import re
+    email = data.email.strip().lower()
+    if not re.match(r'^[^@\s]+@[^@\s]+\.[^@\s]+$', email):
+        return {"ok": False, "message": "Email invalide"}
+
+    if not db:
+        return {"ok": False, "message": "Service non disponible"}
+
+    try:
+        doc_id = hashlib.sha256(email.encode()).hexdigest()[:16]
+        doc_ref = db.collection("newsletter_subscribers").document(doc_id)
+        doc = doc_ref.get()
+
+        if doc.exists:
+            return {"ok": True, "message": "Vous êtes déjà inscrit !", "already_subscribed": True}
+
+        doc_ref.set({
+            "email": email,
+            "subscribed_at": datetime.now(timezone.utc).isoformat(),
+            "source": "website",
+            "active": True,
+        })
+        logger.info(f"📧 Nouvel inscrit newsletter: {email}")
+        return {"ok": True, "message": "Inscription confirmée ! Vous recevrez la veille IA & Data chaque semaine."}
+    except Exception as e:
+        logger.error(f"Erreur newsletter subscribe: {e}")
+        return {"ok": False, "message": "Erreur lors de l'inscription"}
+
+
+@app.delete("/api/newsletter/unsubscribe")
+async def newsletter_unsubscribe(data: NewsletterSubscribe):
+    """Désinscription de la newsletter."""
+    email = data.email.strip().lower()
+    if not db:
+        return {"ok": False, "message": "Service non disponible"}
+
+    try:
+        doc_id = hashlib.sha256(email.encode()).hexdigest()[:16]
+        doc_ref = db.collection("newsletter_subscribers").document(doc_id)
+        doc_ref.set({"active": False}, merge=True)
+        logger.info(f"📧 Désinscription newsletter: {email}")
+        return {"ok": True, "message": "Vous avez été désinscrit avec succès."}
+    except Exception as e:
+        logger.error(f"Erreur newsletter unsubscribe: {e}")
+        return {"ok": False, "message": "Erreur lors de la désinscription"}
+
+
+@app.get("/api/newsletter/count")
+async def newsletter_count():
+    """Nombre d'inscrits actifs (publique)."""
+    if not db:
+        return {"count": 0}
+    try:
+        docs = db.collection("newsletter_subscribers").where("active", "==", True).stream()
+        return {"count": sum(1 for _ in docs)}
+    except Exception:
+        return {"count": 0}
+
+
 if __name__ == "__main__":
     import uvicorn
     port = int(os.getenv("PORT", 8080))

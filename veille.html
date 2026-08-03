@@ -98,6 +98,9 @@ header{max-width:1240px;margin:0 auto;padding:150px 32px 48px}
 .cta-p{font:400 14px/1.7 'Instrument Sans',sans-serif;color:rgba(244,246,248,.5);margin:0}
 .cta-btn{font:500 13px 'IBM Plex Mono',monospace;background:#3b66f5;color:#fff!important;padding:16px 30px;border-radius:8px;text-decoration:none;transition:.25s}
 .cta-btn:hover{filter:brightness(1.15);color:#fff!important}
+.nl-input{flex:1;min-width:200px;padding:14px 18px;border:1px solid rgba(244,246,248,.2);background:rgba(244,246,248,.05);color:#f4f6f8;border-radius:8px;font:400 14px 'Instrument Sans',sans-serif;outline:none;transition:.2s}
+.nl-input::placeholder{color:rgba(244,246,248,.3)}
+.nl-input:focus{border-color:#3b66f5;background:rgba(59,102,245,.1)}
 
 /* AI Act mention */
 .ai-act-mention{max-width:1240px;margin:0 auto;padding:0 32px 20px;font:400 12px/1.6 'IBM Plex Mono',monospace;color:rgba(11,18,32,.35);text-align:center}
@@ -179,14 +182,19 @@ footer{background:#0b1220;color:rgba(244,246,248,.4);border-top:1px solid rgba(2
   </div>
 </section>
 
-<!-- CTA -->
+<!-- NEWSLETTER + CTA -->
 <section class="cta-section">
   <div class="cta-inner">
-    <div class="rv">
-      <h2 class="cta-h2">Ne ratez aucun signal.</h2>
-      <p class="cta-p">3 à 4 analyses par semaine, directement sur LinkedIn.</p>
+    <div class="rv" style="flex:1;min-width:300px">
+      <h2 class="cta-h2">Recevez la veille par email.</h2>
+      <p class="cta-p">Chaque semaine, les analyses IA & Data dans votre boîte mail.</p>
+      <form class="nl-form" id="nl-form" style="margin-top:20px;display:flex;gap:10px;flex-wrap:wrap">
+        <input type="email" id="nl-email" placeholder="votre@email.com" required class="nl-input" />
+        <button type="submit" class="cta-btn" id="nl-btn">→ s_inscrire()</button>
+      </form>
+      <p class="nl-msg" id="nl-msg" style="display:none;margin-top:10px;font:500 13px 'IBM Plex Mono',monospace;color:#7c9aff"></p>
+      <p class="cta-p" style="margin-top:14px;font-size:12px;opacity:.5">Pas de spam. Désinscription en un clic. <a href="https://www.linkedin.com/in/renaud-secq-5593832a/" target="_blank" style="color:#7c9aff;text-decoration:none">→ ou suivre sur LinkedIn</a></p>
     </div>
-    <a href="https://www.linkedin.com/in/renaud-secq-5593832a/" target="_blank" class="cta-btn rv">→ suivre_sur_linkedin()</a>
   </div>
 </section>
 
@@ -357,6 +365,44 @@ function formatDate(dateStr) {
 // Init
 loadLatestPost();
 loadAllPosts();
+
+// Newsletter
+document.getElementById('nl-form').addEventListener('submit', function(e){
+  e.preventDefault();
+  var email = document.getElementById('nl-email').value.trim();
+  var msg = document.getElementById('nl-msg');
+  var btn = document.getElementById('nl-btn');
+  if(!email) return;
+  btn.disabled = true;
+  btn.textContent = '...';
+  msg.style.display = 'block';
+  msg.textContent = 'Inscription en cours...';
+  msg.style.color = '#7c9aff';
+  fetch(API_BASE + '/api/newsletter/subscribe', {
+    method: 'POST',
+    headers: {'Content-Type': 'application/json'},
+    body: JSON.stringify({email: email})
+  })
+  .then(function(r){return r.json();})
+  .then(function(data){
+    if(data.ok){
+      msg.textContent = '✓ ' + data.message;
+      msg.style.color = '#7c9aff';
+      document.getElementById('nl-email').value = '';
+    } else {
+      msg.textContent = '✗ ' + (data.message || 'Erreur');
+      msg.style.color = '#ff6b6b';
+    }
+    btn.disabled = false;
+    btn.textContent = '→ s_inscrire()';
+  })
+  .catch(function(e){
+    msg.textContent = '✗ Erreur réseau';
+    msg.style.color = '#ff6b6b';
+    btn.disabled = false;
+    btn.textContent = '→ s_inscrire()';
+  });
+});
 
 // Cookie banner
 (function(){

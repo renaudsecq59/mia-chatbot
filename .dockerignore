@@ -1,0 +1,13 @@
+backend/
+newdesing/
+node_modules/
+.git/
+*.md
+*.py
+*.txt
+Dockerfile
+docker-compose*
+.env*
+__pycache__/
+.venv/
+venv/

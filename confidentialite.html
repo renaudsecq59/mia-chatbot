@@ -82,6 +82,18 @@ footer{background:#0b1220;color:rgba(244,246,248,.4);border-top:1px solid rgba(2
   </div>
 
   <div class="legal-section">
+    <span class="legal-tag">Newsletter</span>
+    <h2 class="legal-h2">2bis. Données newsletter</h2>
+    <p class="legal-p">L'inscription à la newsletter via le formulaire dédié collecte votre adresse email et la stocke dans Firestore (Google Cloud, europe-west1).</p>
+    <ul class="legal-ul">
+      <li><strong>Finalité</strong> : envoi de la veille IA &amp; Data hebdomadaire.</li>
+      <li><strong>Base légale</strong> : consentement explicite (article 6.1.a du RGPD).</li>
+      <li><strong>Conservation</strong> : jusqu'au désinscription (lien de désinscription dans chaque email).</li>
+      <li><strong>Droit d'accès et d'effacement</strong> : contactez-nous via le formulaire ou LinkedIn.</li>
+    </ul>
+  </div>
+
+  <div class="legal-section">
     <h2 class="legal-h2">3. Vos droits (RGPD)</h2>
     <p class="legal-p">Conformément au RGPD (Règlement UE 2016/679), vous disposez des droits suivants :</p>
     <ul class="legal-ul">
@@ -109,8 +121,9 @@ footer{background:#0b1220;color:rgba(244,246,248,.4);border-top:1px solid rgba(2
   <div class="legal-section">
     <h2 class="legal-h2">5. Hébergement</h2>
     <ul class="legal-ul">
-      <li><strong>Site statique</strong> : hébergé sur GitHub Pages (GitHub Inc., États-Unis).</li>
-      <li><strong>Backend (API veille)</strong> : hébergé sur Google Cloud Run (région europe-west1, Union européenne).</li>
+      <li><strong>Site statique</strong> : hébergé sur Google Cloud Run (région europe-west9, Paris, France) via nginx.</li>
+      <li><strong>Backend (API veille &amp; newsletter)</strong> : hébergé sur Google Cloud Run (région europe-west1, Union européenne).</li>
+      <li><strong>Base de données</strong> : Google Cloud Firestore (région europe-west1, Union européenne).</li>
       <li><strong>Polices</strong> : Google Fonts (Google LLC, États-Unis) — chargées via CDN, aucune donnée personnelle transmise.</li>
     </ul>
   </div>

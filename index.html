@@ -645,6 +645,20 @@ footer{background:#0b1220;color:rgba(244,246,248,.4);border-top:1px solid rgba(2
   </div>
 </section>
 
+<!-- NEWSLETTER -->
+<section style="background:#0b1220;color:#f4f6f8;padding:60px 0">
+  <div style="max-width:760px;margin:0 auto;padding:0 32px;text-align:center">
+    <h2 style="font:700 clamp(24px,3vw,34px)/1.1 'Space Grotesk',sans-serif;letter-spacing:-.03em;margin:0 0 10px">Recevez la veille IA &amp; Data</h2>
+    <p style="font:400 14px/1.7 'Instrument Sans',sans-serif;color:rgba(244,246,248,.5);margin:0 0 24px">Chaque semaine, les analyses qui comptent dans votre boîte mail.</p>
+    <form id="nl-form" style="display:flex;gap:10px;flex-wrap:wrap;max-width:480px;margin:0 auto">
+      <input type="email" id="nl-email" placeholder="votre@email.com" required style="flex:1;min-width:200px;padding:14px 18px;border:1px solid rgba(244,246,248,.2);background:rgba(244,246,248,.05);color:#f4f6f8;border-radius:8px;font:400 14px 'Instrument Sans',sans-serif;outline:none" />
+      <button type="submit" id="nl-btn" style="font:500 13px 'IBM Plex Mono',monospace;background:#3b66f5;color:#fff;border:none;padding:14px 24px;border-radius:8px;cursor:pointer;transition:.2s;white-space:nowrap">→ s_inscrire()</button>
+    </form>
+    <p id="nl-msg" style="display:none;margin-top:12px;font:500 13px 'IBM Plex Mono',monospace;color:#7c9aff"></p>
+    <p style="margin-top:14px;font:400 12px/1.6 'Instrument Sans',sans-serif;color:rgba(244,246,248,.3)">Pas de spam. Désinscription en un clic. Vos données ne sont utilisées que pour l'envoi de la newsletter (RGPD).</p>
+  </div>
+</section>
+
 <!-- COOKIE BANNER -->
 <div class="cookie-banner" id="cookie-banner">
   <p>Ce site ne dépose aucun cookie de tracking. En continuant, vous acceptez l'utilisation de cookies techniques nécessaires au fonctionnement. <a href="confidentialite.html#cookies">Plus d'infos →</a></p>
@@ -867,6 +881,44 @@ function acceptCookies(){
   localStorage.setItem('cookie-consent','accepted');
   document.getElementById('cookie-banner').classList.remove('show');
 }
+
+// Newsletter
+document.getElementById('nl-form').addEventListener('submit', function(e){
+  e.preventDefault();
+  var email = document.getElementById('nl-email').value.trim();
+  var msg = document.getElementById('nl-msg');
+  var btn = document.getElementById('nl-btn');
+  if(!email) return;
+  btn.disabled = true;
+  btn.textContent = '...';
+  msg.style.display = 'block';
+  msg.textContent = 'Inscription en cours...';
+  msg.style.color = '#7c9aff';
+  fetch('https://veille-backend-6lhk5fvt5q-ew.a.run.app/api/newsletter/subscribe', {
+    method: 'POST',
+    headers: {'Content-Type': 'application/json'},
+    body: JSON.stringify({email: email})
+  })
+  .then(function(r){return r.json();})
+  .then(function(data){
+    if(data.ok){
+      msg.textContent = '✓ ' + data.message;
+      msg.style.color = '#7c9aff';
+      document.getElementById('nl-email').value = '';
+    } else {
+      msg.textContent = '✗ ' + (data.message || 'Erreur');
+      msg.style.color = '#ff6b6b';
+    }
+    btn.disabled = false;
+    btn.textContent = '→ s_inscrire()';
+  })
+  .catch(function(e){
+    msg.textContent = '✗ Erreur réseau';
+    msg.style.color = '#ff6b6b';
+    btn.disabled = false;
+    btn.textContent = '→ s_inscrire()';
+  });
+});
 </script>
 </body>
 </html>
