@@ -255,6 +255,7 @@ function loadArticles() {
       allArticles = (data.articles || []).map(function(a) {
         var cat = a.category || 'ia_pratique';
         return {
+          id: a.id || '',
           title: a.title || 'Sans titre',
           excerpt: a.summary || a.expert_opinion || a.summary_raw || '',
           expertOpinion: a.expert_opinion || '',
@@ -346,7 +347,8 @@ function renderArticles() {
     return;
   }
   container.innerHTML = filtered.map(function(article) {
-    return '<a href="' + article.url + '" target="_blank" class="article-card">' +
+    var articleHref = article.id ? 'article.html?id=' + encodeURIComponent(article.id) : article.url;
+    return '<a href="' + articleHref + '" class="article-card">' +
       '<div class="article-meta">' +
         '<span class="article-source">' + article.sourceName + '</span>' +
         (article.trending ? '<span class="trending-badge">🔥 Tendance</span>' : '') +
