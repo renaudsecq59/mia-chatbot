@@ -175,6 +175,18 @@ section{scroll-margin-top:80px}
 .veille-stat{text-align:center}
 .veille-stat-n{font:700 40px 'Space Grotesk',sans-serif;display:block}
 .veille-stat-l{font:400 11px 'IBM Plex Mono',monospace;color:rgba(11,18,32,.45);margin-top:4px}
+.veille-grid{display:grid;grid-template-columns:1fr 1fr 1fr;gap:14px;margin-top:14px}
+.veille-article{display:flex;flex-direction:column;gap:12px;background:#fff;border:1px solid rgba(11,18,32,.1);border-radius:12px;padding:24px 22px;transition:.3s;text-decoration:none;color:inherit}
+.veille-article:hover{transform:translateY(-3px);box-shadow:0 12px 30px rgba(11,18,32,.08);border-color:#3b66f5}
+.veille-article-meta{display:flex;justify-content:space-between;align-items:center;font:500 10px 'IBM Plex Mono',monospace}
+.veille-article-tag{border:1px solid rgba(11,18,32,.15);color:rgba(11,18,32,.55);border-radius:100px;padding:4px 10px}
+.veille-article-date{color:rgba(11,18,32,.35)}
+.veille-article-h4{font:700 16px/1.35 'Space Grotesk',sans-serif;letter-spacing:-.01em;margin:0}
+.veille-article-read{font:500 11px 'IBM Plex Mono',monospace;color:#3b66f5;margin-top:auto}
+.veille-more{display:flex;justify-content:center;margin-top:28px}
+.veille-more a{font:500 13px 'IBM Plex Mono',monospace;border:1px solid rgba(11,18,32,.2);color:rgba(11,18,32,.7);padding:15px 30px;border-radius:8px;text-decoration:none;transition:.2s}
+.veille-more a:hover{border-color:#3b66f5;color:#3b66f5}
+.veille-skeleton{background:#fff;border:1px solid rgba(11,18,32,.1);border-radius:12px;padding:24px 22px;height:140px}
 
 /* FAQ */
 #faq{max-width:900px;margin:0 auto;padding:110px 32px}
@@ -243,6 +255,7 @@ footer{background:#0b1220;color:rgba(244,246,248,.4);border-top:1px solid rgba(2
   .piliers-grid,.method-grid,.offres-grid{grid-template-columns:1fr}
   .preuves-grid{grid-template-columns:1fr}
   .veille-card{flex-direction:column;gap:32px;padding:36px}
+  .veille-grid{grid-template-columns:1fr}
   .cf-row{grid-template-columns:1fr}
 }
 @media(max-width:600px){
@@ -546,6 +559,14 @@ footer{background:#0b1220;color:rgba(244,246,248,.4);border-top:1px solid rgba(2
       <div class="veille-stat"><span class="veille-stat-n">3–4</span><div class="veille-stat-l">ARTICLES / SEMAINE</div></div>
     </div>
   </div>
+  <div class="veille-grid rv" id="veille-grid">
+    <div class="veille-skeleton"></div>
+    <div class="veille-skeleton"></div>
+    <div class="veille-skeleton"></div>
+  </div>
+  <div class="veille-more rv">
+    <a href="veille.html">→ voir_tous_les_articles()</a>
+  </div>
 </section>
 
 <!-- FAQ -->
@@ -783,6 +804,48 @@ if (form) {
     }
   });
 }
+
+// Veille: load 3 latest articles
+(function(){
+  var catMap = {
+    'ia_pratique': 'IA_EN_PRATIQUE',
+    'infra_mlops': 'INFRA_&_MLOPS',
+    'governance_regulation': 'AI_GOVERNANCE',
+    'vibe_coding': 'VIBE_CODING'
+  };
+  function escapeHtml(s){if(!s)return'';return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');}
+  function formatDate(s){
+    if(!s)return'';
+    var d=new Date(s);if(isNaN(d))return s;
+    var now=new Date(),diff=Math.floor((now-d)/86400000);
+    if(diff===0)return"Aujourd'hui";if(diff===1)return'Hier';
+    if(diff<7)return'Il y a '+diff+' jours';
+    if(diff<30)return'Il y a '+Math.floor(diff/7)+' sem.';
+    return d.toLocaleDateString('fr-FR',{day:'numeric',month:'short'});
+  }
+  fetch('https://veille-backend-6lhk5fvt5q-ew.a.run.app/api/articles?limit=3')
+    .then(function(r){if(!r.ok)throw new Error('HTTP '+r.status);return r.json();})
+    .then(function(data){
+      var articles=(data.articles||[]).slice(0,3);
+      if(articles.length===0){document.getElementById('veille-grid').style.display='none';return;}
+      document.getElementById('veille-grid').innerHTML=articles.map(function(a){
+        var cat=catMap[a.category]||a.category||'ARTICLE';
+        var href=a.id?'article.html?id='+encodeURIComponent(a.id):'veille.html';
+        return '<a href="'+href+'" class="veille-article">'+
+          '<div class="veille-article-meta">'+
+            '<span class="veille-article-tag">'+escapeHtml(cat)+'</span>'+
+            '<span class="veille-article-date">'+formatDate(a.published||a.created_at)+'</span>'+
+          '</div>'+
+          '<h4 class="veille-article-h4">'+escapeHtml(a.title||'Sans titre')+'</h4>'+
+          '<span class="veille-article-read">→ lire()</span>'+
+        '</a>';
+      }).join('');
+    })
+    .catch(function(e){
+      console.error('Erreur chargement veille:',e);
+      document.getElementById('veille-grid').style.display='none';
+    });
+})();
 </script>
 </body>
 </html>
