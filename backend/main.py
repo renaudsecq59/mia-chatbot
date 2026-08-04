@@ -598,7 +598,7 @@ async def linkedin_authorize():
         "client_id": "78050rhmzifhz2",
         "redirect_uri": "https://renaudsecq.com/callback.html",
         "state": "auto",
-        "scope": "openid profile w_member_social",
+        "scope": "openid profile w_member_social r_member_social",
     })
     url = f"https://www.linkedin.com/oauth/v2/authorization?{params}"
     return {"auth_url": url}
