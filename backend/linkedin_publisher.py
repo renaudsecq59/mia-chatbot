@@ -13,18 +13,26 @@ import json
 import logging
 import os
 import re
+from google.cloud import firestore
 import httpx
 from datetime import datetime, timezone
 from google import genai
 from config import GCP_PROJECT, GCP_LOCATION, GEMINI_API_KEY, EXPERT_PROFILE
-from post_memory import get_post_history_summary, check_duplicate, store_post_embedding
+from post_memory import (
+    get_post_history_summary, check_duplicate, store_post_embedding, get_performance_insights,
+    store_critic_lesson, get_critic_lessons,
+    get_style_guidelines,
+    update_source_scores, get_top_sources,
+    store_hook_experiment, get_hook_patterns,
+    get_visual_lessons,
+)
 
 logger = logging.getLogger(__name__)
 
 LINKEDIN_ACCESS_TOKEN = os.getenv("LINKEDIN_ACCESS_TOKEN", "")
 LINKEDIN_PERSON_URN = os.getenv("LINKEDIN_PERSON_URN", "")  # Format: urn:li:person:XXXXXX
 
-SITE_URL = "https://renaudsecq59.github.io/mia-chatbot/veille.html"
+SITE_URL = "https://renaudsecq.com/veille.html"
 
 try:
     if GEMINI_API_KEY:
@@ -41,6 +49,15 @@ except Exception:
     gemini_client = None
     GEMINI_MODEL = None
     GEMINI_FLASH_MODEL = None
+
+# Claude Opus 5 via Vertex AI — pour la génération de posts (meilleure qualité d'écriture)
+CLAUDE_MODEL = "claude-opus-5"
+# Claude Sonnet 5 via Vertex AI — pour le critic (near-Opus intelligence, moins cher)
+CLAUDE_CRITIC_MODEL = "claude-sonnet-5"
+# Claude désactivé — quota Vertex AI denied par Google pour les modèles Anthropic
+# Le code garde le fallback pour réactivation future si le quota est débloqué
+claude_client = None
+logger.info(f"ℹ️ Claude désactivé (quota denied) — utilisation de Gemini {GEMINI_MODEL if GEMINI_MODEL else 'N/A'}")
 
 
 EDITO_PROMPT = """Tu es le ghostwriter LinkedIn de {name}, {title}.
@@ -61,9 +78,21 @@ PROFIL RENAUD (à utiliser pour ancrer le propos, pas pour se vanter) :
 OBJECTIF : Que chaque post apporte UNE chose que le lecteur ne savait pas avant.
 Le lecteur idéal est un CDO, CTO ou Data Engineer en entreprise.
 
+MOTS INTERDITS (jargon AI-slop, jamais les utiliser) : game-changer, révolutionnaire, passionnant, incroyable, leverage, dive in, supercharge, unlock, seamless, transformative, delve, harness, "Et vous ?", "Qu'en pensez-vous". Écris comme un humain, pas comme un LLM.
+
 {post_history}
 
 ANTI-RÉPÉTION ABSOLUE : Le post que tu vas écrire DOIT avoir un angle radicalement différent des posts précédents ci-dessus. Si un post précédent parlait d'un outil, parle d'un autre. Si un post précédent était une revue, fais une analyse profonde. Varie les exemples, les chiffres, les références. NE JAMAIS reprendre la même structure ni le même angle.
+
+{performance_insights}
+
+{critic_lessons}
+
+{style_guidelines}
+
+{source_insights}
+
+{hook_patterns}
 
 ARTICLES DE LA SEMAINE :
 {articles_summary}
@@ -90,20 +119,19 @@ Structure :
 3. Ce que ça implique concrètement pour les équipes data/IA en entreprise
 4. Lien vers la veille
 
---- RETOUR_TERRAIN ---
-Partager un pattern ou une observation issue de la pratique terrain, ANCRÉ dans les ARTICLES DE LA SEMAINE.
+--- AI_GOVERNANCE ---
+Analyser un enjeu de gouvernance de l'IA issu de l'actualité de la semaine.
 Structure :
-1. Hook = un problème technique ou organisationnel RÉEL cité dans les articles de la semaine
-2. Pourquoi ce problème est fréquent en entreprise (observation générique, sans citer de client)
-3. L'approche ou le pattern qui fonctionne (basé sur les articles + expertise générale du domaine)
-4. Le takeaway concret pour les équipes data/IA
+1. Hook = un fait précis sur la régulation, la conformité ou la gouvernance de l'IA (EU AI Act, model governance, AI safety, risk management)
+2. Le contexte réglementaire ou technique : pourquoi ce sujet est critique maintenant
+3. L'implication concrète pour les équipes data/IA en entreprise (process, outils, organisation)
+4. Une recommandation actionnable : ce qu'il faut faire (ou arrêter de faire)
 
-RÈGLES ABSOLUES POUR CE FORMAT :
-- NE JAMAIS citer Decathlon, ni aucun autre client ou employeur par son nom
-- NE JAMAIS inventer des chiffres (pertes, économies, délais) non cités dans les articles sources
-- Si tu utilises des chiffres, ils DOIVENT provenir d'un des articles fournis
-- Formuler avec "dans les équipes que je côtoie" ou "pattern fréquent en entreprise" — jamais de cas inventé
-- L'objectif est de partager un PATTERN GÉNÉRIQUE issu des articles, pas de raconter une anecdote personnelle
+RÈGLES POUR CE FORMAT :
+- Ancre-toi sur les faits des articles de la semaine, pas sur des opinions générales
+- Cite des textes réglementaires, frameworks ou standards précis (EU AI Act, NIST AI RMF, ISO 42001, etc.)
+- Évite le sensationnalisme : la gouvernance est un sujet sérieux, traite-le avec rigueur
+- Pas de conseil juridique : reste sur la dimension technique et organisationnelle
 
 --- COMPARATIF ---
 Couper court aux débats stériles avec des faits.
@@ -164,7 +192,7 @@ DAILY_FORMAT = {
     0: "revue_hebdo",      # Lundi : le rendez-vous veille
     1: "decryptage",       # Mardi : vulgariser un concept complexe
     2: "signal_faible",    # Mercredi : un signal que personne n'a connecté
-    3: "retour_terrain",   # Jeudi : du vécu en mission
+    3: "ai_governance",    # Jeudi : gouvernance de l'IA (EU AI Act, model governance, AI safety)
     4: "chiffre_cle",      # Vendredi : un chiffre percutant (format court)
 }
 
@@ -192,7 +220,7 @@ def _quality_gate(post_text: str) -> dict:
         "in today's fast-paced", "now more than ever", "in an era of",
         "Et vous ?", "Qu'en pensez-vous", "What would you add",
         "The lesson?", "The takeaway is simple", "At the end of the day",
-        "supercharge", "unlock", "seamless", "robust", "transformative",
+        "supercharge", "unlock", "seamless", "transformative",
         "delve", "harness",
     ]
     text_lower = post_text.lower()
@@ -258,6 +286,214 @@ def score_articles_by_pillar(articles: list[dict]) -> list[dict]:
     return articles
 
 
+def _batch_variety_check(db, post_type: str, hashtags: list[str]) -> dict:
+    """Vérifie la variété sur les 5 derniers posts : pas 2x le même format, angle, ou hashtags.
+
+    Returns:
+        {"passed": bool, "issues": list[str], "recent_formats": list[str]}
+    """
+    from post_memory import get_recent_posts
+    posts = get_recent_posts(db, limit=5)
+    if not posts:
+        return {"passed": True, "issues": [], "recent_formats": []}
+
+    issues = []
+    recent_formats = [p.get("post_type", "") for p in posts if p.get("post_type")]
+
+    # 1. Pas 2x le même format sur les 3 derniers posts
+    if len(recent_formats) >= 3:
+        last_3 = recent_formats[:3]
+        if last_3.count(post_type) >= 2:
+            issues.append(f"Format '{post_type}' déjà utilisé {last_3.count(post_type)}x dans les 3 derniers posts — varier le format")
+
+    # 2. Pas les mêmes hashtags que le post précédent
+    if posts:
+        last_hashtags = set(posts[0].get("hashtags", []))
+        new_hashtags = set(hashtags)
+        overlap = last_hashtags & new_hashtags
+        if len(overlap) >= 2:
+            issues.append(f"Hashtags répétés vs post précédent: {overlap} — utiliser des hashtags différents")
+
+    # 3. Pas plus de 2x le même format sur 5 posts
+    if recent_formats.count(post_type) >= 3:
+        issues.append(f"Format '{post_type}' utilisé {recent_formats.count(post_type)}x sur 5 posts — trop répétitif")
+
+    return {"passed": len(issues) == 0, "issues": issues, "recent_formats": recent_formats}
+
+
+def _generate_alt_hook(original_hook: str, post_text: str, articles: list[dict], trends: str) -> str:
+    """Génère un hook alternatif pour A/B testing."""
+    try:
+        prompt = f"""Génère UNE seule phrase d'accroche (hook) alternative pour ce post LinkedIn.
+        Le hook doit être court (max 150 caractères), percutant, et différent de l'original.
+
+        HOOK ORIGINAL: {original_hook}
+        POST: {post_text[:500]}
+        TENDANCES: {trends}
+
+        Réponds avec UNIQUEMENT le hook, sans guillemets ni explication."""
+
+        if claude_client:
+            message = claude_client.messages.create(
+                model=CLAUDE_CRITIC_MODEL,
+                max_tokens=200,
+                temperature=0.9,
+                messages=[{"role": "user", "content": prompt}],
+            )
+            alt = message.content[0].text if message.content else ""
+        elif gemini_client and GEMINI_FLASH_MODEL:
+            from google.genai import types as genai_types
+            response = gemini_client.models.generate_content(
+                model=GEMINI_FLASH_MODEL,
+                contents=prompt,
+                config=genai_types.GenerateContentConfig(
+                    max_output_tokens=200,
+                    temperature=0.9,
+                ),
+            )
+            alt = response.text or ""
+        else:
+            return ""
+
+        alt = alt.strip().strip('"').strip("'")
+        if alt and alt != original_hook and len(alt) < 300:
+            return alt
+        return ""
+    except Exception as e:
+        logger.warning(f"⚠️ Génération alt hook échouée: {e}")
+        return ""
+
+
+CRITIC_PROMPT = """Tu es un critique impitoyable de posts LinkedIn. Tu évalues ce post sur 6 dimensions, chacune notée de 0 à 10.
+
+POST À ÉVALUER :
+{post_text}
+
+POSTS PRÉCÉDENTS (pour évaluer l'originalité) :
+{recent_posts}
+
+ÉVALUE SUR CES 6 DIMENSIONS :
+1. HOOK — La première ligne crée-t-elle une "open loop" qui donne envie de lire la suite ? (0 = plate/générique, 10 = impossible de ne pas cliquer)
+2. INSIGHT — Le post apporte-t-il UNE chose que le lecteur ne savait pas ? (0 = évident/redite, 10 = révélation)
+3. VOIX — Le ton est-il authentique, expert, pas du bullshit corporate ? (0 = creux/générique, 10 = voix unique reconnaissable)
+4. ORIGINALITÉ — L'angle est-il différent des posts précédents ? (0 = même angle/redite, 10 = perspective totalement neuve)
+5. FACTUALITÉ — Chaque chiffre/nom/fait est-il sourcé et crédible ? (0 = inventé/vague, 10 = tout est sourcé et précis)
+6. LISIBILITÉ — Le post est-il facile à lire en scrollant ? (0 = mur de texte, 10 = rythme parfait, aérations, bullet points)
+
+RÉPONDS EN JSON STRICT :
+{{
+  "scores": {{"hook": 0, "insight": 0, "voice": 0, "originality": 0, "factuality": 0, "readability": 0}},
+  "average": 0.0,
+  "verdict": "one-liner: pourquoi ce post marche ou pas",
+  "worst_dimension": "la dimension la plus faible",
+  "suggestion": "une phrase concrète pour améliorer"
+}}"""
+
+
+def _critic_evaluate(post_text: str, db) -> dict | None:
+    """Agent Critic : Claude Sonnet 5 évalue le post sur 6 dimensions.
+
+    Fallback sur Gemini Flash si Claude non disponible.
+
+    Returns:
+        {"scores": dict, "average": float, "verdict": str, "passed": bool} ou None si échec.
+    """
+    if not claude_client and not (gemini_client and GEMINI_FLASH_MODEL):
+        return None
+
+    try:
+        from post_memory import get_recent_posts
+        posts = get_recent_posts(db, limit=3) if db else []
+        recent = "\n".join(f"- [{p.get('post_type', '?')}] {p.get('hook', p.get('post_text', '')[:80])}" for p in posts) or "Aucun"
+
+        prompt = CRITIC_PROMPT.format(
+            post_text=post_text[:2000],
+            recent_posts=recent,
+        )
+
+        # Claude Sonnet 5 pour le critic (near-Opus, moins cher)
+        # Fallback sur Gemini Flash si Claude 429
+        raw = ""
+        if claude_client:
+            try:
+                message = claude_client.messages.create(
+                    model=CLAUDE_CRITIC_MODEL,
+                    max_tokens=1024,
+                    temperature=0.3,
+                    messages=[{"role": "user", "content": prompt}],
+                )
+                raw = message.content[0].text if message.content else ""
+            except Exception as critic_err:
+                if "429" in str(critic_err) and gemini_client and GEMINI_FLASH_MODEL:
+                    logger.warning("⏳ Critic Claude 429 — fallback Gemini Flash")
+                    from google.genai import types as genai_types
+                    response = gemini_client.models.generate_content(
+                        model=GEMINI_FLASH_MODEL,
+                        contents=prompt,
+                        config=genai_types.GenerateContentConfig(
+                            response_mime_type="application/json",
+                            max_output_tokens=1024,
+                            temperature=0.3,
+                        ),
+                    )
+                    raw = response.text or ""
+                    if raw is None and response.candidates:
+                        parts = response.candidates[0].content.parts
+                        raw = "".join(p.text for p in parts if p.text)
+                else:
+                    raise
+        else:
+            from google.genai import types as genai_types
+            response = gemini_client.models.generate_content(
+                model=GEMINI_FLASH_MODEL,
+                contents=prompt,
+                config=genai_types.GenerateContentConfig(
+                    response_mime_type="application/json",
+                    max_output_tokens=1024,
+                    temperature=0.3,
+                ),
+            )
+            raw = response.text
+            if raw is None and response.candidates:
+                parts = response.candidates[0].content.parts
+                raw = "".join(p.text for p in parts if p.text)
+        raw = (raw or "").strip()
+        if raw.startswith("```"):
+            raw = raw.split("\n", 1)[1].rsplit("```", 1)[0].strip()
+
+        try:
+            result = json.loads(raw)
+        except json.JSONDecodeError:
+            # Fallback: extraire les scores avec regex si le JSON est malformé
+            import re as _re
+            scores = {}
+            for dim in ["hook", "insight", "voice", "originality", "factuality", "readability"]:
+                m = _re.search(rf'"?{dim}"?\s*:\s*(\d+)', raw, _re.IGNORECASE)
+                if m:
+                    scores[dim] = int(m.group(1))
+            if not scores:
+                raise
+            result = {"scores": scores, "average": round(sum(scores.values()) / len(scores), 1) if scores else 0}
+            # Extraire verdict et suggestion
+            for field in ["verdict", "worst_dimension", "suggestion"]:
+                m = _re.search(rf'"?{field}"?\s*:\s*"([^"]+)"', raw, _re.IGNORECASE)
+                if m:
+                    result[field] = m.group(1)
+        avg = result.get("average", 0)
+        if avg == 0 and result.get("scores"):
+            scores = result["scores"]
+            avg = round(sum(scores.values()) / len(scores), 1) if scores else 0
+            result["average"] = avg
+
+        result["passed"] = avg >= 6.0
+        logger.info(f"🎭 Critic: avg={avg}/10 — verdict: {result.get('verdict', '?')}")
+        return result
+
+    except Exception as e:
+        logger.warning(f"⚠️ Critic evaluation échoué: {e}")
+        return None
+
+
 def generate_weekly_edito(articles: list[dict], trends: list[str] = None, post_type: str = None, db=None) -> dict:
     """Génère l'édito LinkedIn à partir des meilleurs articles.
 
@@ -287,10 +523,40 @@ def generate_weekly_edito(articles: list[dict], trends: list[str] = None, post_t
     # Récupérer l'historique des posts pour l'anti-répétition
     post_history = get_post_history_summary(db, limit=5) if db else "Aucun historique disponible."
 
-    if not gemini_client:
-        logger.warning("⚠️ GenAI non disponible, édito simulé")
+    # Récupérer les insights de performance (quels posts marchent le mieux)
+    performance_insights = get_performance_insights(db, limit=15) if db else "Aucune donnée de performance."
+
+    # MÉCANISME 1: Leçons accumulées du critic
+    critic_lessons = get_critic_lessons(db, limit=20) if db else ""
+
+    # MÉCANISME 2: Guidelines de style basées sur les top posts
+    style_guidelines = get_style_guidelines(db, limit=20) if db else ""
+
+    # MÉCANISME 3: Sources qui génèrent le plus d'engagement
+    source_insights = get_top_sources(db, limit=10) if db else ""
+
+    # MÉCANISME 4: Patterns de hooks gagnants (A/B testing)
+    hook_patterns = get_hook_patterns(db, limit=15) if db else ""
+
+    # Batch variety check — vérifier la variété avant de générer
+    batch_variety = _batch_variety_check(db, post_type, []) if db else {"passed": True, "issues": [], "recent_formats": []}
+    if not batch_variety["passed"]:
+        logger.warning(f"⚠️ Batch variety issues: {batch_variety['issues']}")
+        # Si le format du jour est trop répétitif, forcer un autre format
+        if batch_variety["recent_formats"]:
+            all_formats = list(DAILY_FORMAT.values())
+            used = set(batch_variety["recent_formats"][:3])
+            available = [f for f in all_formats if f not in used]
+            if available:
+                old_type = post_type
+                post_type = available[0]
+                logger.info(f"🔄 Format changé de '{old_type}' → '{post_type}' pour éviter la répétition")
+
+    if not claude_client and not gemini_client:
+        logger.warning("⚠️ Ni Claude ni Gemini disponible, édito simulé")
         return _mock_edito(articles, trends_str, post_type)
 
+    use_claude = claude_client is not None
     max_retries = 3
     for attempt in range(max_retries):
         try:
@@ -303,21 +569,39 @@ def generate_weekly_edito(articles: list[dict], trends: list[str] = None, post_t
                 post_type=post_type,
                 site_url=SITE_URL,
                 post_history=post_history,
+                performance_insights=performance_insights,
+                critic_lessons=critic_lessons,
+                style_guidelines=style_guidelines,
+                source_insights=source_insights,
+                hook_patterns=hook_patterns,
             )
 
-            from google.genai import types as genai_types
-            response = gemini_client.models.generate_content(
-                model=GEMINI_MODEL,
-                contents=prompt,
-                config=genai_types.GenerateContentConfig(
-                    response_mime_type="application/json",
-                    max_output_tokens=4096,
-                ),
-            )
-            raw_text = response.text
-            if raw_text is None and response.candidates:
-                parts = response.candidates[0].content.parts
-                raw_text = "".join(p.text for p in parts if p.text)
+            # Utiliser Claude Opus 5 si disponible, sinon fallback Gemini
+            if use_claude and claude_client:
+                message = claude_client.messages.create(
+                    model=CLAUDE_MODEL,
+                    max_tokens=4096,
+                    temperature=0.9,
+                    messages=[{"role": "user", "content": prompt}],
+                )
+                raw_text = message.content[0].text if message.content else ""
+                logger.info(f"🧠 Post généré avec Claude Opus 5 (attempt {attempt+1})")
+            else:
+                from google.genai import types as genai_types
+                response = gemini_client.models.generate_content(
+                    model=GEMINI_MODEL,
+                    contents=prompt,
+                    config=genai_types.GenerateContentConfig(
+                        response_mime_type="application/json",
+                        max_output_tokens=4096,
+                        temperature=0.9,
+                    ),
+                )
+                raw_text = response.text
+                if raw_text is None and response.candidates:
+                    parts = response.candidates[0].content.parts
+                    raw_text = "".join(p.text for p in parts if p.text)
+                logger.info(f"🧠 Post généré avec Gemini {GEMINI_MODEL} (attempt {attempt+1})")
             raw_text = (raw_text or "").strip()
             if raw_text.startswith("```"):
                 raw_text = raw_text.split("\n", 1)[1].rsplit("```", 1)[0].strip()
@@ -328,12 +612,15 @@ def generate_weekly_edito(articles: list[dict], trends: list[str] = None, post_t
             result["post_type"] = post_type
             result["status"] = "generated"
             result["generation_attempt"] = attempt + 1
+            result["model_used"] = CLAUDE_MODEL if (use_claude and claude_client) else GEMINI_MODEL
 
-            # Quality gate
+            # Quality gate — bloquant : regénère si banned phrases ou problèmes
             qg = _quality_gate(result.get("post_text", ""))
             result["quality_gate"] = qg
-            if not qg["passed"]:
-                logger.warning(f"⚠️ Quality gate issues (attempt {attempt+1}): {qg['issues']}")
+            if not qg["passed"] and attempt < max_retries - 1:
+                logger.warning(f"⚠️ Quality gate FAILED (attempt {attempt+1}): {qg['issues']} — regénération")
+                post_history += f"\n⚠️ ATTENTION: La tentative précédente contenait ces problèmes: {', '.join(qg['issues'])}. Corrige-les absolument."
+                continue
 
             # Dedup check (skip on last attempt to always return something)
             if db and attempt < max_retries - 1:
@@ -344,11 +631,64 @@ def generate_weekly_edito(articles: list[dict], trends: list[str] = None, post_t
                     post_history += f"\n⚠️ ATTENTION: La tentative précédente était trop similaire à un post existant (similarity={dup['max_similarity']}). Change complètement d'angle."
                     continue
 
+            # Critic agent — Claude Sonnet 5 / Gemini Flash évalue la qualité (skip on last attempt)
+            if attempt < max_retries - 1:
+                critic = _critic_evaluate(result.get("post_text", ""), db)
+                if critic:
+                    result["critic"] = critic
+                    # MÉCANISME 1: Stocker la leçon du critic pour l'accumuler
+                    if db:
+                        store_critic_lesson(db, critic, result.get("post_text", ""))
+                    if not critic["passed"]:
+                        logger.warning(f"🎭 Critic REJECTED (avg={critic['average']}/10) — worst: {critic.get('worst_dimension')} — regénération")
+                        post_history += f"\n⚠️ ATTENTION: Le critique a noté ce post {critic['average']}/10. Dimension la plus faible: {critic.get('worst_dimension')}. Suggestion: {critic.get('suggestion')}. Améliore absolument."
+                        continue
+
+            # MÉCANISME 4: A/B testing des hooks — générer un 2e hook et garder le meilleur
+            if db and result.get("hook") and attempt < max_retries - 1:
+                try:
+                    alt_hook = _generate_alt_hook(result.get("hook", ""), result.get("post_text", ""), articles, trends_str)
+                    if alt_hook:
+                        # Évaluer les 2 hooks avec le critic
+                        hook_a_score = critic.get("average", 0) if critic else 0
+                        hook_b_critic = _critic_evaluate(alt_hook + "\n" + result.get("post_text", "")[:500], db)
+                        hook_b_score = hook_b_critic.get("average", 0) if hook_b_critic else 0
+
+                        hooks = [result.get("hook", ""), alt_hook]
+                        winner_idx = 0 if hook_a_score >= hook_b_score else 1
+                        critic_scores = [
+                            {"average": hook_a_score},
+                            {"average": hook_b_score} if hook_b_critic else {}
+                        ]
+
+                        if winner_idx == 1:
+                            result["hook"] = alt_hook
+                            result["post_text"] = alt_hook + "\n\n" + result["post_text"].split("\n\n", 1)[1] if "\n\n" in result["post_text"] else alt_hook + "\n\n" + result["post_text"]
+                            logger.info(f"🧪 A/B hook: hook B gagnant ({hook_b_score} vs {hook_a_score})")
+
+                        # Stocker l'expérience
+                        store_hook_experiment(db, hooks, winner_idx, critic_scores, result.get("post_id", ""))
+                except Exception as ab_err:
+                    logger.warning(f"⚠️ A/B hook échoué: {ab_err}")
+
             logger.info(f"📝 Édito LinkedIn [{post_type}] généré (attempt {attempt+1}, {len(result['post_text'])} chars, {result.get('word_count', '?')} mots)")
             return result
 
         except Exception as e:
+            err_str = str(e)
             logger.error(f"❌ Erreur génération édito (attempt {attempt+1}): {e}")
+            # Si Claude 429 (quota), fallback sur Gemini pour les retries suivants
+            if "429" in err_str and use_claude and gemini_client:
+                logger.warning(f"⏳ Claude 429 (quota) — fallback Gemini pour les retries suivants")
+                use_claude = False
+                if attempt < max_retries - 1:
+                    continue
+            elif "429" in err_str and attempt < max_retries - 1:
+                # Attendre 65s avant retry (quota 1/min)
+                import time
+                logger.warning(f"⏳ Rate limit 429 — attente 65s avant retry...")
+                time.sleep(65)
+                continue
             if attempt < max_retries - 1:
                 continue
             return _mock_edito(articles, trends_str, post_type)
@@ -363,21 +703,30 @@ INFOGRAPHIC_CONTENT_GENERATOR = """Tu es un expert en création d'infographics L
 POST :
 {post_text}
 
+RÈGLES STRICTES:
+- Le titre doit être court et percutant (5-7 mots max, en MAJUSCULES)
+- Le sous-titre donne le contexte (10-15 mots max)
+- Chaque section heading: 2-4 mots en MAJUSCULES
+- Chaque section body: 10-15 mots max, factuel et concret (pas d'opinion)
+- Le key_stat doit être un CHIFFRE précis extrait du post
+- Évite le jargon technique, vise un public CDO/CTO
+- Le texte doit être PARFAITEMENT orthographié en français
+
 L'infographic doit capturer l'ESSENTIEL du post sous forme visuelle et didactique.
-Pense au style "Save for later" de LinkedIn : un visuel que les gens bookmarkent parce qu'il résume parfaitement un concept.
+Pense au style "Save for later" de LinkedIn : un visuel que les gens bookmarkent.
 
 Réponds en JSON strict :
 {{
-  "title": "Titre principal en majuscules (5-7 mots max, percutant)",
-  "subtitle": "Sous-titre accrocheur (10-15 mots)",
+  "title": "TITRE COURT EN MAJUSCULES",
+  "subtitle": "Sous-titre contextuel",
   "sections": [
     {{
       "number": "1",
-      "heading": "TITRE SECTION (3-4 mots)",
-      "body": "Explication courte et factuelle (15-20 mots max)"
+      "heading": "TITRE COURT",
+      "body": "Texte factuel concis (10-15 mots max)"
     }}
   ],
-  "key_stat": "UN chiffre clé ou fait marquant (ex: '70% des projets IA échouent')",
+  "key_stat": "Chiffre clé extrait du post",
   "color_theme": "purple|blue|green|orange",
   "author": "Renaud Secq"
 }}
@@ -385,13 +734,19 @@ Réponds en JSON strict :
 Génère entre 4 et 6 sections. Chaque section doit apporter une information concrète, pas du blabla."""
 
 
-def _generate_image_prompt(post_text: str, post_type: str) -> str:
+def _generate_image_prompt(post_text: str, post_type: str, db=None) -> str:
     """Utilise Gemini Pro pour générer le contenu d'un infographic, puis crée le prompt Imagen."""
     try:
+        # Récupérer les leçons visuelles passées
+        visual_feedback = get_visual_lessons(db, limit=15) if db else ""
+
         # Étape 1 : Gemini génère le contenu structuré de l'infographic
+        content_prompt = INFOGRAPHIC_CONTENT_GENERATOR.format(post_text=post_text[:1000])
+        if visual_feedback:
+            content_prompt += f"\n\n{visual_feedback}"
         content_response = gemini_client.models.generate_content(
             model=GEMINI_MODEL,
-            contents=INFOGRAPHIC_CONTENT_GENERATOR.format(post_text=post_text[:1000]),
+            contents=content_prompt,
         )
         raw = content_response.text
         if raw is None and content_response.candidates:
@@ -424,24 +779,50 @@ def _generate_image_prompt(post_text: str, post_type: str) -> str:
             [f"{s['number']}. {s['heading']} — {s['body']}" for s in sections]
         )
 
-        # Étape 2 : Prompt structuré pour Nano Banana Pro (Gemini 3 Pro Image)
+        # Étape 2 : Prompt structuré pour Gemini 3 Pro Image
+        # Instructions ultra-précises pour un rendu professionnel
         prompt = (
-            f"Create a professional LinkedIn infographic in portrait format (3:4 ratio).\n\n"
-            f"TITLE at top: {title}\n"
-            f"SUBTITLE: {subtitle}\n\n"
-            f"{len(sections)} numbered sections, each with a simple minimalist icon on the left "
-            f"and the text on the right:\n{sections_lines}\n\n"
+            f"Create a vertical infographic image (1080x1440 pixels, 3:4 portrait ratio).\n\n"
+            f"LAYOUT (top to bottom):\n"
+            f"1. HEADER ZONE (top 15% of image):\n"
+            f"   - Large bold title in {accent} color, font size ~48px, centered\n"
+            f"   - Title: \"{title}\"\n"
+            f"   - Subtitle below in dark gray (#374151), font size ~20px, centered\n"
+            f"   - Subtitle: \"{subtitle}\"\n"
+            f"   - Thin horizontal divider line in {accent} below subtitle\n\n"
+            f"2. CONTENT ZONE (middle 70% of image):\n"
+            f"   - {len(sections)} numbered sections stacked vertically with equal spacing\n"
+            f"   - Each section has:\n"
+            f"     * Left: a circular badge with the section number, {accent} background, white text, ~40px diameter\n"
+            f"     * Right of badge: section heading in bold dark text (#1F2937), ~18px\n"
+            f"     * Below heading: body text in medium gray (#6B7280), ~14px, max 2 lines\n"
+            f"   - Sections content:\n{sections_lines}\n\n"
         )
         if key_stat:
-            prompt += f"Highlighted key statistic box: {key_stat}\n\n"
+            prompt += (
+                f"3. KEY STAT ZONE (below sections):\n"
+                f"   - A highlighted box with light {accent} background (10% opacity)\n"
+                f"   - Key statistic in large bold {accent} text, centered\n"
+                f"   - Stat: \"{key_stat}\"\n\n"
+            )
         prompt += (
-            f"Bottom credit: {data.get('author', 'Renaud Secq')} — Consultant IA & Data\n\n"
-            f"STYLE: clean modern flat design, white background, {accent} accents, "
-            f"professional minimalist line icons, clear bold sans-serif typography, "
-            f"well-structured grid with vertical connector line, plenty of whitespace. "
-            f"All text must be perfectly spelled and readable in French. "
-            f"LinkedIn viral 'save for later' infographic style."
+            f"4. FOOTER ZONE (bottom 5% of image):\n"
+            f"   - Small text: \"{data.get('author', 'Renaud Secq')} — Consultant IA & Data\"\n"
+            f"   - Dark gray (#9CA3AF), ~12px, centered\n\n"
+            f"VISUAL SPECIFICATIONS:\n"
+            f"   - Background: pure white (#FFFFFF)\n"
+            f"   - Accent color: {accent}\n"
+            f"   - Typography: Inter or Helvetica Neue, clean sans-serif\n"
+            f"   - All text MUST be in French, perfectly spelled, no typos\n"
+            f"   - All text MUST be fully readable, no overlap, no truncation\n"
+            f"   - Use generous whitespace between sections (at least 20px padding)\n"
+            f"   - Style: professional, minimalist, corporate — like a McKinsey or BCG infographic\n"
+            f"   - NO photographs, NO gradients, NO 3D effects, NO shadows\n"
+            f"   - Flat design only with clean geometric shapes\n"
+            f"   - Vertical connector line between section badges in light gray (#E5E7EB)\n"
         )
+        if visual_feedback:
+            prompt += f"\nCORRECTIONS FROM PREVIOUS FEEDBACK:\n{visual_feedback}\n"
         logger.info(f"📊 Infographic: {title} | {len(sections)} sections")
         return prompt
 
@@ -456,42 +837,580 @@ def _generate_image_prompt(post_text: str, post_type: str) -> str:
         )
 
 
-def generate_visual(post_text: str, post_type: str) -> bytes | None:
-    """Génère un infographic IA (Nano Banana Pro / Gemini 3 Pro Image) pour le post LinkedIn."""
+VISUAL_CRITIC_PROMPT = """Tu es un critique visuel d'infographics LinkedIn. Analyse cette image et évalue sa qualité.
+
+Réponds UNIQUEMENT avec un JSON valide, sans texte avant ou après, dans ce format exact:
+{"readability": 8, "spelling": 7, "layout": 8, "visual_appeal": 7, "text_accuracy": 9, "average": 7.8, "issues": ["problème 1", "problème 2"], "verdict": "1-2 phrases", "passed": true}
+
+Critères (chaque dimension notée de 0 à 10):
+- readability: le texte est-il lisible ? Pas de chevauchement, taille suffisante ?
+- spelling: y a-t-il des fautes d'orthographe dans le texte de l'image ?
+- layout: la structure est-elle claire ? Alignement, espacement, hiérarchie visuelle ?
+- visual_appeal: est-ce professionnel et esthétique ? Digne d'un partage LinkedIn ?
+- text_accuracy: le texte correspond-il au contenu du post ? Pas d'hallucination ?
+- average: moyenne des 5 scores
+- passed: true si average >= 7, false sinon"""
+
+
+def _visual_critic(image_bytes: bytes, post_text: str) -> dict | None:
+    """Évalue la qualité d'un infographic via Gemini (vision).
+
+    Returns: {"readability": int, "spelling": int, "layout": int,
+              "visual_appeal": int, "text_accuracy": int, "average": float,
+              "issues": list, "verdict": str, "passed": bool} ou None.
+    """
+    if not gemini_client:
+        return None
+    try:
+        import base64
+        from google.genai import types as genai_types
+
+        image_b64 = base64.b64encode(image_bytes).decode()
+
+        prompt = VISUAL_CRITIC_PROMPT + f"\n\nPOST ORIGINAL (pour vérifier la cohérence du texte):\n{post_text[:500]}"
+
+        response = gemini_client.models.generate_content(
+            model=GEMINI_FLASH_MODEL,
+            contents=[
+                genai_types.Part.from_bytes(data=image_bytes, mime_type="image/png"),
+                prompt,
+            ],
+            config=genai_types.GenerateContentConfig(
+                max_output_tokens=1024,
+                temperature=0.3,
+            ),
+        )
+
+        raw = response.text or ""
+        if raw is None and response.candidates:
+            parts = response.candidates[0].content.parts
+            raw = "".join(p.text for p in parts if p.text)
+
+        raw = (raw or "").strip()
+        if raw.startswith("```"):
+            raw = raw.split("\n", 1)[1].rsplit("```", 1)[0].strip()
+
+        try:
+            result = json.loads(raw)
+        except json.JSONDecodeError:
+            # Fallback: extraire les scores avec regex
+            result = {}
+            for dim in ["readability", "spelling", "layout", "visual_appeal", "text_accuracy"]:
+                m = re.search(rf'"{dim}"\s*:\s*(\d+(?:\.\d+)?)', raw)
+                if m:
+                    result[dim] = float(m.group(1))
+            m_avg = re.search(r'"average"\s*:\s*(\d+(?:\.\d+)?)', raw)
+            if m_avg:
+                result["average"] = float(m_avg.group(1))
+            m_passed = re.search(r'"passed"\s*:\s*(true|false)', raw, re.I)
+            if m_passed:
+                result["passed"] = m_passed.group(1).lower() == "true"
+            if not result:
+                logger.warning(f"⚠️ Visual critic JSON parse échoué: {raw[:200]}")
+                return None
+
+        # Calculer l'average si manquant
+        if "average" not in result:
+            scores = [result.get(d, 0) for d in ["readability", "spelling", "layout", "visual_appeal", "text_accuracy"] if d in result]
+            result["average"] = round(sum(scores) / len(scores), 1) if scores else 0
+        else:
+            result["average"] = round(float(result["average"]), 1)
+        result["passed"] = result.get("average", 0) >= 7
+        logger.info(f"👁️ Visual critic: avg={result['average']}/10, passed={result['passed']}, issues={result.get('issues', [])[:3]}")
+        return result
+    except Exception as e:
+        logger.warning(f"⚠️ Visual critic échoué: {e}")
+        return None
+
+
+FORMAT_SELECTOR_PROMPT = """Tu es un expert en design de contenu LinkedIn. Analyse ce post et choisis le format visuel le plus adapté.
+
+POST :
+{post_text}
+
+Formats disponibles:
+- infographic: sections numérotées structurées. Idéal pour: listes, étapes, points multiples, résumé structuré.
+- quote_card: citation percutante en grand format. Idéal pour: une phrase forte, une insight mémorable, une citation d'expert.
+- comparison: tableau comparatif 2 colonnes. Idéal pour: comparer 2 outils/approches/concepts, avant/après, pour/contre.
+- stat_highlight: un chiffre choc en très grand format. Idéal pour: un statistique marquante, un chiffre surprenant, une donnée clé.
+
+Choisis le format qui mettra LE MIEUX en valeur le contenu de ce post.
+
+Réponds en JSON strict:
+{{"format": "infographic|quote_card|comparison|stat_highlight", "reason": "1 phrase courte expliquant le choix"}}"""
+
+
+def _select_visual_format(post_text: str, post_type: str, db=None) -> str:
+    """Sélectionne le format visuel le plus adapté au contenu du post.
+
+    1. Gemini analyse le post et recommande un format
+    2. Évite les 2 derniers formats utilisés (rotation anti-monotonie)
+    3. Fallback sur post_type si l'analyse échoue
+    """
+    # Récupérer l'historique récent pour la rotation
+    recent_formats = []
+    try:
+        if db:
+            docs = (
+                db.collection("visual_lessons")
+                .order_by("created_at", direction=firestore.Query.DESCENDING)
+                .limit(5)
+                .stream()
+            )
+            for doc in docs:
+                fmt = doc.to_dict().get("visual_format")
+                if fmt:
+                    recent_formats.append(fmt)
+    except Exception:
+        pass
+
+    # Étape 1 : Gemini analyse le contenu et recommande un format
+    recommended = None
+    reason = ""
+    try:
+        prompt = FORMAT_SELECTOR_PROMPT.format(post_text=post_text[:1500])
+        response = gemini_client.models.generate_content(
+            model=GEMINI_FLASH_MODEL,
+            contents=prompt,
+        )
+        raw = (response.text or "").strip()
+        if raw is None and response.candidates:
+            parts = response.candidates[0].content.parts
+            raw = "".join(p.text for p in parts if p.text)
+        raw = (raw or "").strip()
+        if "```" in raw:
+            raw = raw.split("```")[1].replace("json", "").strip()
+        data = json.loads(raw)
+        recommended = data.get("format", "").strip().lower()
+        reason = data.get("reason", "")
+        valid_formats = ["infographic", "quote_card", "comparison", "stat_highlight"]
+        if recommended not in valid_formats:
+            recommended = None
+    except Exception as e:
+        logger.warning(f"⚠️ Format selector IA échoué: {e}")
+
+    # Étape 2 : Si le format recommandé est dans les 2 derniers utilisés, essayer le 2e choix
+    if recommended and recommended in recent_formats[:2]:
+        logger.info(f"🎨 Format {recommended} recommandé mais utilisé récemment, rotation...")
+        # Garder recommended comme 2e choix, prendre un format différent
+        rotation_order = ["infographic", "comparison", "stat_highlight", "quote_card"]
+        for fmt in rotation_order:
+            if fmt != recommended and fmt not in recent_formats[:2]:
+                logger.info(f"🎨 Format visuel sélectionné: {fmt} (rotation, recommandé={recommended}, reason={reason})")
+                return fmt
+
+    if recommended:
+        logger.info(f"🎨 Format visuel sélectionné: {recommended} (IA, reason={reason})")
+        return recommended
+
+    # Fallback : rotation basée sur post_type
+    if post_type == "citation_inspirante":
+        preferred = ["quote_card", "stat_highlight", "infographic"]
+    elif post_type in ("analyse_profonde", "signal_faible"):
+        preferred = ["infographic", "comparison", "stat_highlight"]
+    elif post_type == "revue_hebdo":
+        preferred = ["infographic", "comparison"]
+    elif post_type == "ai_governance":
+        preferred = ["infographic", "comparison", "stat_highlight"]
+    elif post_type == "tutoriel_rapide":
+        preferred = ["comparison", "infographic", "stat_highlight"]
+    else:
+        preferred = ["infographic", "quote_card", "comparison", "stat_highlight"]
+
+    for fmt in preferred:
+        if fmt not in recent_formats[:2]:
+            logger.info(f"🎨 Format visuel fallback: {fmt} (post_type={post_type}, recent={recent_formats[:3]})")
+            return fmt
+
+    logger.info(f"🎨 Format visuel fallback: {preferred[0]} (post_type={post_type})")
+    return preferred[0]
+
+
+QUOTE_CARD_GENERATOR = """Tu es un expert en création de quote cards LinkedIn virales sur la Data et l'IA.
+
+À partir du post LinkedIn ci-dessous, extrait la phrase la plus percutante et génère le contenu d'une quote card en JSON.
+
+POST :
+{post_text}
+
+RÈGLES:
+- La citation doit être une phrase DU post (pas inventée)
+- Maximum 15 mots, idéalement 8-12 mots
+- Doit être une insight, pas une description
+- Le contexte donne la source ou l'auteur référencé
+
+Réponds en JSON strict :
+{{
+  "quote": "La phrase percutante extraite du post",
+  "attribution": "Source ou auteur mentionné",
+  "context": "Contexte en 5-8 mots",
+  "color_theme": "purple|blue|green|orange"
+}}"""
+
+
+COMPARISON_GENERATOR = """Tu es un expert en création de tableaux comparatifs LinkedIn sur la Data et l'IA.
+
+À partir du post LinkedIn ci-dessous, génère un tableau comparatif en JSON.
+
+POST :
+{post_text}
+
+RÈGLES:
+- Identifie 2 concepts/tools/approches comparés dans le post
+- 3-4 critères de comparaison max
+- Chaque cellule: 3-6 mots max
+- Factuel, pas d'opinion
+
+Réponds en JSON strict :
+{{
+  "title": "TITRE COMPARATIF COURT",
+  "left_label": "Concept A",
+  "right_label": "Concept B",
+  "rows": [
+    {{"criterion": "CRITÈRE", "left": "valeur A", "right": "valeur B"}}
+  ],
+  "color_theme": "purple|blue|green|orange"
+}}"""
+
+
+STAT_HIGHLIGHT_GENERATOR = """Tu es un expert en création de visuels "chiffre choc" pour LinkedIn.
+
+À partir du post LinkedIn ci-dessous, extrait LE chiffre le plus marquant et génère le contenu d'un stat highlight en JSON.
+
+POST :
+{post_text}
+
+RÈGLES:
+- Le chiffre doit être extrait du post (pas inventé)
+- Le contexte explique le chiffre en 8-12 mots
+- La source doit être mentionnée
+
+Réponds en JSON strict :
+{{
+  "big_number": "13x",
+  "context": "Baisse du coût de l'IA en 4 mois",
+  "source": "Latent Space",
+  "takeaway": "L'IA devient accessible à tous les budgets",
+  "color_theme": "purple|blue|green|orange"
+}}"""
+
+
+def _generate_quote_card_prompt(post_text: str, db=None) -> str:
+    """Génère un prompt pour une quote card."""
+    try:
+        visual_feedback = get_visual_lessons(db, limit=15) if db else ""
+        content_prompt = QUOTE_CARD_GENERATOR.format(post_text=post_text[:1000])
+        if visual_feedback:
+            content_prompt += f"\n\n{visual_feedback}"
+        response = gemini_client.models.generate_content(
+            model=GEMINI_MODEL,
+            contents=content_prompt,
+        )
+        raw = response.text or ""
+        if raw is None and response.candidates:
+            parts = response.candidates[0].content.parts
+            raw = "".join(p.text for p in parts if p.text)
+        raw = (raw or "").strip()
+        if "```" in raw:
+            raw = raw.split("```")[1].replace("json", "").strip()
+
+        import json
+        data = json.loads(raw)
+
+        quote = data.get("quote", "")
+        attribution = data.get("attribution", "")
+        context = data.get("context", "")
+        color = data.get("color_theme", "purple")
+
+        color_map = {
+            "purple": "purple and violet (#6B46C1)",
+            "blue": "electric blue (#2563EB)",
+            "green": "emerald green (#059669)",
+            "orange": "deep orange (#EA580C)",
+        }
+        accent = color_map.get(color, color_map["purple"])
+
+        prompt = (
+            f"Create a vertical quote card image (1080x1440 pixels, 3:4 portrait ratio).\n\n"
+            f"LAYOUT:\n"
+            f"1. Large decorative quotation mark at top in {accent}, ~120px, semi-transparent\n"
+            f"2. CENTER: The quote in large bold text, dark color (#1F2937), ~36px, centered, max 3 lines:\n"
+            f"   \"{quote}\"\n"
+            f"3. Below quote: thin horizontal line in {accent}\n"
+            f"4. Attribution in medium gray (#6B7280), ~18px:\n"
+            f"   — {attribution}\n"
+            f"5. Context in smaller gray (#9CA3AF), ~14px:\n"
+            f"   {context}\n"
+            f"6. Bottom: \"Renaud Secq — Consultant IA & Data\" in small gray text\n\n"
+            f"VISUAL SPECIFICATIONS:\n"
+            f"   - Background: very light gray (#F9FAFB) or white\n"
+            f"   - Accent: {accent}\n"
+            f"   - Typography: Inter or Helvetica Neue\n"
+            f"   - All text in French, perfectly spelled\n"
+            f"   - Generous whitespace, minimalist\n"
+            f"   - NO photographs, NO gradients, NO 3D\n"
+            f"   - Flat design, corporate style\n"
+        )
+        if visual_feedback:
+            prompt += f"\nCORRECTIONS:\n{visual_feedback}\n"
+        logger.info(f"📊 Quote card: \"{quote[:50]}...\"")
+        return prompt
+    except Exception as e:
+        logger.warning(f"⚠️ Fallback quote card: {e}")
+        hook = post_text.split("\n")[0][:80]
+        return (
+            f"Create a vertical quote card (1080x1440, 3:4 ratio) with white background, "
+            f"large purple quotation mark, centered quote \"{hook[:60]}\" in bold dark text, "
+            f"attribution below, minimalist flat design, French text."
+        )
+
+
+def _generate_comparison_prompt(post_text: str, db=None) -> str:
+    """Génère un prompt pour un tableau comparatif."""
+    try:
+        visual_feedback = get_visual_lessons(db, limit=15) if db else ""
+        content_prompt = COMPARISON_GENERATOR.format(post_text=post_text[:1000])
+        if visual_feedback:
+            content_prompt += f"\n\n{visual_feedback}"
+        response = gemini_client.models.generate_content(
+            model=GEMINI_MODEL,
+            contents=content_prompt,
+        )
+        raw = response.text or ""
+        if raw is None and response.candidates:
+            parts = response.candidates[0].content.parts
+            raw = "".join(p.text for p in parts if p.text)
+        raw = (raw or "").strip()
+        if "```" in raw:
+            raw = raw.split("```")[1].replace("json", "").strip()
+
+        import json
+        data = json.loads(raw)
+
+        title = data.get("title", "COMPARATIF")
+        left_label = data.get("left_label", "A")
+        right_label = data.get("right_label", "B")
+        rows = data.get("rows", [])[:4]
+        color = data.get("color_theme", "purple")
+
+        color_map = {
+            "purple": "purple (#6B46C1)",
+            "blue": "blue (#2563EB)",
+            "green": "green (#059669)",
+            "orange": "orange (#EA580C)",
+        }
+        accent = color_map.get(color, color_map["purple"])
+
+        rows_text = "\n".join(
+            f"   {r['criterion']} | {r['left']} | {r['right']}"
+            for r in rows
+        )
+
+        prompt = (
+            f"Create a vertical comparison table image (1080x1440 pixels, 3:4 portrait ratio).\n\n"
+            f"LAYOUT:\n"
+            f"1. HEADER: Title \"{title}\" in bold {accent}, ~36px, centered\n"
+            f"2. Two-column table header:\n"
+            f"   Left column header: \"{left_label}\" in {accent} background, white text\n"
+            f"   Right column header: \"{right_label}\" in dark gray (#374151) background, white text\n"
+            f"3. Table rows (alternating white and light gray #F3F4F6 backgrounds):\n{rows_text}\n"
+            f"   Each row: criterion label on far left in bold, then two values\n"
+            f"4. Bottom: \"Renaud Secq — Consultant IA & Data\" in small gray text\n\n"
+            f"VISUAL SPECIFICATIONS:\n"
+            f"   - Background: white (#FFFFFF)\n"
+            f"   - Accent: {accent}\n"
+            f"   - Typography: Inter or Helvetica Neue\n"
+            f"   - All text in French, perfectly spelled\n"
+            f"   - Clean table borders, aligned columns\n"
+            f"   - NO photographs, NO gradients, NO 3D\n"
+            f"   - Flat design, corporate style\n"
+        )
+        if visual_feedback:
+            prompt += f"\nCORRECTIONS:\n{visual_feedback}\n"
+        logger.info(f"📊 Comparison: {title} | {len(rows)} rows")
+        return prompt
+    except Exception as e:
+        logger.warning(f"⚠️ Fallback comparison: {e}")
+        return (
+            f"Create a vertical comparison table (1080x1440, 3:4 ratio) with white background, "
+            f"purple header, two-column table with 3-4 rows, clean borders, "
+            f"French text, flat corporate design."
+        )
+
+
+def _generate_stat_highlight_prompt(post_text: str, db=None) -> str:
+    """Génère un prompt pour un stat highlight (chiffre choc)."""
+    try:
+        visual_feedback = get_visual_lessons(db, limit=15) if db else ""
+        content_prompt = STAT_HIGHLIGHT_GENERATOR.format(post_text=post_text[:1000])
+        if visual_feedback:
+            content_prompt += f"\n\n{visual_feedback}"
+        response = gemini_client.models.generate_content(
+            model=GEMINI_MODEL,
+            contents=content_prompt,
+        )
+        raw = response.text or ""
+        if raw is None and response.candidates:
+            parts = response.candidates[0].content.parts
+            raw = "".join(p.text for p in parts if p.text)
+        raw = (raw or "").strip()
+        if "```" in raw:
+            raw = raw.split("```")[1].replace("json", "").strip()
+
+        import json
+        data = json.loads(raw)
+
+        big_number = data.get("big_number", "")
+        context = data.get("context", "")
+        source = data.get("source", "")
+        takeaway = data.get("takeaway", "")
+        color = data.get("color_theme", "purple")
+
+        color_map = {
+            "purple": "purple (#6B46C1)",
+            "blue": "blue (#2563EB)",
+            "green": "green (#059669)",
+            "orange": "orange (#EA580C)",
+        }
+        accent = color_map.get(color, color_map["purple"])
+
+        prompt = (
+            f"Create a vertical stat highlight image (1080x1440 pixels, 3:4 portrait ratio).\n\n"
+            f"LAYOUT:\n"
+            f"1. TOP THIRD: The big number \"{big_number}\" in HUGE bold {accent} text, ~180px, centered\n"
+            f"2. MIDDLE: Context line \"{context}\" in dark gray (#1F2937), ~24px, centered, max 2 lines\n"
+            f"3. Below context: thin horizontal line in {accent}\n"
+            f"4. Takeaway: \"{takeaway}\" in medium gray (#6B7280), ~18px, centered\n"
+            f"5. Source: \"Source: {source}\" in small gray (#9CA3AF), ~14px\n"
+            f"6. Bottom: \"Renaud Secq — Consultant IA & Data\" in small gray text\n\n"
+            f"VISUAL SPECIFICATIONS:\n"
+            f"   - Background: white (#FFFFFF) with subtle {accent} geometric accent shapes in corners\n"
+            f"   - The big number is the FOCAL POINT — it should dominate the image\n"
+            f"   - Typography: Inter or Helvetica Neue\n"
+            f"   - All text in French, perfectly spelled\n"
+            f"   - Generous whitespace\n"
+            f"   - NO photographs, NO gradients, NO 3D\n"
+            f"   - Flat design, corporate style\n"
+        )
+        if visual_feedback:
+            prompt += f"\nCORRECTIONS:\n{visual_feedback}\n"
+        logger.info(f"📊 Stat highlight: {big_number} | {context[:50]}")
+        return prompt
+    except Exception as e:
+        logger.warning(f"⚠️ Fallback stat highlight: {e}")
+        return (
+            f"Create a vertical stat highlight (1080x1440, 3:4 ratio) with white background, "
+            f"one huge purple number in center, context text below, minimalist flat design, "
+            f"French text, corporate style."
+        )
+
+
+def generate_visual(post_text: str, post_type: str, db=None) -> bytes | None:
+    """Génère un visuel IA avec critique visuelle et régénération si nécessaire.
+
+    Pipeline:
+    1. Sélectionne le format visuel (infographic, quote_card, comparison, stat_highlight)
+    2. Gemini génère le contenu structuré + le prompt adapté au format
+    3. Gemini 3 Pro Image génère l'image
+    4. Visual critic évalue l'image (readability, spelling, layout)
+    5. Si critic < 7/10, régénération (max 2 tentatives)
+    6. Leçon visuelle stockée en Firestore pour amélioration continue
+    """
     if not gemini_client:
         logger.warning("⚠️ GenAI non dispo, pas de visuel")
         return None
 
-    # Étape 1 : Gemini génère le contenu structuré + le prompt infographic
-    image_prompt = _generate_image_prompt(post_text, post_type)
-    logger.info(f"🖼️ Prompt infographic: {image_prompt[:120]}...")
+    # Sélectionner le format visuel adapté au contenu
+    visual_format = _select_visual_format(post_text, post_type, db=db)
+    logger.info(f"🎨 Format visuel: {visual_format}")
 
-    try:
-        from google import genai as image_genai
-        from google.genai import types as genai_types
+    max_visual_attempts = 2
+    for v_attempt in range(max_visual_attempts):
+        # Étape 1 : Générer le prompt selon le format sélectionné
+        if visual_format == "quote_card":
+            image_prompt = _generate_quote_card_prompt(post_text, db=db)
+        elif visual_format == "comparison":
+            image_prompt = _generate_comparison_prompt(post_text, db=db)
+        elif visual_format == "stat_highlight":
+            image_prompt = _generate_stat_highlight_prompt(post_text, db=db)
+        else:
+            image_prompt = _generate_image_prompt(post_text, post_type, db=db)
+        if v_attempt > 0:
+            # Ajouter les feedbacks du critic au prompt pour la régénération
+            image_prompt += f"\n\nCORRECTIONS À APPLIQUER: {visual_issues_feedback}"
+        logger.info(f"🖼️ Prompt {visual_format} (attempt {v_attempt+1}): {image_prompt[:120]}...")
 
-        # Nano Banana Pro requiert la location "global"
-        client = image_genai.Client(vertexai=True, project=GCP_PROJECT, location="global")
-        response = client.models.generate_content(
-            model="gemini-3-pro-image",
-            contents=image_prompt,
-            config=genai_types.GenerateContentConfig(
-                response_modalities=["TEXT", "IMAGE"],
-            ),
-        )
+        try:
+            from google import genai as image_genai
+            from google.genai import types as genai_types
 
-        for part in response.candidates[0].content.parts:
-            if part.inline_data and part.inline_data.data:
-                image_bytes = part.inline_data.data
-                logger.info(f"🎨 Infographic Nano Banana Pro généré ({len(image_bytes)} bytes)")
-                return image_bytes
+            # Nano Banana Pro requiert la location "global"
+            client = image_genai.Client(vertexai=True, project=GCP_PROJECT, location="global")
+            response = client.models.generate_content(
+                model="gemini-3-pro-image",
+                contents=image_prompt,
+                config=genai_types.GenerateContentConfig(
+                    response_modalities=["TEXT", "IMAGE"],
+                ),
+            )
 
-        logger.warning("⚠️ Aucune image dans la réponse Nano Banana Pro")
-        return None
+            image_bytes = None
+            for part in response.candidates[0].content.parts:
+                if part.inline_data and part.inline_data.data:
+                    image_bytes = part.inline_data.data
+                    break
 
-    except Exception as e:
-        logger.error(f"❌ Erreur génération visuel: {e}")
-        return None
+            if not image_bytes:
+                logger.warning(f"⚠️ Aucune image dans la réponse (attempt {v_attempt+1})")
+                if v_attempt < max_visual_attempts - 1:
+                    continue
+                return None
+
+            logger.info(f"🎨 {visual_format} généré ({len(image_bytes)} bytes, attempt {v_attempt+1})")
+
+            # Étape 2 : Visual critic
+            critic = _visual_critic(image_bytes, post_text)
+            if critic:
+                # Stocker la leçon visuelle en Firestore
+                if db:
+                    try:
+                        db.collection("visual_lessons").add({
+                            "scores": {k: v for k, v in critic.items() if k in ["readability", "spelling", "layout", "visual_appeal", "text_accuracy"]},
+                            "average": critic.get("average", 0),
+                            "issues": critic.get("issues", []),
+                            "verdict": critic.get("verdict", ""),
+                            "passed": critic.get("passed", False),
+                            "attempt": v_attempt + 1,
+                            "visual_format": visual_format,
+                            "created_at": datetime.now(timezone.utc).isoformat(),
+                        })
+                        logger.info(f"👁️ Leçon visuelle stockée (avg={critic.get('average', 0)})")
+                    except Exception:
+                        pass
+
+                if critic.get("passed", False):
+                    logger.info(f"✅ Visual critic PASSED — image validée")
+                    return image_bytes
+                else:
+                    logger.warning(f"⚠️ Visual critic REJECTED (avg={critic.get('average', 0)}) — issues: {critic.get('issues', [])}")
+                    # Préparer le feedback pour la régénération
+                    visual_issues_feedback = "; ".join(critic.get("issues", []))
+                    if v_attempt < max_visual_attempts - 1:
+                        continue
+                    # Dernier attempt — garder l'image même si imparfaite
+                    logger.warning("⚠️ Dernier attempt visuel — publication malgré les issues")
+                    return image_bytes
+
+            # Pas de critic → garder l'image
+            return image_bytes
+
+        except Exception as e:
+            logger.error(f"❌ Erreur génération visuel (attempt {v_attempt+1}): {e}")
+            if v_attempt < max_visual_attempts - 1:
+                continue
+            return None
+
+    return None
 
 
 def _upload_image_to_linkedin(image_bytes: bytes) -> str | None:
@@ -502,7 +1421,7 @@ def _upload_image_to_linkedin(image_bytes: bytes) -> str | None:
     headers = {
         "Authorization": f"Bearer {LINKEDIN_ACCESS_TOKEN}",
         "Content-Type": "application/json",
-        "LinkedIn-Version": "202506",
+        "LinkedIn-Version": "202607",
         "X-Restli-Protocol-Version": "2.0.0",
     }
 
@@ -589,7 +1508,7 @@ def publish_to_linkedin(post_text: str, image_bytes: bytes = None) -> dict:
         headers = {
             "Authorization": f"Bearer {LINKEDIN_ACCESS_TOKEN}",
             "Content-Type": "application/json",
-            "LinkedIn-Version": "202506",
+            "LinkedIn-Version": "202607",
             "X-Restli-Protocol-Version": "2.0.0",
         }
 

@@ -546,7 +546,7 @@ async def linkedin_oauth_callback(code: str = None, state: str = None, error: st
     secret_name = f"projects/{GCP_PROJECT}/secrets/LINKEDIN_CLIENT_SECRET/versions/latest"
     client_secret = sm.access_secret_version(name=secret_name).payload.data.decode()
 
-    redirect_uri = "https://renaudsecq59.github.io/mia-chatbot/callback.html"
+    redirect_uri = "https://renaudsecq.com/callback.html"
     r = httpx.post(
         "https://www.linkedin.com/oauth/v2/accessToken",
         data={
@@ -596,7 +596,7 @@ async def linkedin_authorize():
     params = urllib.parse.urlencode({
         "response_type": "code",
         "client_id": "78050rhmzifhz2",
-        "redirect_uri": "https://renaudsecq59.github.io/mia-chatbot/callback.html",
+        "redirect_uri": "https://renaudsecq.com/callback.html",
         "state": "auto",
         "scope": "openid profile w_member_social",
     })
@@ -641,7 +641,7 @@ async def llms_txt():
 ## Auteur
 - Renaud Secq — Consultant Freelance IA & Data
 - LinkedIn: https://www.linkedin.com/in/renaud-secq-5593832a/
-- Site: https://renaudsecq59.github.io/mia-chatbot/veille.html
+- Site: https://renaudsecq.com/veille.html
 """
     return PlainTextResponse(content=content, media_type="text/plain")
 
@@ -687,8 +687,8 @@ async def json_feed(limit: int = 20):
             "version": "https://www.jsonfeed.org/version/1.1",
             "title": "MIA Veille — Data & AI Governance",
             "description": "Veille automatisée sur l'AI Governance, Data Governance et Vibe Coding",
-            "home_page_url": "https://renaudsecq59.github.io/mia-chatbot/veille.html",
-            "feed_url": "https://veille-backend-791183172510.europe-west1.run.app/api/feed.json",
+            "home_page_url": "https://renaudsecq.com/veille.html",
+            "feed_url": "https://veille-backend-6lhk5fvt5q-ew.a.run.app/api/feed.json",
             "author": {
                 "name": "Renaud Secq",
                 "url": "https://www.linkedin.com/in/renaud-secq-5593832a/",

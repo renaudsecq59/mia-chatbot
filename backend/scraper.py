@@ -69,7 +69,7 @@ async def fetch_feed(source_name: str, url: str) -> list[dict]:
     try:
         async with httpx.AsyncClient(timeout=15.0, follow_redirects=True) as client:
             headers = {
-                "User-Agent": "Mozilla/5.0 (MIA Veille Bot; +https://renaudsecq59.github.io/mia-chatbot/veille.html)"
+                "User-Agent": "Mozilla/5.0 (MIA Veille Bot; +https://renaudsecq.com/veille.html)"
             }
             response = await client.get(url, headers=headers)
             response.raise_for_status()
