@@ -228,12 +228,15 @@ def _quality_gate(post_text: str) -> dict:
         if phrase.lower() in text_lower:
             issues.append(f"Banned phrase: '{phrase}'")
 
-    # Hook strength: first 210 chars should not start with a question or filler
-    first_line = post_text.split("\n")[0]
+    # Hook strength: first line must be a complete sentence
+    first_line = post_text.split("\n")[0].strip()
     if len(first_line) < 20:
         issues.append("Hook trop court (< 20 chars)")
     if first_line.startswith(("👍", "🔥", "💡", "✅", "❌", "⚡", "🚀")):
         issues.append("Hook commence par un emoji")
+    # Hook must end with proper punctuation (complete sentence check)
+    if first_line and not first_line.endswith((".", "!", "?", ":", ";", "…")):
+        issues.append(f"Hook incomplet (pas de ponctuation de fin): '{first_line[:60]}'")
 
     # Word count: 200-350 words sweet spot
     word_count = len(post_text.split())
@@ -373,7 +376,7 @@ POSTS PRÉCÉDENTS (pour évaluer l'originalité) :
 {recent_posts}
 
 ÉVALUE SUR CES 6 DIMENSIONS :
-1. HOOK — La première ligne crée-t-elle une "open loop" qui donne envie de lire la suite ? (0 = plate/générique, 10 = impossible de ne pas cliquer)
+1. HOOK — La première ligne est-elle une phrase COMPLÈTE qui crée une "open loop" ? Vérifie que ce n'est pas une phrase tronquée/incomplète. (0 = plate/tronquée, 10 = phrase complète et irrésistible)
 2. INSIGHT — Le post apporte-t-il UNE chose que le lecteur ne savait pas ? (0 = évident/redite, 10 = révélation)
 3. VOIX — Le ton est-il authentique, expert, pas du bullshit corporate ? (0 = creux/générique, 10 = voix unique reconnaissable)
 4. ORIGINALITÉ — L'angle est-il différent des posts précédents ? (0 = même angle/redite, 10 = perspective totalement neuve)
