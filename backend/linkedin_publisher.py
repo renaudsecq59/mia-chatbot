@@ -76,7 +76,14 @@ PROFIL RENAUD (à utiliser pour ancrer le propos, pas pour se vanter) :
 3. VIBE CODING — cursor, claude code, copilot, windsurf, agent coding, vibe coding, dev assisté IA
 
 OBJECTIF : Que chaque post apporte UNE chose que le lecteur ne savait pas avant.
-Le lecteur idéal est un CDO, CTO ou Data Engineer en entreprise.
+
+LECTEUR IDÉAL — CDO, CTO ou Data Engineer en entreprise :
+- Il subit la pression de "faire de l'IA" sans budget ni équipe dédiée
+- Il a déjà lancé 3 POCs IA, 2 sont morts en production, 1 tourne à vide
+- Il connaît les outils mais manque de recul stratégique sur la gouvernance
+- Il scroll LinkedIn le matin en 5 min : il veut de la viande, pas du marketing
+- Ses pain points : coût GPU explosif, conformité EU AI Act qui arrive, qualité des données pourrie, vendor lock-in
+- Ce qui l'arrête de scroller : un chiffre précis, un nom d'outil qu'il ne connaissait pas, une contradiction avec ce qu'il croyait vrai
 
 MOTS INTERDITS (jargon AI-slop, jamais les utiliser) : game-changer, révolutionnaire, passionnant, incroyable, leverage, dive in, supercharge, unlock, seamless, transformative, delve, harness, "Et vous ?", "Qu'en pensez-vous". Écris comme un humain, pas comme un LLM.
 
@@ -96,6 +103,9 @@ ANTI-RÉPÉTION ABSOLUE : Le post que tu vas écrire DOIT avoir un angle radical
 
 ARTICLES DE LA SEMAINE :
 {articles_summary}
+
+CONTENU APPROFONDI DES TOP ARTICLES (extrait réel — utilise ces informations factuelles) :
+{article_deep_dive}
 
 TENDANCES : {trends}
 
@@ -157,6 +167,37 @@ Structure :
 2. L'analogie (1 phrase, pas plus)
 3. Comment ça marche vraiment (2-3 paragraphes techniques mais lisibles)
 4. Pourquoi c'est important pour l'entreprise
+
+EXEMPLES DE POSTS QUI MARCHENT (pour calibrer le niveau d'expertise et le ton) :
+
+EXEMPLE 1 (DECRYPTAGE) :
+La donnée en silos ne coûte pas cher. C'est son absence qui ruine les projets IA.
+
+L'analogie : imaginez un chef cuisinier avec 50 frigos éparpillés dans 10 cuisines différentes. Pour chaque plat, il doit courir partout, vérifier chaque frigo, et prier pour que les ingrédients soient frais. C'est exactement ce que vivent les équipes data sans catalogue.
+
+Le problème : 73% des projets IA échouent en production. La cause n°1 selon Gartner n'est pas la technologie — c'est la qualité et la disponibilité des données. Un modèle LLM nourri avec des données non cataloguées, sans lineage, c'est un chef étoilé qui cuisine avec des ingrédients périmés sans le savoir.
+
+La solution n'est pas un outil. C'est une discipline : data contracts entre producteurs et consommateurs, catalogue vivant maintenu par les métiers, lineage automatique sur tous les pipelines. Collibra, Alation ou OpenMetadata — peu importe l'outil si la gouvernance organisationnelle n'existe pas.
+
+Sans ça, votre investissement IA est un château de cartes sur un sol de sable.
+
+EXEMPLE 2 (SIGNAL_FAIBLE) :
+Cursor vient de passer 500M d'arrondissement. Personne n'en parle comme il faut.
+
+Le chiffre est spectaculaire, mais ce qui m'intéresse c'est l'inversion de tendance qu'il révèle. Pendant 20 ans, les IDE étaient gratuits (VS Code) ou payants mais invisibles (JetBrains). Aujourd'hui, un IDE IA à $20/mois par développeur devient le standard.
+
+C'est plus significatif qu'il n'y paraît : ça signifie que la valeur se déplace du modèle (commoditisé par OpenAI/Anthropic) vers l'orchestration du workflow de développement. Celui qui possède l'interface de coding possède le point de contrôle de toute la chaîne de valeur dev.
+
+Pour les CTO : votre budget outils va exploser. Pas à cause des LLMs — à cause des couches d'orchestration qui se superposent. Budgetez $50-80/dev/mois minimum, et préparez vos équipes à changer d'IDE tous les 6 mois pendant 2 ans.
+
+EXEMPLE 3 (AI_GOVERNANCE) :
+L'EU AI Act entre en vigueur en août 2026. 90% des entreprises ne sont pas prêtes.
+
+Le risque n'est pas l'amende (jusqu'à 7% du CA). Le vrai risque, c'est l'obligation de documentation technique rétroactive. Si vous déployez un système IA "à haut risque" (recrutement, scoring, crédit), vous devez prouver que vous avez testé les biais, documenté les données d'entraînement, et mis en place un système de monitoring humain.
+
+En pratique, ça veut dire : inventory complet de tous vos modèles IA en production, classification par niveau de risque, et pour chaque modèle à haut risque — un dossier de conformité. C'est 3-6 mois de travail pour une équipe de 2-3 personnes.
+
+Ce qu'il faut faire maintenant : cartographier vos cas d'usage IA. Pas dans 6 mois. Maintenant. Le régulateur ne vous demandera pas si c'était difficile.
 
 INTERDICTIONS ABSOLUES :
 - "On me demande souvent", "J'ai eu l'occasion de" → INTERDIT
@@ -389,7 +430,8 @@ RÉPONDS EN JSON STRICT :
   "average": 0.0,
   "verdict": "one-liner: pourquoi ce post marche ou pas",
   "worst_dimension": "la dimension la plus faible",
-  "suggestion": "une phrase concrète pour améliorer"
+  "suggestion": "une phrase concrète pour améliorer",
+  "rewrite": "SI le post a un score < 7, réécris ici la version améliorée du passage le plus faible (1-3 phrases). Sinon laisse vide."
 }}"""
 
 
@@ -497,6 +539,132 @@ def _critic_evaluate(post_text: str, db) -> dict | None:
         return None
 
 
+async def _research_agent(articles: list[dict], top_n: int = 3) -> str:
+    """Research agent : fetch le contenu complet des top articles pour donner plus de matière au LLM.
+
+    Récupère le texte des articles via httpx, extrait les paragraphes pertinents,
+    et retourne un résumé structuré avec les faits/chiffres/noms exploitables.
+    """
+    import httpx as _httpx
+    from scraper import clean_html
+
+    deep_dive = []
+    for article in articles[:top_n]:
+        url = article.get("url", "")
+        if not url:
+            continue
+        try:
+            async with _httpx.AsyncClient(timeout=12.0, follow_redirects=True) as client:
+                resp = await client.get(url, headers={
+                    "User-Agent": "Mozilla/5.0 (MIA Veille Bot; +https://renaudsecq.com/veille.html)"
+                })
+                resp.raise_for_status()
+                raw_html = resp.text
+
+            # Extraction basique : retirer scripts/styles, garder le texte
+            import re as _re
+            # Supprimer scripts, styles, nav, footer
+            for tag in ["script", "style", "nav", "footer", "header", "aside"]:
+                raw_html = _re.sub(rf"<{tag}[^>]*>.*?</{tag}>", "", raw_html, flags=_re.DOTALL | _re.IGNORECASE)
+            # Extraire les paragraphes
+            paragraphs = _re.findall(r"<p[^>]*>(.*?)</p>", raw_html, _re.DOTALL | _re.IGNORECASE)
+            # Nettoyer le HTML des paragraphes
+            clean_paragraphs = []
+            for p in paragraphs:
+                clean_p = clean_html(p).strip()
+                if len(clean_p) > 50:  # Ignorer les paragraphes trop courts
+                    clean_paragraphs.append(clean_p)
+
+            # Prendre les 8 meilleurs paragraphes (les plus longs = généralement les plus informatifs)
+            clean_paragraphs.sort(key=len, reverse=True)
+            top_paragraphs = clean_paragraphs[:8]
+            # Re-trier par ordre d'apparition (index original)
+            top_paragraphs.sort(key=lambda p: clean_paragraphs.index(p))
+
+            content = "\n".join(top_paragraphs)
+            # Limiter à 2000 chars par article
+            if len(content) > 2000:
+                content = content[:2000] + "..."
+
+            deep_dive.append(f"### {article['title']}\nSource: {article.get('source_name', '?')}\nURL: {url}\n\n{content}")
+            logger.info(f"🔬 Research agent: {article.get('source_name', '?')} — {len(top_paragraphs)} paragraphes extraits")
+
+        except Exception as e:
+            logger.debug(f"🔬 Research agent: échec fetch {url}: {e}")
+            # Fallback sur le summary RSS si disponible
+            summary = article.get("summary_raw", "")[:500]
+            if summary:
+                deep_dive.append(f"### {article['title']}\nSource: {article.get('source_name', '?')}\n(Résumé RSS)\n\n{summary}")
+
+    return "\n\n---\n\n".join(deep_dive) if deep_dive else "Aucun contenu approfondi disponible."
+
+
+FACT_CHECK_PROMPT = """Tu es un fact-checker strict. Tu vérifies que TOUTES les affirmations factuelles du post LinkedIn ci-dessous sont sourcées dans les articles fournis.
+
+POST À VÉRIFIER :
+{post_text}
+
+ARTICLES SOURCES (contenu réel) :
+{source_content}
+
+RÈGLES :
+1. Pour chaque chiffre, pourcentage, nom d'outil, nom d'entreprise, date, ou affirmation factuelle dans le post → vérifie qu'elle est présente dans les articles sources
+2. Si une affirmation n'est PAS sourcée → liste-la comme "unsourced"
+3. Si une affirmation contredit les sources → liste-la comme "contradicted"
+4. Les chiffres de notoriété publique (ex: "73% des projets IA échouent" si c'est un fait bien connu) sont acceptés sans source
+
+RÉPONDS EN JSON STRICT :
+{{
+  "verified": true/false,
+  "issues": [
+    {{"claim": "l'affirmation du post", "type": "unsourced|contradicted", "fix": "correction suggérée ou 'supprimer'"}}
+  ],
+  "summary": "1 ligne: nombre de problèmes trouvés"
+}}"""
+
+
+def _fact_check(post_text: str, source_content: str) -> dict | None:
+    """Fact-check agent : vérifie que les affirmations du post sont sourcées dans les articles.
+
+    Returns:
+        {"verified": bool, "issues": list, "summary": str} ou None si échec.
+    """
+    if not gemini_client or not source_content:
+        return None
+
+    try:
+        from google.genai import types as genai_types
+        prompt = FACT_CHECK_PROMPT.format(
+            post_text=post_text[:2000],
+            source_content=source_content[:4000],
+        )
+        response = gemini_client.models.generate_content(
+            model=GEMINI_FLASH_MODEL,
+            contents=prompt,
+            config=genai_types.GenerateContentConfig(
+                response_mime_type="application/json",
+                max_output_tokens=1024,
+                temperature=0.1,
+            ),
+        )
+        raw = response.text
+        if raw is None and response.candidates:
+            parts = response.candidates[0].content.parts
+            raw = "".join(p.text for p in parts if p.text)
+        raw = (raw or "").strip()
+        if raw.startswith("```"):
+            raw = raw.split("\n", 1)[1].rsplit("```", 1)[0].strip()
+
+        result = json.loads(raw)
+        issues_count = len(result.get("issues", []))
+        logger.info(f"🔬 Fact-check: {'OK' if result.get('verified') else f'{issues_count} problème(s)'}")
+        return result
+
+    except Exception as e:
+        logger.warning(f"⚠️ Fact-check échoué: {e}")
+        return None
+
+
 def generate_weekly_edito(articles: list[dict], trends: list[str] = None, post_type: str = None, db=None) -> dict:
     """Génère l'édito LinkedIn à partir des meilleurs articles.
 
@@ -522,6 +690,14 @@ def generate_weekly_edito(articles: list[dict], trends: list[str] = None, post_t
             articles_summary += f"   💬 {a['expert_opinion'][:120]}\n"
 
     trends_str = ", ".join(trends[:8]) if trends else "AI governance, data governance, vibe coding"
+
+    # RESEARCH AGENT : fetch le contenu complet des top 3 articles
+    article_deep_dive = "Aucun contenu approfondi disponible."
+    try:
+        import asyncio as _asyncio
+        article_deep_dive = _asyncio.run(_research_agent(articles, top_n=3))
+    except Exception as research_err:
+        logger.warning(f"⚠️ Research agent échoué: {research_err}")
 
     # Récupérer l'historique des posts pour l'anti-répétition
     post_history = get_post_history_summary(db, limit=5) if db else "Aucun historique disponible."
@@ -568,6 +744,7 @@ def generate_weekly_edito(articles: list[dict], trends: list[str] = None, post_t
                 title=EXPERT_PROFILE["title"],
                 today=datetime.now(timezone.utc).strftime("%d %B 2026"),
                 articles_summary=articles_summary,
+                article_deep_dive=article_deep_dive,
                 trends=trends_str,
                 post_type=post_type,
                 site_url=SITE_URL,
@@ -644,7 +821,23 @@ def generate_weekly_edito(articles: list[dict], trends: list[str] = None, post_t
                         store_critic_lesson(db, critic, result.get("post_text", ""))
                     if not critic["passed"]:
                         logger.warning(f"🎭 Critic REJECTED (avg={critic['average']}/10) — worst: {critic.get('worst_dimension')} — regénération")
-                        post_history += f"\n⚠️ ATTENTION: Le critique a noté ce post {critic['average']}/10. Dimension la plus faible: {critic.get('worst_dimension')}. Suggestion: {critic.get('suggestion')}. Améliore absolument."
+                        rewrite_hint = critic.get("rewrite", "")
+                        post_history += f"\n⚠️ ATTENTION: Le critique a noté ce post {critic['average']}/10. Dimension la plus faible: {critic.get('worst_dimension')}. Suggestion: {critic.get('suggestion')}."
+                        if rewrite_hint:
+                            post_history += f" Réécriture suggérée: {rewrite_hint}"
+                        post_history += " Améliore absolument."
+                        continue
+
+            # FACT-CHECK AGENT — vérifie que les chiffres/affirmations sont sourcés (skip on last attempt)
+            if attempt < max_retries - 1 and article_deep_dive != "Aucun contenu approfondi disponible.":
+                fc = _fact_check(result.get("post_text", ""), article_deep_dive)
+                if fc:
+                    result["fact_check"] = fc
+                    if not fc.get("verified", True):
+                        issues = fc.get("issues", [])
+                        logger.warning(f"🔬 Fact-check FAILED: {len(issues)} problème(s) — regénération")
+                        fixes = "; ".join(f"{i.get('claim', '?')} → {i.get('fix', '?')}" for i in issues[:3])
+                        post_history += f"\n⚠️ ATTENTION: Le fact-checker a trouvé {len(issues)} affirmation(s) non sourcée(s): {fixes}. Ne fabrique AUCUN chiffre qui n'est pas dans les articles."
                         continue
 
             # MÉCANISME 4: A/B testing des hooks — générer un 2e hook et garder le meilleur
