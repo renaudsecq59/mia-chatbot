@@ -168,36 +168,36 @@ Structure :
 3. Comment ça marche vraiment (2-3 paragraphes techniques mais lisibles)
 4. Pourquoi c'est important pour l'entreprise
 
-EXEMPLES DE POSTS QUI MARCHENT (pour calibrer le niveau d'expertise et le ton) :
+EXEMPLES DE POSTS QUI MARCHENT (3 styles différents — adapte selon le sujet) :
 
-EXEMPLE 1 (DECRYPTAGE) :
-La donnée en silos ne coûte pas cher. C'est son absence qui ruine les projets IA.
+EXEMPLE 1 — STYLE PUNCHY (court, percutant, scroll-stopper) :
+73% des projets IA en production échouent. Et ce n'est même pas un problème de modèle.
 
-L'analogie : imaginez un chef cuisinier avec 50 frigos éparpillés dans 10 cuisines différentes. Pour chaque plat, il doit courir partout, vérifier chaque frigo, et prier pour que les ingrédients soient frais. C'est exactement ce que vivent les équipes data sans catalogue.
+C'est un problème de données. Gartner le dit clairement : la cause n°1 n'est pas la techno, c'est la qualité des données en entrée.
 
-Le problème : 73% des projets IA échouent en production. La cause n°1 selon Gartner n'est pas la technologie — c'est la qualité et la disponibilité des données. Un modèle LLM nourri avec des données non cataloguées, sans lineage, c'est un chef étoilé qui cuisine avec des ingrédients périmés sans le savoir.
+Un LLM nourri avec des données non cataloguées, sans lineage, sans contrôle qualité ? C'est un chef étoilé qui cuisine avec des ingrédients périmés sans le savoir.
 
-La solution n'est pas un outil. C'est une discipline : data contracts entre producteurs et consommateurs, catalogue vivant maintenu par les métiers, lineage automatique sur tous les pipelines. Collibra, Alation ou OpenMetadata — peu importe l'outil si la gouvernance organisationnelle n'existe pas.
+La solution n'est pas un outil. C'est une discipline : data contracts, catalogue vivant, lineage automatique. Collibra ou OpenMetadata — peu importe, tant que la gouvernance existe.
 
 Sans ça, votre investissement IA est un château de cartes sur un sol de sable.
 
-EXEMPLE 2 (SIGNAL_FAIBLE) :
-Cursor vient de passer 500M d'arrondissement. Personne n'en parle comme il faut.
+EXEMPLE 2 — STYLE EXPERT DENSE (analyse profonde, sujets complexes) :
+L'EU AI Act arrive en août 2026. Personne n'est prêt. Et l'amende n'est pas le vrai problème.
 
-Le chiffre est spectaculaire, mais ce qui m'intéresse c'est l'inversion de tendance qu'il révèle. Pendant 20 ans, les IDE étaient gratuits (VS Code) ou payants mais invisibles (JetBrains). Aujourd'hui, un IDE IA à $20/mois par développeur devient le standard.
+Le vrai risque, c'est la documentation technique rétroactive. Si vous déployez un système IA "à haut risque" (recrutement, scoring, crédit), vous devez prouver que vous avez testé les biais, documenté les données d'entraînement, et mis en place un monitoring humain.
 
-C'est plus significatif qu'il n'y paraît : ça signifie que la valeur se déplace du modèle (commoditisé par OpenAI/Anthropic) vers l'orchestration du workflow de développement. Celui qui possède l'interface de coding possède le point de contrôle de toute la chaîne de valeur dev.
+En pratique : inventory complet de vos modèles IA, classification par niveau de risque, et pour chaque modèle à haut risque — un dossier de conformité. C'est 3-6 mois de travail pour 2-3 personnes.
 
-Pour les CTO : votre budget outils va exploser. Pas à cause des LLMs — à cause des couches d'orchestration qui se superposent. Budgetez $50-80/dev/mois minimum, et préparez vos équipes à changer d'IDE tous les 6 mois pendant 2 ans.
+Cartographiez vos cas d'usage IA. Pas dans 6 mois. Maintenant.
 
-EXEMPLE 3 (AI_GOVERNANCE) :
-L'EU AI Act entre en vigueur en août 2026. 90% des entreprises ne sont pas prêtes.
+EXEMPLE 3 — STYLE NARRATIF (histoire concrète, ancrage terrain) :
+Un data scientist a passé 3 semaines à tuner un modèle de churn. Accuracy : 94%. Le modèle était parfait pour des clients qui n'existaient plus.
 
-Le risque n'est pas l'amende (jusqu'à 7% du CA). Le vrai risque, c'est l'obligation de documentation technique rétroactive. Si vous déployez un système IA "à haut risque" (recrutement, scoring, crédit), vous devez prouver que vous avez testé les biais, documenté les données d'entraînement, et mis en place un système de monitoring humain.
+Les données d'entraînement dataient de 18 mois. Les comportements clients avaient changé. Le modèle optimisait dans le vide.
 
-En pratique, ça veut dire : inventory complet de tous vos modèles IA en production, classification par niveau de risque, et pour chaque modèle à haut risque — un dossier de conformité. C'est 3-6 mois de travail pour une équipe de 2-3 personnes.
+C'est le piège classique du ML en production : on tune la métrique, on oublie la donnée. Le modèle le plus performant sur papier peut être le plus dangereux en réel si personne ne monitor le drift.
 
-Ce qu'il faut faire maintenant : cartographier vos cas d'usage IA. Pas dans 6 mois. Maintenant. Le régulateur ne vous demandera pas si c'était difficile.
+Un modèle à 80% sur des données propres bat toujours un modèle à 94% sur des données pourries.
 
 INTERDICTIONS ABSOLUES :
 - "On me demande souvent", "J'ai eu l'occasion de" → INTERDIT
