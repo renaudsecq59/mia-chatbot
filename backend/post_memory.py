@@ -222,23 +222,22 @@ def fetch_linkedin_engagement(access_token: str, post_urn: str) -> dict | None:
             "X-Restli-Protocol-Version": "2.0.0",
         }
 
-        # 1. Social Actions summary (likes + comments en un seul call)
-        # Pour les posts personnels, utiliser urn:li:share: directement
+        # 1. Social Metadata API (remplace socialActions — fonctionne pour les posts personnels)
         likes_count = 0
         comments_count = 0
-        shares_count = 0
 
         social_resp = httpx.get(
-            f"https://api.linkedin.com/rest/socialActions/{post_urn}",
+            f"https://api.linkedin.com/rest/socialMetadata/{post_urn}",
             headers=headers, timeout=15,
         )
         if social_resp.status_code == 200:
             data = social_resp.json()
-            likes_count = data.get("likesSummary", {}).get("totalLikes", 0)
-            comments_count = data.get("commentsSummary", {}).get("totalFirstLevelComments", 0)
-            shares_count = data.get("shareStatistics", {}).get("shareCount", 0)
+            # reactionSummaries: dict of reactionType -> {count}
+            for rtype, rdata in data.get("reactionSummaries", {}).items():
+                likes_count += rdata.get("count", 0)
+            comments_count = data.get("commentSummary", {}).get("topLevelCount", 0)
         else:
-            logger.debug(f"socialActions {post_urn}: {social_resp.status_code} — {social_resp.text[:200]}")
+            logger.debug(f"socialMetadata {post_urn}: {social_resp.status_code} — {social_resp.text[:200]}")
 
         # 2. Impressions via individualShareStatistics (profil personnel)
         impressions = 0
@@ -263,7 +262,6 @@ def fetch_linkedin_engagement(access_token: str, post_urn: str) -> dict | None:
         return {
             "likes": likes_count,
             "comments": comments_count,
-            "shares": shares_count,
             "impressions": impressions,
             "engagement_rate": engagement_rate,
             "fetched_at": datetime.now(timezone.utc).isoformat(),
