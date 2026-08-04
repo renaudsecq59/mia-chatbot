@@ -4,10 +4,15 @@ node_modules/
 .git/
 *.md
 *.py
-*.txt
 Dockerfile
 docker-compose*
 .env*
 __pycache__/
 .venv/
 venv/
+setup-cron.sh
+deploy.sh
+firebase.json
+firestore.indexes.json
+firestore.rules
+.firebase/
