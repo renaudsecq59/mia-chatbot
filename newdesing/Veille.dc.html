@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet data-dc-atomics>
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;700&amp;family=Instrument+Sans:ital,wght@0,400;0,500;0,600;1,400&amp;family=IBM+Plex+Mono:wght@400;500&amp;display=swap" rel="stylesheet">
+<style>
+html{scroll-behavior:smooth}
+body{margin:0;background:#f4f6f8;color:#0b1220;font-family:'Instrument Sans',sans-serif}
+a{color:#0b1220;text-decoration:none}a:hover{color:oklch(0.55 0.19 255)}
+::selection{background:oklch(0.55 0.19 255);color:#fff}
+@keyframes pulse{0%,100%{opacity:1;transform:scale(1)}50%{opacity:.35;transform:scale(1.5)}}
+</style>
+</helmet>
+
+<!-- NAV -->
+<nav style="position:fixed;top:0;left:0;right:0;z-index:100;background:rgba(244,246,248,.9);backdrop-filter:blur(16px) saturate(160%);border-bottom:1px solid rgba(11,18,32,.08)">
+  <div style="max-width:1240px;margin:0 auto;padding:16px 32px;display:flex;align-items:center;justify-content:space-between">
+    <a href="Renaud Secq - Site.dc.html" style="display:flex;align-items:center;gap:10px"><span style="width:24px;height:24px;background:#0b1220;color:#f4f6f8;display:inline-flex;align-items:center;justify-content:center;font:700 11px 'Space Grotesk',sans-serif;border-radius:5px">RS</span><span style="font:700 15px 'Space Grotesk',sans-serif;letter-spacing:-.01em">renaud.secq</span></a>
+    <div style="display:flex;align-items:center;gap:26px;font:500 12px 'IBM Plex Mono',monospace">
+      <a href="Renaud Secq - Site.dc.html" style="color:rgba(11,18,32,.55)">← retour_au_site</a>
+      <a href="Etudes de cas.dc.html" style="color:rgba(11,18,32,.55)">/etudes_de_cas</a>
+      <a href="Renaud Secq - Site.dc.html#contact" style="background:oklch(0.55 0.19 255);color:#fff;padding:8px 18px;border-radius:6px">contact --now</a>
+    </div>
+  </div>
+</nav>
+
+<!-- HEADER -->
+<header style="max-width:1240px;margin:0 auto;padding:150px 32px 48px" data-screen-label="Header veille">
+  <div style="font:500 11px 'IBM Plex Mono',monospace;letter-spacing:.12em;color:oklch(0.55 0.19 255);margin-bottom:16px;display:flex;align-items:center;gap:10px"><span style="width:7px;height:7px;border-radius:50%;background:oklch(0.55 0.19 255);animation:pulse 2s infinite"></span>[ VEILLE — 3 À 4 ARTICLES / SEMAINE ]</div>
+  <h1 style="font:700 clamp(40px,5vw,68px)/1.02 'Space Grotesk',sans-serif;letter-spacing:-.035em;margin:0 0 20px;max-width:900px">Les signaux faibles de l'IA en entreprise.<br><span style="color:rgba(11,18,32,.35)">Avec un angle terrain.</span></h1>
+  <p style="font:400 16px/1.7 'Instrument Sans',sans-serif;color:rgba(11,18,32,.55);max-width:560px;margin:0 0 28px">Réglementation, outillage agentique, retours de production : ce qui change vraiment pour les équipes data et produit — décrypté depuis le terrain, pas depuis les communiqués de presse.</p>
+  <a href="https://www.linkedin.com/in/renaud-secq-5593832a/" target="_blank" style="display:inline-flex;font:500 13px 'IBM Plex Mono',monospace;background:#0b1220;color:#f4f6f8;padding:14px 26px;border-radius:8px" style-hover="background:oklch(0.35 0.12 255);color:#fff">→ suivre_sur_linkedin() · 20k abonnés</a>
+</header>
+
+<!-- BANNER PLACEHOLDER -->
+<div style="max-width:1240px;margin:0 auto;padding:0 32px 40px">
+  <div style="border:1px dashed rgba(11,18,32,.3);border-radius:10px;padding:14px 20px;font:500 12px 'IBM Plex Mono',monospace;color:rgba(11,18,32,.5);background:rgba(255,255,255,.6)">[ CONTENU D'EXEMPLE ] — Les articles ci-dessous sont des gabarits. Envoyez-moi vos vrais titres / liens LinkedIn (ou un flux) et je les branche.</div>
+</div>
+
+<!-- FEATURED -->
+<section style="max-width:1240px;margin:0 auto;padding:0 32px 16px" data-screen-label="Article vedette">
+  <a href="Article.dc.html" style="display:grid;grid-template-columns:1fr 380px;gap:56px;align-items:center;background:#0b1220;color:#f4f6f8;border-radius:16px;padding:48px;transition:.3s" style-hover="transform:translateY(-3px);box-shadow:0 20px 50px rgba(11,18,32,.25);color:#f4f6f8">
+    <div>
+      <div style="display:flex;gap:8px;margin-bottom:18px;font:500 10px 'IBM Plex Mono',monospace">
+        <span style="background:oklch(0.55 0.19 255);color:#fff;border-radius:100px;padding:4px 12px">À LA UNE</span>
+        <span style="border:1px solid rgba(244,246,248,.25);color:rgba(244,246,248,.6);border-radius:100px;padding:4px 12px">AI_GOVERNANCE</span>
+      </div>
+      <h2 style="font:700 clamp(24px,2.8vw,34px)/1.15 'Space Grotesk',sans-serif;letter-spacing:-.02em;margin:0 0 14px">Titre de votre article vedette — à remplacer</h2>
+      <p style="font:400 14.5px/1.75 'Instrument Sans',sans-serif;color:rgba(244,246,248,.55);margin:0 0 20px;max-width:560px">Deux ou trois lignes d'accroche de l'article. C'est l'emplacement idéal pour votre analyse la plus forte de la semaine.</p>
+      <span style="font:500 12px 'IBM Plex Mono',monospace;color:oklch(0.75 0.17 255)">→ lire_l_article() · JJ.MM.2026 · 6 min</span>
+    </div>
+    <div style="height:240px;border:1px dashed rgba(244,246,248,.25);border-radius:12px;display:flex;align-items:center;justify-content:center;font:500 11px 'IBM Plex Mono',monospace;color:rgba(244,246,248,.4);text-align:center;padding:20px">[ visuel de l'article —<br>schéma blueprint ou image ]</div>
+  </a>
+</section>
+
+<!-- FILTERS + GRID -->
+<section style="max-width:1240px;margin:0 auto;padding:32px 32px 100px" data-screen-label="Articles">
+  <div style="display:flex;flex-wrap:wrap;gap:8px;margin-bottom:28px;font:500 11px 'IBM Plex Mono',monospace">
+    <span style="background:#0b1220;color:#f4f6f8;border-radius:100px;padding:7px 16px">tous</span>
+    <span style="border:1px solid rgba(11,18,32,.15);color:rgba(11,18,32,.6);border-radius:100px;padding:7px 16px;cursor:pointer" style-hover="border-color:oklch(0.55 0.19 255);color:oklch(0.55 0.19 255)">data_governance</span>
+    <span style="border:1px solid rgba(11,18,32,.15);color:rgba(11,18,32,.6);border-radius:100px;padding:7px 16px;cursor:pointer" style-hover="border-color:oklch(0.55 0.19 255);color:oklch(0.55 0.19 255)">ai_governance</span>
+    <span style="border:1px solid rgba(11,18,32,.15);color:rgba(11,18,32,.6);border-radius:100px;padding:7px 16px;cursor:pointer" style-hover="border-color:oklch(0.55 0.19 255);color:oklch(0.55 0.19 255)">software_eng_3.0</span>
+    <span style="border:1px solid rgba(11,18,32,.15);color:rgba(11,18,32,.6);border-radius:100px;padding:7px 16px;cursor:pointer" style-hover="border-color:oklch(0.55 0.19 255);color:oklch(0.55 0.19 255)">retours_terrain</span>
+  </div>
+  <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:16px">
+    <sc-for list="{{ articles }}" as="art" hint-placeholder-count="6">
+      <a href="Article.dc.html" style="display:flex;flex-direction:column;gap:14px;background:#fff;border:1px solid rgba(11,18,32,.1);border-radius:14px;padding:28px 26px;transition:.3s" style-hover="transform:translateY(-4px);box-shadow:0 14px 36px rgba(11,18,32,.08);border-color:oklch(0.55 0.19 255);color:#0b1220">
+        <div style="display:flex;justify-content:space-between;align-items:center;font:500 10px 'IBM Plex Mono',monospace">
+          <span style="border:1px solid rgba(11,18,32,.15);color:rgba(11,18,32,.55);border-radius:100px;padding:4px 11px">{{ art.tag }}</span>
+          <span style="color:rgba(11,18,32,.35)">{{ art.date }}</span>
+        </div>
+        <h3 style="font:700 18px/1.3 'Space Grotesk',sans-serif;letter-spacing:-.01em;margin:0">{{ art.titre }}</h3>
+        <p style="font:400 13px/1.7 'Instrument Sans',sans-serif;color:rgba(11,18,32,.55);margin:0">{{ art.extrait }}</p>
+        <span style="font:500 11px 'IBM Plex Mono',monospace;color:oklch(0.55 0.19 255);margin-top:auto">→ lire() · {{ art.duree }}</span>
+      </a>
+    </sc-for>
+  </div>
+</section>
+
+<!-- CTA -->
+<section style="background:#0b1220;color:#f4f6f8;padding:80px 0" data-screen-label="CTA newsletter">
+  <div style="max-width:1240px;margin:0 auto;padding:0 32px;display:flex;justify-content:space-between;align-items:center;gap:48px;flex-wrap:wrap">
+    <div>
+      <h2 style="font:700 clamp(26px,3vw,38px)/1.1 'Space Grotesk',sans-serif;letter-spacing:-.03em;margin:0 0 8px">Ne ratez aucun signal.</h2>
+      <p style="font:400 14px/1.7 'Instrument Sans',sans-serif;color:rgba(244,246,248,.5);margin:0">3 à 4 analyses par semaine, directement sur LinkedIn.</p>
+    </div>
+    <a href="https://www.linkedin.com/in/renaud-secq-5593832a/" target="_blank" style="font:500 13px 'IBM Plex Mono',monospace;background:oklch(0.55 0.19 255);color:#fff;padding:16px 30px;border-radius:8px" style-hover="filter:brightness(1.15)">→ suivre_sur_linkedin()</a>
+  </div>
+</section>
+
+<footer style="background:#0b1220;color:rgba(244,246,248,.4);border-top:1px solid rgba(244,246,248,.1);padding:24px 0">
+  <div style="max-width:1240px;margin:0 auto;padding:0 32px;display:flex;flex-direction:column;gap:14px;font:400 12px 'IBM Plex Mono',monospace">
+    <div style="display:flex;justify-content:space-between;align-items:center;gap:24px;flex-wrap:wrap">
+      <span>© 2026 Renaud Secq — Consultant IA &amp; Data</span>
+      <a href="Renaud Secq - Site.dc.html" style="color:rgba(244,246,248,.4)">← retour_au_site</a>
+    </div>
+    <div style="border-top:1px solid rgba(244,246,248,.08);padding-top:12px;font-size:11px;color:rgba(244,246,248,.3);line-height:1.7">RENAISSANCE DIGITAL CONSULTING — SAS · SIREN 830 153 128 · TVA FR13 830 153 128 · 2 allée du Vert Galant, 59840 Lompret · Conseil en systèmes et logiciels informatiques (NAF 62.02A) · Immatriculée au RNE depuis 2017</div>
+  </div>
+</footer>
+
+</x-dc>
+<script type="text/x-dc" data-dc-script>
+class Component extends DCLogic {
+  renderVals() {
+    return {
+      articles: [
+        { tag: 'ai_governance', date: 'JJ.MM.2026', titre: "Titre d'article — à remplacer", extrait: "Deux lignes d'accroche de l'article, à remplacer par votre vrai contenu LinkedIn.", duree: '4 min' },
+        { tag: 'software_eng_3.0', date: 'JJ.MM.2026', titre: "Titre d'article — à remplacer", extrait: "Deux lignes d'accroche de l'article, à remplacer par votre vrai contenu LinkedIn.", duree: '5 min' },
+        { tag: 'data_governance', date: 'JJ.MM.2026', titre: "Titre d'article — à remplacer", extrait: "Deux lignes d'accroche de l'article, à remplacer par votre vrai contenu LinkedIn.", duree: '3 min' },
+        { tag: 'retours_terrain', date: 'JJ.MM.2026', titre: "Titre d'article — à remplacer", extrait: "Deux lignes d'accroche de l'article, à remplacer par votre vrai contenu LinkedIn.", duree: '6 min' },
+        { tag: 'ai_governance', date: 'JJ.MM.2026', titre: "Titre d'article — à remplacer", extrait: "Deux lignes d'accroche de l'article, à remplacer par votre vrai contenu LinkedIn.", duree: '4 min' },
+        { tag: 'software_eng_3.0', date: 'JJ.MM.2026', titre: "Titre d'article — à remplacer", extrait: "Deux lignes d'accroche de l'article, à remplacer par votre vrai contenu LinkedIn.", duree: '5 min' }
+      ]
+    };
+  }
+}
+</script>
+</body>
+</html>

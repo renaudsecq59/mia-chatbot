@@ -1,0 +1,554 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet data-dc-atomics>
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;700&amp;family=Instrument+Sans:ital,wght@0,400;0,500;0,600;1,400&amp;family=IBM+Plex+Mono:wght@400;500&amp;display=swap" rel="stylesheet">
+<script src="./image-slot.js"></script>
+<style>
+html{scroll-behavior:smooth}
+body{margin:0;background:#f4f6f8;color:#0b1220;font-family:'Instrument Sans',sans-serif;overflow-x:hidden}
+a{color:#0b1220;text-decoration:none}a:hover{color:oklch(0.55 0.19 255)}
+::selection{background:oklch(0.55 0.19 255);color:#fff}
+::-webkit-scrollbar{width:5px}::-webkit-scrollbar-track{background:#f4f6f8}::-webkit-scrollbar-thumb{background:rgba(11,18,32,.2);border-radius:3px}
+@keyframes pulse{0%,100%{opacity:1;transform:scale(1)}50%{opacity:.35;transform:scale(1.5)}}
+@keyframes marq{from{transform:translateX(0)}to{transform:translateX(-50%)}}
+@keyframes flow{from{stroke-dashoffset:240}to{stroke-dashoffset:0}}
+@keyframes drift{0%,100%{transform:translateY(0)}50%{transform:translateY(-8px)}}
+@keyframes blink{0%,100%{opacity:1}50%{opacity:0}}
+</style>
+</helmet>
+
+<div id="cursor" style="position:fixed;top:0;left:0;width:36px;height:36px;border:1.5px solid oklch(0.55 0.19 255);border-radius:50%;pointer-events:none;z-index:9999;transform:translate(-100px,-100px);transition:transform .12s ease-out;mix-blend-mode:multiply"></div>
+<div id="cursorDot" style="position:fixed;top:0;left:0;width:5px;height:5px;background:oklch(0.55 0.19 255);border-radius:50%;pointer-events:none;z-index:9999;transform:translate(-100px,-100px)"></div>
+
+<!-- NAV -->
+<nav style="position:fixed;top:0;left:0;right:0;z-index:100;background:rgba(244,246,248,.9);backdrop-filter:blur(16px) saturate(160%);border-bottom:1px solid rgba(11,18,32,.08)">
+  <div style="max-width:1240px;margin:0 auto;padding:16px 32px;display:flex;align-items:center;justify-content:space-between">
+    <a href="#top" style="display:flex;align-items:center;gap:10px"><span style="width:24px;height:24px;background:#0b1220;color:#f4f6f8;display:inline-flex;align-items:center;justify-content:center;font:700 11px 'Space Grotesk',sans-serif;border-radius:5px">RS</span><span style="font:700 15px 'Space Grotesk',sans-serif;letter-spacing:-.01em">renaud.secq</span></a>
+    <div style="display:flex;align-items:center;gap:26px;font:500 12px 'IBM Plex Mono',monospace">
+      <a href="#piliers" style="color:rgba(11,18,32,.55)">/piliers</a>
+      <a href="#preuves" style="color:rgba(11,18,32,.55)">/preuves</a>
+      <a href="#methode" style="color:rgba(11,18,32,.55)">/methode</a>
+      <a href="#offres" style="color:rgba(11,18,32,.55)">/offres</a>
+      <a href="Veille.dc.html" style="color:rgba(11,18,32,.55)">/veille</a>
+      <span style="color:rgba(11,18,32,.35)">FR·<span style="opacity:.5">EN</span></span>
+      <a href="#contact" style="background:oklch(0.55 0.19 255);color:#fff;padding:8px 18px;border-radius:6px" style-hover="filter:brightness(1.15)">contact --now</a>
+    </div>
+  </div>
+</nav>
+
+<!-- HERO -->
+<header id="top" style="position:relative;min-height:100vh;display:flex;flex-direction:column;justify-content:center;padding:140px 0 60px;background-image:linear-gradient(rgba(11,18,32,.045) 1px,transparent 1px),linear-gradient(90deg,rgba(11,18,32,.045) 1px,transparent 1px);background-size:56px 56px;overflow:hidden">
+  <canvas id="net" style="position:absolute;inset:0;width:100%;height:100%"></canvas>
+  <div style="position:relative;z-index:1;max-width:1240px;margin:0 auto;padding:0 32px;width:100%;box-sizing:border-box">
+    <div style="font:500 11px 'IBM Plex Mono',monospace;letter-spacing:.12em;color:oklch(0.55 0.19 255);margin-bottom:28px;display:flex;align-items:center;gap:10px"><span style="width:7px;height:7px;border-radius:50%;background:oklch(0.55 0.19 255);animation:pulse 2s infinite"></span>[ DISPONIBLE DÈS DÉC. 2026 — MISSIONS LONGUES ] · CONSULTANT IA &amp; DATA · LILLE / REMOTE</div>
+    <h1 style="font:700 clamp(52px,7vw,92px)/1.0 'Space Grotesk',sans-serif;letter-spacing:-.035em;margin:0 0 28px;max-width:900px">Des systèmes agentiques qui tournent.<br><span style="color:rgba(11,18,32,.32)">Gouvernés. Conformes. Mesurés.</span></h1>
+    <p style="font:400 17px/1.7 'Instrument Sans',sans-serif;color:rgba(11,18,32,.6);max-width:520px;margin:0 0 40px">Data Governance → AI Governance → Software Engineering 3.0. Une chaîne complète, un seul interlocuteur. Des résultats en production chez Decathlon et Adeo — pas des slides.</p>
+    <div style="display:flex;gap:12px;font:500 13px 'IBM Plex Mono',monospace;flex-wrap:wrap">
+      <a href="#contact" style="background:#0b1220;color:#f4f6f8;padding:15px 28px;border-radius:8px;display:inline-flex;align-items:center;gap:8px" style-hover="background:oklch(0.35 0.12 255);color:#fff;transform:translateY(-2px)">→ lancer_un_projet()</a>
+      <a href="#preuves" style="border:1px solid rgba(11,18,32,.2);padding:15px 28px;border-radius:8px;color:rgba(11,18,32,.7)" style-hover="border-color:oklch(0.55 0.19 255);color:oklch(0.55 0.19 255)">voir_les_preuves()</a>
+      <a href="https://www.linkedin.com/in/renaud-secq-5593832a/" target="_blank" style="border:1px solid rgba(11,18,32,.2);padding:15px 28px;border-radius:8px;color:rgba(11,18,32,.7)" style-hover="border-color:oklch(0.55 0.19 255);color:oklch(0.55 0.19 255)">linkedin [20k]</a>
+    </div>
+    <div style="display:flex;gap:0;margin-top:72px;border:1px solid rgba(11,18,32,.12);border-radius:12px;overflow:hidden;background:rgba(255,255,255,.7);backdrop-filter:blur(8px);max-width:760px">
+      <div style="flex:1;padding:20px 24px;border-right:1px solid rgba(11,18,32,.1)"><div style="font:700 30px 'Space Grotesk',sans-serif"><span data-count="20">0</span></div><div style="font:400 11.5px 'IBM Plex Mono',monospace;color:rgba(11,18,32,.5);margin-top:2px">ans dans le digital</div></div>
+      <div style="flex:1;padding:20px 24px;border-right:1px solid rgba(11,18,32,.1)"><div style="font:700 30px 'Space Grotesk',sans-serif"><span data-count="8">0</span></div><div style="font:400 11.5px 'IBM Plex Mono',monospace;color:rgba(11,18,32,.5);margin-top:2px">ans freelance grands comptes</div></div>
+      <div style="flex:1;padding:20px 24px;border-right:1px solid rgba(11,18,32,.1)"><div style="font:700 30px 'Space Grotesk',sans-serif;color:oklch(0.55 0.19 255)">~<span data-count="400">0</span></div><div style="font:400 11.5px 'IBM Plex Mono',monospace;color:rgba(11,18,32,.5);margin-top:2px">utilisateurs quotidiens de mes agents</div></div>
+      <div style="flex:1;padding:20px 24px"><div style="font:700 30px 'Space Grotesk',sans-serif"><span data-count="99">0</span>&nbsp;%</div><div style="font:400 11.5px 'IBM Plex Mono',monospace;color:rgba(11,18,32,.5);margin-top:2px">de satisfaction utilisateurs</div></div>
+    </div>
+  </div>
+</header>
+
+<!-- LOGOS MARQUEE -->
+<div style="border-top:1px solid rgba(11,18,32,.08);border-bottom:1px solid rgba(11,18,32,.08);background:#fff;overflow:hidden;padding:18px 0;white-space:nowrap">
+  <div style="display:inline-flex;animation:marq 26s linear infinite;font:500 13px 'IBM Plex Mono',monospace;color:rgba(11,18,32,.45)">
+    <span style="padding:0 28px">DECATHLON</span><span style="color:oklch(0.55 0.19 255)">✦</span><span style="padding:0 28px">ADEO</span><span style="color:oklch(0.55 0.19 255)">✦</span><span style="padding:0 28px">AUCHAN</span><span style="color:oklch(0.55 0.19 255)">✦</span><span style="padding:0 28px">ONEY</span><span style="color:oklch(0.55 0.19 255)">✦</span><span style="padding:0 28px">LA REDOUTE</span><span style="color:oklch(0.55 0.19 255)">✦</span><span style="padding:0 28px">FNAC</span><span style="color:oklch(0.55 0.19 255)">✦</span><span style="padding:0 28px">PUBLICIS</span><span style="color:oklch(0.55 0.19 255)">✦</span><span style="padding:0 28px">EXPERIAN</span><span style="color:oklch(0.55 0.19 255)">✦</span>
+    <span style="padding:0 28px">DECATHLON</span><span style="color:oklch(0.55 0.19 255)">✦</span><span style="padding:0 28px">ADEO</span><span style="color:oklch(0.55 0.19 255)">✦</span><span style="padding:0 28px">AUCHAN</span><span style="color:oklch(0.55 0.19 255)">✦</span><span style="padding:0 28px">ONEY</span><span style="color:oklch(0.55 0.19 255)">✦</span><span style="padding:0 28px">LA REDOUTE</span><span style="color:oklch(0.55 0.19 255)">✦</span><span style="padding:0 28px">FNAC</span><span style="color:oklch(0.55 0.19 255)">✦</span><span style="padding:0 28px">PUBLICIS</span><span style="color:oklch(0.55 0.19 255)">✦</span><span style="padding:0 28px">EXPERIAN</span><span style="color:oklch(0.55 0.19 255)">✦</span>
+  </div>
+</div>
+
+<!-- À PROPOS -->
+<section id="apropos" style="max-width:1240px;margin:0 auto;padding:110px 32px 20px" data-screen-label="À propos">
+  <div data-rv style="display:grid;grid-template-columns:280px 1fr;gap:72px;align-items:start">
+    <div style="display:flex;flex-direction:column;gap:18px;align-items:center">
+      <image-slot id="portrait" shape="circle" style="width:220px;height:220px" placeholder="Portrait pro (photo ou visuel IA à venir)"></image-slot>
+      <div style="font:500 11px 'IBM Plex Mono',monospace;color:rgba(11,18,32,.45);text-align:center">Renaud Secq · Lompret — Lille</div>
+    </div>
+    <div>
+      <div style="font:500 11px 'IBM Plex Mono',monospace;letter-spacing:.12em;color:oklch(0.55 0.19 255);margin-bottom:14px">[ 00 — QUI SUIS-JE ]</div>
+      <h2 style="font:700 clamp(28px,3.2vw,42px)/1.1 'Space Grotesk',sans-serif;letter-spacing:-.03em;margin:0 0 20px">20 ans dans le digital.<br><span style="color:rgba(11,18,32,.35)">La vision stratégique et l'exécution technique.</span></h2>
+      <p style="font:400 15.5px/1.8 'Instrument Sans',sans-serif;color:rgba(11,18,32,.65);max-width:620px;margin:0 0 14px">Fondateur d'agence, Product Manager grands comptes, aujourd'hui spécialisé sur les sujets data et IA les plus complexes. Je combine les deux profils que les entreprises cherchent séparément : celui qui cadre la stratégie, et celui qui écrit le code qui part en production.</p>
+      <p style="font:400 15.5px/1.8 'Instrument Sans',sans-serif;color:rgba(11,18,32,.65);max-width:620px;margin:0 0 24px">Je travaille en direct avec les décideurs — DSI, CDO, directeurs produit. <strong>La réactivité d'un freelance, l'engagement d'un partenaire.</strong></p>
+      <div style="display:flex;flex-wrap:wrap;gap:7px;font:500 11px 'IBM Plex Mono',monospace">
+        <span style="border:1px solid rgba(11,18,32,.12);border-radius:100px;padding:5px 13px;color:rgba(11,18,32,.6)">Agents IA · RAG · MCP</span>
+        <span style="border:1px solid rgba(11,18,32,.12);border-radius:100px;padding:5px 13px;color:rgba(11,18,32,.6)">EU AI Act · ISO 42001</span>
+        <span style="border:1px solid rgba(11,18,32,.12);border-radius:100px;padding:5px 13px;color:rgba(11,18,32,.6)">Data Governance</span>
+        <span style="border:1px solid rgba(11,18,32,.12);border-radius:100px;padding:5px 13px;color:rgba(11,18,32,.6)">Product Management</span>
+        <span style="border:1px solid rgba(11,18,32,.12);border-radius:100px;padding:5px 13px;color:rgba(11,18,32,.6)">GCP · AWS</span>
+        <span style="border:1px solid rgba(11,18,32,.12);border-radius:100px;padding:5px 13px;color:rgba(11,18,32,.6)">Python · SQL</span>
+        <span style="border:1px solid rgba(11,18,32,.12);border-radius:100px;padding:5px 13px;color:rgba(11,18,32,.6)">SAFe · OKR</span>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- PILIERS -->
+<section id="piliers" style="max-width:1240px;margin:0 auto;padding:120px 32px 100px" data-screen-label="Piliers">
+  <div data-rv style="display:flex;justify-content:space-between;align-items:flex-end;gap:40px;margin-bottom:20px">
+    <div>
+      <div style="font:500 11px 'IBM Plex Mono',monospace;letter-spacing:.12em;color:oklch(0.55 0.19 255);margin-bottom:14px">[ 01 — L'OFFRE ]</div>
+      <h2 style="font:700 clamp(34px,4vw,52px)/1.05 'Space Grotesk',sans-serif;letter-spacing:-.03em;margin:0">Une chaîne complète,<br><span style="color:rgba(11,18,32,.35)">trois piliers.</span></h2>
+    </div>
+    <p style="font:400 15px/1.7 'Instrument Sans',sans-serif;color:rgba(11,18,32,.55);max-width:380px;margin:0">Un agent IA n'est fiable que si ses données le sont, et n'est déployable que s'il est conforme. Je couvre les trois maillons — c'est ce qui rend la chaîne solide.</p>
+  </div>
+  <svg data-rv viewBox="0 0 1176 60" style="width:100%;height:60px;display:block" aria-hidden="true">
+    <path d="M196 10 v14 c0 10 8 18 18 18 h360 c10 0 18 8 18 18" fill="none" stroke="rgba(11,18,32,.2)" stroke-width="1.5"></path>
+    <path d="M588 10 v50" fill="none" stroke="oklch(0.55 0.19 255)" stroke-width="1.5" stroke-dasharray="6 6" style="animation:flow 5s linear infinite"></path>
+    <path d="M980 10 v14 c0 10 -8 18 -18 18 h-360 c-10 0 -18 8 -18 18" fill="none" stroke="rgba(11,18,32,.2)" stroke-width="1.5"></path>
+    <circle cx="588" cy="58" r="4" fill="oklch(0.55 0.19 255)"></circle>
+  </svg>
+  <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:16px">
+    <div data-rv style="border:1px solid rgba(11,18,32,.12);border-radius:14px;background:#fff;padding:34px 30px;transition:.3s" style-hover="transform:translateY(-4px);box-shadow:0 16px 40px rgba(11,18,32,.08);border-color:oklch(0.55 0.19 255)">
+      <div style="display:flex;justify-content:space-between;font:500 11px 'IBM Plex Mono',monospace;color:rgba(11,18,32,.4);margin-bottom:48px"><span>module_01 / data_governance</span><span style="color:oklch(0.55 0.19 255)">●</span></div>
+      <h3 style="font:700 24px 'Space Grotesk',sans-serif;letter-spacing:-.02em;margin:0 0 12px">Data Governance</h3>
+      <p style="font:400 14px/1.75 'Instrument Sans',sans-serif;color:rgba(11,18,32,.55);margin:0 0 24px">Des données prêtes pour l'IA. Operating model, qualité, data contracts, catalogage métier. J'anime les communautés data et pilote la mise à niveau des données critiques.</p>
+      <div style="display:flex;flex-wrap:wrap;gap:6px;font:500 11px 'IBM Plex Mono',monospace">
+        <span style="border:1px solid rgba(11,18,32,.12);border-radius:100px;padding:4px 11px;color:rgba(11,18,32,.55)">Collibra</span><span style="border:1px solid rgba(11,18,32,.12);border-radius:100px;padding:4px 11px;color:rgba(11,18,32,.55)">Databricks</span><span style="border:1px solid rgba(11,18,32,.12);border-radius:100px;padding:4px 11px;color:rgba(11,18,32,.55)">Data Contracts</span><span style="border:1px solid rgba(11,18,32,.12);border-radius:100px;padding:4px 11px;color:rgba(11,18,32,.55)">Data Quality</span>
+      </div>
+    </div>
+    <div data-rv style="border:1px solid rgba(11,18,32,.12);border-radius:14px;background:#fff;padding:34px 30px;transition:.3s" style-hover="transform:translateY(-4px);box-shadow:0 16px 40px rgba(11,18,32,.08);border-color:oklch(0.55 0.19 255)">
+      <div style="display:flex;justify-content:space-between;font:500 11px 'IBM Plex Mono',monospace;color:rgba(11,18,32,.4);margin-bottom:48px"><span>module_02 / ai_governance</span><span style="color:oklch(0.55 0.19 255)">●</span></div>
+      <h3 style="font:700 24px 'Space Grotesk',sans-serif;letter-spacing:-.02em;margin:0 0 12px">AI Governance</h3>
+      <p style="font:400 14px/1.75 'Instrument Sans',sans-serif;color:rgba(11,18,32,.55);margin:0 0 24px">Conforme by design. Classification EU AI Act, ISO 42001, RGPD, IA frugale (AFNOR Spec). Registre IA, documentation technique, plan d'actions réglementaire actionnable.</p>
+      <div style="display:flex;flex-wrap:wrap;gap:6px;font:500 11px 'IBM Plex Mono',monospace">
+        <span style="border:1px solid rgba(11,18,32,.12);border-radius:100px;padding:4px 11px;color:rgba(11,18,32,.55)">EU AI Act</span><span style="border:1px solid rgba(11,18,32,.12);border-radius:100px;padding:4px 11px;color:rgba(11,18,32,.55)">ISO 42001</span><span style="border:1px solid rgba(11,18,32,.12);border-radius:100px;padding:4px 11px;color:rgba(11,18,32,.55)">RGPD</span><span style="border:1px solid rgba(11,18,32,.12);border-radius:100px;padding:4px 11px;color:rgba(11,18,32,.55)">IA frugale</span>
+      </div>
+    </div>
+    <div data-rv style="border:1px solid rgba(11,18,32,.12);border-radius:14px;background:#0b1220;color:#f4f6f8;padding:34px 30px;transition:.3s" style-hover="transform:translateY(-4px);box-shadow:0 16px 40px rgba(11,18,32,.25)">
+      <div style="display:flex;justify-content:space-between;font:500 11px 'IBM Plex Mono',monospace;color:rgba(244,246,248,.4);margin-bottom:48px"><span>module_03 / software_eng_3.0</span><span style="color:oklch(0.75 0.17 255)">●</span></div>
+      <h3 style="font:700 24px 'Space Grotesk',sans-serif;letter-spacing:-.02em;margin:0 0 12px">Software Engineering 3.0</h3>
+      <p style="font:400 14px/1.75 'Instrument Sans',sans-serif;color:rgba(244,246,248,.6);margin:0 0 24px">Flows agentiques performants et auto-apprenants. Multi-agents, RAG, MCP, intégrations API. Du prototype en 2 semaines à la production monitorée.</p>
+      <div style="display:flex;flex-wrap:wrap;gap:6px;font:500 11px 'IBM Plex Mono',monospace">
+        <span style="border:1px solid rgba(244,246,248,.2);border-radius:100px;padding:4px 11px;color:rgba(244,246,248,.6)">Google ADK</span><span style="border:1px solid rgba(244,246,248,.2);border-radius:100px;padding:4px 11px;color:rgba(244,246,248,.6)">RAG / MCP</span><span style="border:1px solid rgba(244,246,248,.2);border-radius:100px;padding:4px 11px;color:rgba(244,246,248,.6)">Claude · Gemini</span><span style="border:1px solid rgba(244,246,248,.2);border-radius:100px;padding:4px 11px;color:rgba(244,246,248,.6)">GCP · AWS</span>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- PREUVES -->
+<section id="preuves" style="background:#0b1220;color:#f4f6f8;padding:120px 0" data-screen-label="Preuves">
+  <div style="max-width:1240px;margin:0 auto;padding:0 32px">
+    <div data-rv style="display:flex;justify-content:space-between;align-items:flex-end;gap:40px;margin-bottom:56px">
+      <div>
+        <div style="font:500 11px 'IBM Plex Mono',monospace;letter-spacing:.12em;color:oklch(0.75 0.17 255);margin-bottom:14px">[ 02 — LES PREUVES ]</div>
+        <h2 style="font:700 clamp(34px,4vw,52px)/1.05 'Space Grotesk',sans-serif;letter-spacing:-.03em;margin:0">En production.<br><span style="color:rgba(244,246,248,.35)">Pas sur des slides.</span></h2>
+      </div>
+      <p style="font:400 15px/1.7 'Instrument Sans',sans-serif;color:rgba(244,246,248,.5);max-width:380px;margin:0">Chaque chiffre est sourcé, daté, vérifiable en référence. C'est la seule métrique qui compte pour un DSI.</p>
+    </div>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px">
+      <div data-rv style="border:1px solid rgba(244,246,248,.12);border-radius:14px;padding:32px 36px 30px;background:rgba(244,246,248,.03);transition:.3s;display:flex;flex-direction:column" style-hover="border-color:oklch(0.75 0.17 255);background:rgba(244,246,248,.05)">
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:26px;font:500 11px 'IBM Plex Mono',monospace">
+          <span style="background:rgba(244,246,248,.08);border:1px solid rgba(244,246,248,.15);border-radius:6px;padding:5px 12px;color:#f4f6f8;letter-spacing:.08em">DECATHLON — COPILOTE DOCUMENTATION</span>
+          <span style="color:oklch(0.75 0.17 255)">software_eng_3.0 · 2026</span>
+        </div>
+        <div style="display:flex;align-items:baseline;gap:14px;margin-bottom:6px"><span style="font:700 58px/1 'Space Grotesk',sans-serif;letter-spacing:-.03em;color:oklch(0.75 0.17 255)">12→3</span><span style="font:700 20px/1.25 'Space Grotesk',sans-serif">mois pour gouverner et certifier<br>une donnée critique</span></div>
+        <p style="font:italic 400 13.5px/1.7 'Instrument Sans',sans-serif;color:rgba(244,246,248,.45);margin:14px 0 18px">Le défi — documenter un Business Object dans Collibra exigeait de maîtriser un format complexe et lourd : un an de time-to-market, des équipes à former en continu.</p>
+        <div style="display:flex;flex-direction:column;gap:8px;font:400 13.5px/1.5 'Instrument Sans',sans-serif;color:rgba(244,246,248,.65);margin-bottom:22px">
+          <span style="display:flex;gap:10px"><span style="color:oklch(0.75 0.17 255)">→</span>Un chatbot qui part du métier de l'expert et structure tout au format Collibra : lineage, accessibilité, règles de qualité</span>
+          <span style="display:flex;gap:10px"><span style="color:oklch(0.75 0.17 255)">→</span>Human-in-the-loop : le collaborateur reste l'auteur et le propriétaire de la donnée transmise</span>
+          <span style="display:flex;gap:10px"><span style="color:oklch(0.75 0.17 255)">→</span>Dashboards de suivi, emails personnalisés par domaine, feedback loop d'amélioration continue</span>
+        </div>
+        <div style="display:flex;flex-wrap:wrap;gap:8px;margin-top:auto;font:500 11px 'IBM Plex Mono',monospace">
+          <span style="border:1px solid oklch(0.75 0.17 255 / 0.4);color:oklch(0.75 0.17 255);border-radius:100px;padding:5px 12px">~400 utilisateurs quotidiens</span>
+          <span style="border:1px solid oklch(0.75 0.17 255 / 0.4);color:oklch(0.75 0.17 255);border-radius:100px;padding:5px 12px">satisfaction &gt; 99 %</span>
+          <span style="border:1px solid rgba(244,246,248,.15);color:rgba(244,246,248,.55);border-radius:100px;padding:5px 12px">React · Vertex AI · Collibra API</span>
+        </div>
+        <a href="Etudes de cas.dc.html#copilote" style="font:500 12px 'IBM Plex Mono',monospace;color:oklch(0.75 0.17 255);margin-top:18px">→ lire_l_etude_de_cas()</a>
+      </div>
+      <div data-rv style="border:1px solid rgba(244,246,248,.12);border-radius:14px;padding:32px 36px 30px;background:rgba(244,246,248,.03);transition:.3s;display:flex;flex-direction:column" style-hover="border-color:oklch(0.75 0.17 255);background:rgba(244,246,248,.05)">
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:26px;font:500 11px 'IBM Plex Mono',monospace">
+          <span style="background:rgba(244,246,248,.08);border:1px solid rgba(244,246,248,.15);border-radius:6px;padding:5px 12px;color:#f4f6f8;letter-spacing:.08em">DECATHLON — PLATEFORME AI GOVERNANCE</span>
+          <span style="color:oklch(0.75 0.17 255)">ai_governance · 2026</span>
+        </div>
+        <div style="display:flex;align-items:baseline;gap:14px;margin-bottom:6px"><span style="font:700 58px/1 'Space Grotesk',sans-serif;letter-spacing:-.03em;color:oklch(0.75 0.17 255)">2000+</span><span style="font:700 20px/1.25 'Space Grotesk',sans-serif">IA inventoriées<br>et évaluées</span></div>
+        <p style="font:italic 400 13.5px/1.7 'Instrument Sans',sans-serif;color:rgba(244,246,248,.45);margin:14px 0 18px">Le défi — des milliers d'IA (agents Vertex, gems, notebooks, produits digitaux) sans registre unifié ni priorisation des risques.</p>
+        <div style="display:flex;flex-direction:column;gap:8px;font:400 13.5px/1.5 'Instrument Sans',sans-serif;color:rgba(244,246,248,.65);margin-bottom:22px">
+          <span style="display:flex;gap:10px"><span style="color:oklch(0.75 0.17 255)">→</span>Scoring de criticité : prisme EU AI Act × criticité business</span>
+          <span style="display:flex;gap:10px"><span style="color:oklch(0.75 0.17 255)">→</span>Roadmap de conformité personnalisée : légal, sécurité, data gov, bonnes pratiques dev, éthique</span>
+          <span style="display:flex;gap:10px"><span style="color:oklch(0.75 0.17 255)">→</span>Governance by design à la création + intégrations Wiz, Workspace, PLM</span>
+        </div>
+        <div style="display:flex;flex-wrap:wrap;gap:8px;margin-top:auto;font:500 11px 'IBM Plex Mono',monospace">
+          <span style="border:1px solid oklch(0.75 0.17 255 / 0.4);color:oklch(0.75 0.17 255);border-radius:100px;padding:5px 12px">registre IA unifié</span>
+          <span style="border:1px solid rgba(244,246,248,.15);color:rgba(244,246,248,.55);border-radius:100px;padding:5px 12px">dashboards &amp; alerting</span>
+          <span style="border:1px solid rgba(244,246,248,.15);color:rgba(244,246,248,.55);border-radius:100px;padding:5px 12px">vers la certification IA</span>
+        </div>
+        <a href="Etudes de cas.dc.html#aigov" style="font:500 12px 'IBM Plex Mono',monospace;color:oklch(0.75 0.17 255);margin-top:18px">→ lire_l_etude_de_cas()</a>
+      </div>
+      <div data-rv style="border:1px solid rgba(244,246,248,.12);border-radius:14px;padding:32px 36px 30px;background:rgba(244,246,248,.03);transition:.3s;display:flex;flex-direction:column" style-hover="border-color:oklch(0.75 0.17 255);background:rgba(244,246,248,.05)">
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:26px;font:500 11px 'IBM Plex Mono',monospace">
+          <span style="background:rgba(244,246,248,.08);border:1px solid rgba(244,246,248,.15);border-radius:6px;padding:5px 12px;color:#f4f6f8;letter-spacing:.08em">DECATHLON — TALK TO MY DATA</span>
+          <span style="color:oklch(0.75 0.17 255)">software_eng_3.0 · 2026</span>
+        </div>
+        <div style="display:flex;align-items:baseline;gap:14px;margin-bottom:6px"><span style="font:700 58px/1 'Space Grotesk',sans-serif;letter-spacing:-.03em;color:oklch(0.75 0.17 255)">&lt;1 min</span><span style="font:700 20px/1.25 'Space Grotesk',sans-serif">pour une réponse sourcée<br>sur n'importe quelle donnée</span></div>
+        <p style="font:italic 400 13.5px/1.7 'Instrument Sans',sans-serif;color:rgba(244,246,248,.45);margin:14px 0 18px">Le défi — le data discovery se faisait en bouteille à la mer dans les spaces Google : des réponses en heures ou en jours, pas toujours justes.</p>
+        <div style="display:flex;flex-direction:column;gap:8px;font:400 13.5px/1.5 'Instrument Sans',sans-serif;color:rgba(244,246,248,.65);margin-bottom:22px">
+          <span style="display:flex;gap:10px"><span style="color:oklch(0.75 0.17 255)">→</span>Agent branché sur l'ensemble du dictionnaire de données Collibra</span>
+          <span style="display:flex;gap:10px"><span style="color:oklch(0.75 0.17 255)">→</span>Sujet business, données, règles de qualité, contacts — tout en une question</span>
+          <span style="display:flex;gap:10px"><span style="color:oklch(0.75 0.17 255)">→</span>Sources officielles Decathlon citées dans chaque réponse</span>
+        </div>
+        <div style="display:flex;flex-wrap:wrap;gap:8px;margin-top:auto;font:500 11px 'IBM Plex Mono',monospace">
+          <span style="border:1px solid oklch(0.75 0.17 255 / 0.4);color:oklch(0.75 0.17 255);border-radius:100px;padding:5px 12px">data discovery instantané</span>
+          <span style="border:1px solid rgba(244,246,248,.15);color:rgba(244,246,248,.55);border-radius:100px;padding:5px 12px">très apprécié en interne</span>
+        </div>
+        <a href="Etudes de cas.dc.html#talkdata" style="font:500 12px 'IBM Plex Mono',monospace;color:oklch(0.75 0.17 255);margin-top:18px">→ lire_l_etude_de_cas()</a>
+      </div>
+      <div data-rv style="border:1px solid rgba(244,246,248,.12);border-radius:14px;padding:32px 36px 30px;background:rgba(244,246,248,.03);transition:.3s;display:flex;flex-direction:column" style-hover="border-color:oklch(0.75 0.17 255);background:rgba(244,246,248,.05)">
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:26px;font:500 11px 'IBM Plex Mono',monospace">
+          <span style="background:rgba(244,246,248,.08);border:1px solid rgba(244,246,248,.15);border-radius:6px;padding:5px 12px;color:#f4f6f8;letter-spacing:.08em">DECATHLON — DOMAINE INDUSTRY</span>
+          <span style="color:oklch(0.75 0.17 255)">data_governance · 2023–26</span>
+        </div>
+        <div style="display:flex;align-items:baseline;gap:14px;margin-bottom:6px"><span style="font:700 58px/1 'Space Grotesk',sans-serif;letter-spacing:-.03em;color:oklch(0.75 0.17 255)">0→50</span><span style="font:700 20px/1.25 'Space Grotesk',sans-serif">Business Objects gouvernés,<br>partis de zéro</span></div>
+        <p style="font:italic 400 13.5px/1.7 'Instrument Sans',sans-serif;color:rgba(244,246,248,.45);margin:14px 0 18px">Le défi — un domaine Industrie / Production qui venait de se créer : aucune gouvernance existante, tout à construire.</p>
+        <div style="display:flex;flex-direction:column;gap:8px;font:400 13.5px/1.5 'Instrument Sans',sans-serif;color:rgba(244,246,248,.65);margin-bottom:22px">
+          <span style="display:flex;gap:10px"><span style="color:oklch(0.75 0.17 255)">→</span>Operating model créé from scratch sur 5 sous-domaines</span>
+          <span style="display:flex;gap:10px"><span style="color:oklch(0.75 0.17 255)">→</span>Montée en compétence : data owners, data stewards, quality managers</span>
+          <span style="display:flex;gap:10px"><span style="color:oklch(0.75 0.17 255)">→</span>Onboarding des data producers</span>
+        </div>
+        <div style="display:flex;flex-wrap:wrap;gap:8px;margin-top:auto;font:500 11px 'IBM Plex Mono',monospace">
+          <span style="border:1px solid oklch(0.75 0.17 255 / 0.4);color:oklch(0.75 0.17 255);border-radius:100px;padding:5px 12px">5 sous-domaines structurés</span>
+          <span style="border:1px solid rgba(244,246,248,.15);color:rgba(244,246,248,.55);border-radius:100px;padding:5px 12px">12 personnes animées</span>
+        </div>
+        <a href="Etudes de cas.dc.html#industry" style="font:500 12px 'IBM Plex Mono',monospace;color:oklch(0.75 0.17 255);margin-top:18px">→ lire_l_etude_de_cas()</a>
+      </div>
+      <div data-rv style="border:1px solid rgba(244,246,248,.12);border-radius:14px;padding:32px 36px 30px;background:rgba(244,246,248,.03);transition:.3s;display:flex;flex-direction:column" style-hover="border-color:oklch(0.75 0.17 255);background:rgba(244,246,248,.05)">
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:26px;font:500 11px 'IBM Plex Mono',monospace">
+          <span style="background:rgba(244,246,248,.08);border:1px solid rgba(244,246,248,.15);border-radius:6px;padding:5px 12px;color:#f4f6f8;letter-spacing:.08em">ADEO — RECOMMANDATION</span>
+          <span style="color:oklch(0.75 0.17 255)">product_ia · 2022–23</span>
+        </div>
+        <div style="display:flex;align-items:baseline;gap:14px;margin-bottom:6px"><span style="font:700 58px/1 'Space Grotesk',sans-serif;letter-spacing:-.03em;color:oklch(0.75 0.17 255)">+15 %</span><span style="font:700 20px/1.25 'Space Grotesk',sans-serif">de conversion<br>sur le site français</span></div>
+        <p style="font:italic 400 13.5px/1.7 'Instrument Sans',sans-serif;color:rgba(244,246,248,.45);margin:14px 0 18px">Le défi — une recommandation produit générique, identique pour tous les visiteurs.</p>
+        <div style="display:flex;flex-direction:column;gap:8px;font:400 13.5px/1.5 'Instrument Sans',sans-serif;color:rgba(244,246,248,.65);margin-bottom:22px">
+          <span style="display:flex;gap:10px"><span style="color:oklch(0.75 0.17 255)">→</span>Pilotage d'une équipe de 12 (data scientists + engineers)</span>
+          <span style="display:flex;gap:10px"><span style="color:oklch(0.75 0.17 255)">→</span>A/B tests : knowledge graph vs collaborative filtering</span>
+        </div>
+        <div style="display:flex;flex-wrap:wrap;gap:8px;margin-top:auto;font:500 11px 'IBM Plex Mono',monospace">
+          <span style="border:1px solid oklch(0.75 0.17 255 / 0.4);color:oklch(0.75 0.17 255);border-radius:100px;padding:5px 12px">+22 % ajout au panier</span>
+          <span style="border:1px solid rgba(244,246,248,.15);color:rgba(244,246,248,.55);border-radius:100px;padding:5px 12px">équipe de 12 pilotée</span>
+        </div>
+        <a href="Etudes de cas.dc.html#adeo" style="font:500 12px 'IBM Plex Mono',monospace;color:oklch(0.75 0.17 255);margin-top:18px">→ lire_l_etude_de_cas()</a>
+      </div>
+      <div data-rv style="border:1px dashed rgba(244,246,248,.25);border-radius:14px;padding:32px 36px 30px;display:flex;flex-direction:column;justify-content:center;gap:16px">
+        <span style="font:700 44px/1 'Space Grotesk',sans-serif;color:oklch(0.75 0.17 255)">“</span>
+        <p style="font:italic 400 16px/1.7 'Instrument Sans',sans-serif;color:rgba(244,246,248,.5);margin:0">Citation d'un sponsor client en cours de recueil — elle prendra place ici, avec nom et fonction.</p>
+        <span style="font:500 11px 'IBM Plex Mono',monospace;color:rgba(244,246,248,.35)">[ PLACEHOLDER — témoignage nominatif à venir ]</span>
+      </div>
+    </div>
+    <div data-rv style="display:flex;justify-content:center;margin-top:32px">
+      <a href="Etudes de cas.dc.html" style="font:500 13px 'IBM Plex Mono',monospace;border:1px solid rgba(244,246,248,.25);color:#f4f6f8;padding:15px 30px;border-radius:8px" style-hover="border-color:oklch(0.75 0.17 255);color:oklch(0.75 0.17 255)">→ toutes_les_etudes_de_cas()</a>
+    </div>
+  </div>
+</section>
+
+<!-- MÉTHODE -->
+<section id="methode" style="max-width:1240px;margin:0 auto;padding:120px 32px" data-screen-label="Méthode">
+  <div data-rv style="margin-bottom:56px">
+    <div style="font:500 11px 'IBM Plex Mono',monospace;letter-spacing:.12em;color:oklch(0.55 0.19 255);margin-bottom:14px">[ 03 — LA MÉTHODE ]</div>
+    <h2 style="font:700 clamp(34px,4vw,52px)/1.05 'Space Grotesk',sans-serif;letter-spacing:-.03em;margin:0">Trois étapes.<br><span style="color:rgba(11,18,32,.35)">Zéro tunnel.</span></h2>
+  </div>
+  <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:16px">
+    <div data-rv style="position:relative;border-top:2px solid oklch(0.55 0.19 255);padding:28px 4px 0">
+      <div style="font:500 12px 'IBM Plex Mono',monospace;color:rgba(11,18,32,.4);margin-bottom:14px">step_01 · j+0</div>
+      <h3 style="font:700 19px 'Space Grotesk',sans-serif;margin:0 0 10px">Cadrage sans complaisance</h3>
+      <p style="font:400 13.5px/1.75 'Instrument Sans',sans-serif;color:rgba(11,18,32,.55);margin:0">Désirabilité, faisabilité, viabilité. Si les données manquent ou si le ROI est fantaisiste, je le dis — et on réoriente. Les projets non « AI ready » s'arrêtent ici.</p>
+    </div>
+    <div data-rv style="position:relative;border-top:2px solid rgba(11,18,32,.15);padding:28px 4px 0">
+      <div style="font:500 12px 'IBM Plex Mono',monospace;color:rgba(11,18,32,.4);margin-bottom:14px">step_02 · j+14</div>
+      <h3 style="font:700 19px 'Space Grotesk',sans-serif;margin:0 0 10px">Premier système en 2 semaines</h3>
+      <p style="font:400 13.5px/1.75 'Instrument Sans',sans-serif;color:rgba(11,18,32,.55);margin:0">Un système fonctionnel testé par de vrais utilisateurs, avec mesure d'impact dès le départ. Boucles courtes, décisions informées.</p>
+    </div>
+    <div data-rv style="position:relative;border-top:2px solid rgba(11,18,32,.15);padding:28px 4px 0">
+      <div style="font:500 12px 'IBM Plex Mono',monospace;color:rgba(11,18,32,.4);margin-bottom:14px">step_03 · production</div>
+      <h3 style="font:700 19px 'Space Grotesk',sans-serif;margin:0 0 10px">Production réelle, pas une démo</h3>
+      <p style="font:400 13.5px/1.75 'Instrument Sans',sans-serif;color:rgba(11,18,32,.55);margin:0">Déploiement, monitoring, adoption. Je reste jusqu'à ce que le système soit utilisé. Un outil que personne n'ouvre n'a aucune valeur.</p>
+    </div>
+  </div>
+</section>
+
+<!-- OFFRES -->
+<section id="offres" style="background:#fff;border-top:1px solid rgba(11,18,32,.08);border-bottom:1px solid rgba(11,18,32,.08);padding:120px 0" data-screen-label="Offres">
+  <div style="max-width:1240px;margin:0 auto;padding:0 32px">
+    <div data-rv style="margin-bottom:56px">
+      <div style="font:500 11px 'IBM Plex Mono',monospace;letter-spacing:.12em;color:oklch(0.55 0.19 255);margin-bottom:14px">[ 04 — TRAVAILLER ENSEMBLE ]</div>
+      <h2 style="font:700 clamp(34px,4vw,52px)/1.05 'Space Grotesk',sans-serif;letter-spacing:-.03em;margin:0">Trois formats.<br><span style="color:rgba(11,18,32,.35)">Un point d'entrée simple.</span></h2>
+    </div>
+    <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:16px">
+      <div data-rv style="border:1px solid rgba(11,18,32,.12);border-radius:14px;padding:36px 32px;transition:.3s" style-hover="transform:translateY(-4px);box-shadow:0 16px 40px rgba(11,18,32,.08)">
+        <div style="font:500 11px 'IBM Plex Mono',monospace;color:rgba(11,18,32,.4);margin-bottom:8px">diagnostic / 1 semaine</div>
+        <h3 style="font:700 24px 'Space Grotesk',sans-serif;margin:0 0 24px">Audit IA &amp; Data</h3>
+        <ul style="list-style:none;padding:0;margin:0 0 28px;display:flex;flex-direction:column;gap:10px;font:400 13.5px/1.5 'Instrument Sans',sans-serif;color:rgba(11,18,32,.65)">
+          <li style="display:flex;gap:10px"><span style="color:oklch(0.55 0.19 255)">→</span>Analyse données &amp; processus</li>
+          <li style="display:flex;gap:10px"><span style="color:oklch(0.55 0.19 255)">→</span>Opportunités IA priorisées</li>
+          <li style="display:flex;gap:10px"><span style="color:oklch(0.55 0.19 255)">→</span>Verdict « AI ready » vs « Data first »</li>
+          <li style="display:flex;gap:10px"><span style="color:oklch(0.55 0.19 255)">→</span>Roadmap chiffrée 12 mois</li>
+        </ul>
+        <a href="#contact" style="font:500 12px 'IBM Plex Mono',monospace;border:1px solid rgba(11,18,32,.2);padding:12px 20px;border-radius:8px;display:block;text-align:center" style-hover="border-color:oklch(0.55 0.19 255);color:oklch(0.55 0.19 255)">demander_un_audit()</a>
+      </div>
+      <div data-rv style="border:1px solid oklch(0.55 0.19 255);border-radius:14px;padding:36px 32px;position:relative;background:linear-gradient(170deg,oklch(0.97 0.02 255),#fff 55%);transition:.3s" style-hover="transform:translateY(-4px);box-shadow:0 16px 48px oklch(0.55 0.19 255 / 0.18)">
+        <div style="position:absolute;top:18px;right:18px;font:500 10px 'IBM Plex Mono',monospace;background:oklch(0.55 0.19 255);color:#fff;padding:4px 10px;border-radius:100px">RECOMMANDÉ</div>
+        <div style="font:500 11px 'IBM Plex Mono',monospace;color:rgba(11,18,32,.4);margin-bottom:8px">forfait / 4–10 semaines</div>
+        <h3 style="font:700 24px 'Space Grotesk',sans-serif;margin:0 0 24px">Mission Projet</h3>
+        <ul style="list-style:none;padding:0;margin:0 0 28px;display:flex;flex-direction:column;gap:10px;font:400 13.5px/1.5 'Instrument Sans',sans-serif;color:rgba(11,18,32,.65)">
+          <li style="display:flex;gap:10px"><span style="color:oklch(0.55 0.19 255)">→</span>Cadrage désirabilité / faisabilité / viabilité</li>
+          <li style="display:flex;gap:10px"><span style="color:oklch(0.55 0.19 255)">→</span>Développement agentique complet</li>
+          <li style="display:flex;gap:10px"><span style="color:oklch(0.55 0.19 255)">→</span>Déploiement GCP / AWS en production</li>
+          <li style="display:flex;gap:10px"><span style="color:oklch(0.55 0.19 255)">→</span>Métriques de succès contractuelles</li>
+        </ul>
+        <a href="#contact" style="font:500 12px 'IBM Plex Mono',monospace;background:#0b1220;color:#fff;padding:12px 20px;border-radius:8px;display:block;text-align:center" style-hover="background:oklch(0.35 0.12 255)">discuter_de_mon_projet()</a>
+      </div>
+      <div data-rv style="border:1px solid rgba(11,18,32,.12);border-radius:14px;padding:36px 32px;transition:.3s" style-hover="transform:translateY(-4px);box-shadow:0 16px 40px rgba(11,18,32,.08)">
+        <div style="font:500 11px 'IBM Plex Mono',monospace;color:rgba(11,18,32,.4);margin-bottom:8px">régie / TJM · min. 10 jours</div>
+        <h3 style="font:700 24px 'Space Grotesk',sans-serif;margin:0 0 24px">Mission longue</h3>
+        <ul style="list-style:none;padding:0;margin:0 0 28px;display:flex;flex-direction:column;gap:10px;font:400 13.5px/1.5 'Instrument Sans',sans-serif;color:rgba(11,18,32,.65)">
+          <li style="display:flex;gap:10px"><span style="color:oklch(0.55 0.19 255)">→</span>Intégration équipe produit / data</li>
+          <li style="display:flex;gap:10px"><span style="color:oklch(0.55 0.19 255)">→</span>Périmètre flexible et évolutif</li>
+          <li style="display:flex;gap:10px"><span style="color:oklch(0.55 0.19 255)">→</span>Remote ou sur site (Lille / France)</li>
+          <li style="display:flex;gap:10px"><span style="color:oklch(0.55 0.19 255)">→</span>Reporting OKR hebdomadaire</li>
+        </ul>
+        <a href="#contact" style="font:500 12px 'IBM Plex Mono',monospace;border:1px solid rgba(11,18,32,.2);padding:12px 20px;border-radius:8px;display:block;text-align:center" style-hover="border-color:oklch(0.55 0.19 255);color:oklch(0.55 0.19 255)">discuter_du_format()</a>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- VEILLE -->
+<sc-if value="{{ showVeille }}" hint-placeholder-val="{{ true }}">
+<section id="veille" style="max-width:1240px;margin:0 auto;padding:100px 32px" data-screen-label="Veille">
+  <div data-rv style="border:1px solid rgba(11,18,32,.12);border-radius:16px;background:linear-gradient(135deg,oklch(0.96 0.025 255),#fff 60%);padding:52px 48px;display:flex;align-items:center;justify-content:space-between;gap:56px">
+    <div style="flex:1">
+      <div style="font:500 11px 'IBM Plex Mono',monospace;letter-spacing:.12em;color:oklch(0.55 0.19 255);margin-bottom:14px">[ VEILLE HEBDOMADAIRE ]</div>
+      <h3 style="font:700 clamp(22px,2.5vw,30px)/1.2 'Space Grotesk',sans-serif;letter-spacing:-.02em;margin:0 0 14px">Les signaux faibles de l'IA en entreprise, avec un angle terrain.</h3>
+      <p style="font:400 14px/1.75 'Instrument Sans',sans-serif;color:rgba(11,18,32,.55);max-width:520px;margin:0 0 24px">Chaque semaine : ce qui change vraiment pour les équipes data et produit — réglementation, outillage agentique, retours de production.</p>
+      <a href="Veille.dc.html" style="font:500 12px 'IBM Plex Mono',monospace;color:oklch(0.55 0.19 255)">→ lire_la_veille()</a>
+    </div>
+    <div style="display:flex;gap:48px;flex-shrink:0">
+      <div style="text-align:center"><div style="font:700 40px 'Space Grotesk',sans-serif"><span data-count="20">0</span>k</div><div style="font:400 11px 'IBM Plex Mono',monospace;color:rgba(11,18,32,.45);margin-top:4px">ABONNÉS LINKEDIN</div></div>
+      <div style="text-align:center"><div style="font:700 40px 'Space Grotesk',sans-serif">3–4</div><div style="font:400 11px 'IBM Plex Mono',monospace;color:rgba(11,18,32,.45);margin-top:4px">ARTICLES / SEMAINE</div></div>
+    </div>
+  </div>
+</section>
+</sc-if>
+
+<!-- FAQ -->
+<section id="faq" style="max-width:900px;margin:0 auto;padding:110px 32px" data-screen-label="FAQ">
+  <div data-rv style="text-align:center;margin-bottom:48px">
+    <div style="font:500 11px 'IBM Plex Mono',monospace;letter-spacing:.12em;color:oklch(0.55 0.19 255);margin-bottom:14px">[ FAQ — LES QUESTIONS QU'ON ME POSE ]</div>
+    <h2 style="font:700 clamp(30px,3.5vw,44px)/1.1 'Space Grotesk',sans-serif;letter-spacing:-.03em;margin:0">Levons les doutes.</h2>
+  </div>
+  <div data-rv style="display:flex;flex-direction:column;gap:10px">
+    <details style="background:#fff;border:1px solid rgba(11,18,32,.1);border-radius:12px;padding:0 26px">
+      <summary style="font:600 15px 'Instrument Sans',sans-serif;padding:20px 0;cursor:pointer;list-style-position:outside">Comment démarre une mission ?</summary>
+      <p style="font:400 14px/1.75 'Instrument Sans',sans-serif;color:rgba(11,18,32,.6);margin:0;padding:0 0 20px">Un premier échange de 30 minutes, sans engagement, pour comprendre votre contexte — <a href="https://calendly.com/renaudsecq/30min" target="_blank" style="color:oklch(0.55 0.19 255);text-decoration:underline">réservez directement un créneau</a>. Ensuite : un cadrage écrit et une proposition claire sous une semaine — périmètre, livrables, métriques de succès.</p>
+    </details>
+    <details style="background:#fff;border:1px solid rgba(11,18,32,.1);border-radius:12px;padding:0 26px">
+      <summary style="font:600 15px 'Instrument Sans',sans-serif;padding:20px 0;cursor:pointer">Quand êtes-vous disponible ?</summary>
+      <p style="font:400 14px/1.75 'Instrument Sans',sans-serif;color:rgba(11,18,32,.6);margin:0;padding:0 0 20px">Missions longues : à partir de décembre 2026. Audits et cadrages courts : selon agenda — parlons-en dès maintenant pour réserver le créneau.</p>
+    </details>
+    <details style="background:#fff;border:1px solid rgba(11,18,32,.1);border-radius:12px;padding:0 26px">
+      <summary style="font:600 15px 'Instrument Sans',sans-serif;padding:20px 0;cursor:pointer">Remote ou sur site ?</summary>
+      <p style="font:400 14px/1.75 'Instrument Sans',sans-serif;color:rgba(11,18,32,.6);margin:0;padding:0 0 20px">Full remote ou hybride. Sur site : Lille et sa région sans contrainte, France entière selon le rythme de la mission.</p>
+    </details>
+    <details style="background:#fff;border:1px solid rgba(11,18,32,.1);border-radius:12px;padding:0 26px">
+      <summary style="font:600 15px 'Instrument Sans',sans-serif;padding:20px 0;cursor:pointer">Qui possède le code et les livrables ?</summary>
+      <p style="font:400 14px/1.75 'Instrument Sans',sans-serif;color:rgba(11,18,32,.6);margin:0;padding:0 0 20px">Vous, intégralement. Code, documentation, dashboards : tout est livré dans vos environnements, avec une passation prévue pour que vos équipes soient autonomes.</p>
+    </details>
+    <details style="background:#fff;border:1px solid rgba(11,18,32,.1);border-radius:12px;padding:0 26px">
+      <summary style="font:600 15px 'Instrument Sans',sans-serif;padding:20px 0;cursor:pointer">Et la confidentialité ?</summary>
+      <p style="font:400 14px/1.75 'Instrument Sans',sans-serif;color:rgba(11,18,32,.6);margin:0;padding:0 0 20px">NDA dès le premier échange si vous le souhaitez. Rien de ce qui concerne un client n'est publié sans son accord explicite.</p>
+    </details>
+  </div>
+</section>
+
+<!-- CONTACT -->
+<section id="contact" style="background:#0b1220;color:#f4f6f8;padding:120px 0 100px" data-screen-label="Contact">
+  <div style="max-width:1240px;margin:0 auto;padding:0 32px;display:grid;grid-template-columns:1fr 1fr;gap:80px;align-items:start">
+    <div data-rv>
+      <div style="font:500 11px 'IBM Plex Mono',monospace;letter-spacing:.12em;color:oklch(0.75 0.17 255);margin-bottom:14px">[ 05 — CONTACT ]</div>
+      <h2 style="font:700 clamp(34px,4vw,52px)/1.05 'Space Grotesk',sans-serif;letter-spacing:-.03em;margin:0 0 20px">Un cas d'usage<br>en tête ?</h2>
+      <p style="font:400 15px/1.75 'Instrument Sans',sans-serif;color:rgba(244,246,248,.55);max-width:400px;margin:0 0 32px">Décrivez votre contexte en trois lignes. Réponse sous 24 h, premier échange de 30 minutes sans engagement.</p>
+      <div style="display:flex;flex-direction:column;gap:12px;font:500 13px 'IBM Plex Mono',monospace;color:rgba(244,246,248,.6)">
+        <span>→ Lompret — Lille · remote ou sur site</span>
+        <span>→ <a href="https://www.linkedin.com/in/renaud-secq-5593832a/" target="_blank" style="color:oklch(0.75 0.17 255)">linkedin.com/in/renaud-secq</a></span>
+        <span style="display:flex;align-items:center;gap:10px"><span style="width:7px;height:7px;border-radius:50%;background:oklch(0.75 0.17 255);animation:pulse 2s infinite"></span>Missions longues : disponible à partir de décembre 2026</span>
+      </div>
+      <div style="margin-top:36px;display:flex;flex-direction:column;gap:14px">
+        <div style="font:500 11px 'IBM Plex Mono',monospace;letter-spacing:.1em;color:rgba(244,246,248,.4)">COMMENT ON DÉMARRE</div>
+        <div style="display:flex;gap:12px;align-items:baseline"><span style="font:700 13px 'IBM Plex Mono',monospace;color:oklch(0.75 0.17 255)">01</span><span style="font:400 14px/1.5 'Instrument Sans',sans-serif;color:rgba(244,246,248,.6)">Échange de 30 min — votre contexte, sans engagement</span></div>
+        <div style="display:flex;gap:12px;align-items:baseline"><span style="font:700 13px 'IBM Plex Mono',monospace;color:oklch(0.75 0.17 255)">02</span><span style="font:400 14px/1.5 'Instrument Sans',sans-serif;color:rgba(244,246,248,.6)">Cadrage écrit + proposition sous une semaine</span></div>
+        <div style="display:flex;gap:12px;align-items:baseline"><span style="font:700 13px 'IBM Plex Mono',monospace;color:oklch(0.75 0.17 255)">03</span><span style="font:400 14px/1.5 'Instrument Sans',sans-serif;color:rgba(244,246,248,.6)">Démarrage — premier livrable sous 2 semaines</span></div>
+        <a href="https://calendly.com/renaudsecq/30min" target="_blank" style="display:inline-flex;align-self:flex-start;margin-top:10px;font:500 13px 'IBM Plex Mono',monospace;background:oklch(0.55 0.19 255);color:#fff;padding:15px 28px;border-radius:8px" style-hover="filter:brightness(1.15);transform:translateY(-2px);color:#fff">→ reserver_30_min() · Calendly</a>
+      </div>
+    </div>
+    <form data-rv style="display:flex;flex-direction:column;gap:14px" onSubmit="{{ onContact }}">
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:14px">
+        <input id="cf-nom" placeholder="Nom" style="background:rgba(244,246,248,.05);border:1px solid rgba(244,246,248,.15);border-radius:8px;padding:14px 16px;font:400 14px 'Instrument Sans',sans-serif;color:#f4f6f8;outline:none" style-focus="border-color:oklch(0.75 0.17 255)">
+        <input id="cf-email" placeholder="Email" style="background:rgba(244,246,248,.05);border:1px solid rgba(244,246,248,.15);border-radius:8px;padding:14px 16px;font:400 14px 'Instrument Sans',sans-serif;color:#f4f6f8;outline:none" style-focus="border-color:oklch(0.75 0.17 255)">
+      </div>
+      <input id="cf-societe" placeholder="Société" style="background:rgba(244,246,248,.05);border:1px solid rgba(244,246,248,.15);border-radius:8px;padding:14px 16px;font:400 14px 'Instrument Sans',sans-serif;color:#f4f6f8;outline:none" style-focus="border-color:oklch(0.75 0.17 255)">
+      <textarea id="cf-msg" placeholder="Votre contexte, en trois lignes…" style="background:rgba(244,246,248,.05);border:1px solid rgba(244,246,248,.15);border-radius:8px;padding:14px 16px;font:400 14px/1.6 'Instrument Sans',sans-serif;color:#f4f6f8;outline:none;min-height:130px;resize:none" style-focus="border-color:oklch(0.75 0.17 255)"></textarea>
+      <button type="submit" style="font:500 13px 'IBM Plex Mono',monospace;background:oklch(0.55 0.19 255);color:#fff;border:none;padding:16px 28px;border-radius:8px;cursor:pointer;align-self:flex-start;transition:.25s" style-hover="filter:brightness(1.15);transform:translateY(-2px)">→ envoyer_le_message()</button>
+      <sc-if value="{{ sent }}" hint-placeholder-val="{{ false }}">
+        <div style="border:1px solid oklch(0.75 0.17 255 / 0.4);border-radius:10px;padding:14px 18px;font:500 12px 'IBM Plex Mono',monospace;color:oklch(0.75 0.17 255)">✓ Votre client mail s'est ouvert avec le message pré-rempli — envoyez-le, réponse sous 24 h. Sinon : renaudsecq@gmail.com</div>
+      </sc-if>
+      <p style="font:400 11px/1.6 'Instrument Sans',sans-serif;color:rgba(244,246,248,.35);margin:2px 0 0">Vos informations ne servent qu'à vous répondre. Elles ne sont ni stockées ni transmises à des tiers (RGPD).</p>
+    </form>
+  </div>
+</section>
+
+<!-- FOOTER -->
+<footer style="background:#0b1220;color:rgba(244,246,248,.4);border-top:1px solid rgba(244,246,248,.1);padding:24px 0">
+  <div style="max-width:1240px;margin:0 auto;padding:0 32px;display:flex;flex-direction:column;gap:14px;font:400 12px 'IBM Plex Mono',monospace">
+    <div style="display:flex;justify-content:space-between;align-items:center;gap:24px;flex-wrap:wrap">
+      <span>© 2026 Renaud Secq — Consultant IA &amp; Data</span>
+      <span>data_governance · ai_governance · software_engineering_3.0</span>
+    </div>
+    <div style="border-top:1px solid rgba(244,246,248,.08);padding-top:12px;font-size:11px;color:rgba(244,246,248,.3);line-height:1.7">RENAISSANCE DIGITAL CONSULTING — SAS · SIREN 830 153 128 · TVA FR13 830 153 128 · 2 allée du Vert Galant, 59840 Lompret · Conseil en systèmes et logiciels informatiques (NAF 62.02A) · Immatriculée au RNE depuis 2017</div>
+  </div>
+</footer>
+
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props="{&quot;motion&quot;:{&quot;editor&quot;:&quot;boolean&quot;,&quot;default&quot;:true,&quot;tsType&quot;:&quot;boolean&quot;,&quot;section&quot;:&quot;Comportement&quot;},&quot;showVeille&quot;:{&quot;editor&quot;:&quot;boolean&quot;,&quot;default&quot;:true,&quot;tsType&quot;:&quot;boolean&quot;,&quot;section&quot;:&quot;Sections&quot;}}">
+class Component extends DCLogic {
+  state = { sent: false };
+  renderVals() {
+    return {
+      sent: this.state.sent,
+      showVeille: this.props.showVeille ?? true,
+      onContact: (e) => {
+        this.setState({ sent: true });
+        e.preventDefault();
+        const v = id => (document.getElementById(id) || {}).value || '';
+        const body = encodeURIComponent(`Nom: ${v('cf-nom')}\nSociété: ${v('cf-societe')}\n\n${v('cf-msg')}`);
+        window.open(`mailto:renaudsecq@gmail.com?subject=${encodeURIComponent('Contact site — ' + v('cf-societe'))}&body=${body}`);
+      }
+    };
+  }
+  componentDidMount() {
+    const motion = this.props.motion ?? true;
+    // Cursor
+    const cur = document.getElementById('cursor'), dot = document.getElementById('cursorDot');
+    if (cur && matchMedia('(pointer:fine)').matches) {
+      addEventListener('mousemove', e => {
+        cur.style.transform = `translate(${e.clientX - 18}px,${e.clientY - 18}px)`;
+        dot.style.transform = `translate(${e.clientX - 2}px,${e.clientY - 2}px)`;
+      });
+    } else if (cur) { cur.style.display = 'none'; dot.style.display = 'none'; }
+    // Reveals — scroll-driven check (robust to inner scroll containers)
+    const rvEls = [...document.querySelectorAll('[data-rv]')];
+    rvEls.forEach((el, i) => {
+      el.style.opacity = '0';
+      el.style.transform = 'translateY(26px)';
+      el.style.transition = `opacity .8s cubic-bezier(.16,1,.3,1) ${(i % 3) * .1}s, transform .8s cubic-bezier(.16,1,.3,1) ${(i % 3) * .1}s`;
+    });
+    const checkReveals = () => {
+      const vh = window.innerHeight;
+      for (let i = rvEls.length - 1; i >= 0; i--) {
+        const r = rvEls[i].getBoundingClientRect();
+        if (r.top < vh * 0.92 && r.bottom > 0) {
+          rvEls[i].style.opacity = '1';
+          rvEls[i].style.transform = 'none';
+          rvEls.splice(i, 1);
+        }
+      }
+    };
+    document.addEventListener('scroll', checkReveals, { capture: true, passive: true });
+    addEventListener('resize', checkReveals);
+    checkReveals();
+    setTimeout(checkReveals, 400);
+    // Safety net: tout révéler après 6 s quoi qu'il arrive
+    setTimeout(() => rvEls.splice(0).forEach(el => { el.style.opacity = '1'; el.style.transform = 'none'; }), 6000);
+    // Counters — même mécanique scroll
+    const cntEls = [...document.querySelectorAll('[data-count]')];
+    const runCount = el => {
+      const t = +el.dataset.count, start = performance.now();
+      const tick = now => {
+        const p = Math.min(1, (now - start) / 1400), e = 1 - Math.pow(1 - p, 3);
+        el.textContent = Math.round(t * e);
+        if (p < 1) requestAnimationFrame(tick);
+      };
+      requestAnimationFrame(tick);
+    };
+    const checkCounts = () => {
+      const vh = window.innerHeight;
+      for (let i = cntEls.length - 1; i >= 0; i--) {
+        const r = cntEls[i].getBoundingClientRect();
+        if (r.top < vh && r.bottom > 0) { runCount(cntEls[i]); cntEls.splice(i, 1); }
+      }
+    };
+    document.addEventListener('scroll', checkCounts, { capture: true, passive: true });
+    checkCounts();
+    setTimeout(checkCounts, 400);
+    setTimeout(() => cntEls.splice(0).forEach(el => el.textContent = el.dataset.count), 6000);
+    // Canvas network
+    const cv = document.getElementById('net');
+    if (!cv || !motion) return;
+    const ctx = cv.getContext('2d');
+    let W, H, nodes = [], mouse = { x: -9999, y: -9999 };
+    const resize = () => {
+      W = cv.width = cv.offsetWidth * devicePixelRatio;
+      H = cv.height = cv.offsetHeight * devicePixelRatio;
+    };
+    resize();
+    addEventListener('resize', resize);
+    cv.parentElement.addEventListener('mousemove', e => {
+      const r = cv.getBoundingClientRect();
+      mouse.x = (e.clientX - r.left) * devicePixelRatio;
+      mouse.y = (e.clientY - r.top) * devicePixelRatio;
+    });
+    cv.parentElement.addEventListener('mouseleave', () => { mouse.x = -9999; mouse.y = -9999; });
+    const N = 70;
+    for (let i = 0; i < N; i++) nodes.push({
+      x: Math.random(), y: Math.random(),
+      vx: (Math.random() - .5) * .0004, vy: (Math.random() - .5) * .0004,
+      r: Math.random() < .15 ? 3 : 1.6, a: Math.random() < .15
+    });
+    const loop = () => {
+      if (!cv.isConnected) return;
+      ctx.clearRect(0, 0, W, H);
+      const px = n => n.x * W, py = n => n.y * H;
+      for (const n of nodes) {
+        n.x += n.vx; n.y += n.vy;
+        if (n.x < 0 || n.x > 1) n.vx *= -1;
+        if (n.y < 0 || n.y > 1) n.vy *= -1;
+        const dx = px(n) - mouse.x, dy = py(n) - mouse.y, d = Math.hypot(dx, dy);
+        if (d < 140 * devicePixelRatio && d > 0) {
+          n.x += (dx / d) * .0012; n.y += (dy / d) * .0012;
+        }
+      }
+      const maxD = 130 * devicePixelRatio;
+      for (let i = 0; i < N; i++) for (let j = i + 1; j < N; j++) {
+        const a = nodes[i], b = nodes[j];
+        const d = Math.hypot(px(a) - px(b), py(a) - py(b));
+        if (d < maxD) {
+          ctx.strokeStyle = (a.a || b.a) ? `rgba(59,102,245,${.35 * (1 - d / maxD)})` : `rgba(11,18,32,${.14 * (1 - d / maxD)})`;
+          ctx.lineWidth = devicePixelRatio * .7;
+          ctx.beginPath(); ctx.moveTo(px(a), py(a)); ctx.lineTo(px(b), py(b)); ctx.stroke();
+        }
+      }
+      for (const n of nodes) {
+        ctx.fillStyle = n.a ? '#3b66f5' : 'rgba(11,18,32,.35)';
+        ctx.beginPath(); ctx.arc(px(n), py(n), n.r * devicePixelRatio, 0, 7); ctx.fill();
+      }
+      requestAnimationFrame(loop);
+    };
+    loop();
+  }
+}
+</script>
+</body>
+</html>

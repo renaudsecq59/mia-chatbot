@@ -1,0 +1,6 @@
+User-agent: *
+Allow: /
+Disallow: /preview.html
+Disallow: /callback.html
+
+Sitemap: https://renaudsecq.com/sitemap.xml
