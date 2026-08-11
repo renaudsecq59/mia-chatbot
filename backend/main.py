@@ -2,16 +2,16 @@
 import hashlib
 import logging
 import os
-from datetime import datetime, timezone
+from datetime import UTC, datetime
+
+from ai_curator import process_articles
+from config import GCP_PROJECT, MAX_ARTICLES_PER_WEEK
 from fastapi import FastAPI, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
 from google.cloud import firestore
-
+from linkedin_publisher import generate_visual, generate_weekly_edito, publish_to_linkedin
 from scraper import scrape_all_sources
-from ai_curator import process_articles
 from visual_generator import save_visual_html
-from linkedin_publisher import generate_weekly_edito, generate_visual, publish_to_linkedin
-from config import GCP_PROJECT, MAX_ARTICLES_PER_WEEK
 
 logging.basicConfig(level=logging.INFO, format='%(asctime)s %(message)s')
 logger = logging.getLogger(__name__)
@@ -54,24 +54,24 @@ async def root():
 async def run_scrape():
     """Déclenche le scraping complet : RSS → scoring → Firestore."""
     logger.info("🚀 Démarrage du scraping...")
-    
+
     # 1. Scrape toutes les sources RSS
     raw_articles = await scrape_all_sources()
-    
+
     if not raw_articles:
         return {"status": "warning", "message": "Aucun article récupéré"}
-    
+
     # 2. Scoring et enrichissement avec Claude
     scored_articles = await process_articles(raw_articles)
-    
+
     # 3. Limiter le nombre d'articles par jour
     top_articles = scored_articles[:MAX_ARTICLES_PER_WEEK]
-    
+
     # 4. Générer les visuels HTML
     for article in top_articles:
         if article.get("visual_type"):
             save_visual_html(article)
-    
+
     # 5. Sauvegarder dans Firestore
     saved_count = 0
     for article in top_articles:
@@ -83,8 +83,8 @@ async def run_scrape():
             doc_ref = db.collection("articles").document(article["id"])
             article_data = {
                 **article,
-                "created_at": datetime.now(timezone.utc).isoformat(),
-                "updated_at": datetime.now(timezone.utc).isoformat(),
+                "created_at": datetime.now(UTC).isoformat(),
+                "updated_at": datetime.now(UTC).isoformat(),
             }
             batch.set(doc_ref, article_data, merge=True)
             saved_count += 1
@@ -92,7 +92,7 @@ async def run_scrape():
         logger.info(f"💾 {saved_count} articles sauvegardés dans Firestore")
     else:
         logger.warning("⚠️ Firestore offline — articles non sauvegardés")
-    
+
     # 6. Générer et publier le post LinkedIn automatiquement
     linkedin_result = None
     try:
@@ -129,7 +129,7 @@ async def run_scrape():
             url_line = f"\n\n{_SITE_URL}"
             hashtag_line = ("\n\n" + " ".join(hashtags)) if hashtags and not any(h in post_text for h in hashtags) else ""
             post_text = post_text.rstrip() + url_line + hashtag_line
-        
+
         if post_text:
             # Garde-fou anti-shadowban : max 1 post LinkedIn par jour
             already_published_today = False
@@ -160,8 +160,9 @@ async def run_scrape():
                 image_b64_thumb = None
                 if image_bytes:
                     try:
-                        from PIL import Image
                         import io
+
+                        from PIL import Image
                         img = Image.open(io.BytesIO(image_bytes)).convert("RGB")
                         img.thumbnail((800, 1067), Image.LANCZOS)  # ratio 3:4 max 800px
                         buf = io.BytesIO()
@@ -174,7 +175,7 @@ async def run_scrape():
                 linkedin_result["image_b64"] = image_b64_thumb
                 linkedin_result["image_size_kb"] = round(len(image_bytes) / 1024) if image_bytes else 0
             logger.info(f"📣 LinkedIn: {linkedin_result.get('status')} — type={post_type} — image={linkedin_result.get('has_image')}")
-            
+
             # Sauvegarder le post dans Firestore
             if db and linkedin_result.get("status") == "published":
                 db.collection("linkedin_posts").add({
@@ -184,7 +185,7 @@ async def run_scrape():
                     "has_image": linkedin_result.get("has_image", False),
                     "image_b64": linkedin_result.get("image_b64"),
                     "image_size_kb": linkedin_result.get("image_size_kb", 0),
-                    "published_at": datetime.now(timezone.utc).isoformat(),
+                    "published_at": datetime.now(UTC).isoformat(),
                     "hashtags": hashtags,
                     "hook": edito.get("hook", ""),
                     "quality_gate": edito.get("quality_gate", {}),
@@ -201,7 +202,7 @@ async def run_scrape():
     except Exception as e:
         logger.error(f"❌ Erreur LinkedIn auto-publish: {e}")
         linkedin_result = {"status": "error", "error": str(e)}
-    
+
     return {
         "status": "ok",
         "raw_articles": len(raw_articles),
@@ -225,20 +226,20 @@ async def get_articles(category: str = None, limit: int = 20):
     """Récupère les articles depuis Firestore."""
     if not db:
         raise HTTPException(status_code=503, detail="Firestore non disponible")
-    
+
     query = db.collection("articles").order_by("score", direction=firestore.Query.DESCENDING)
-    
+
     if category:
         query = query.where("category", "==", category)
-    
+
     query = query.limit(limit)
     docs = query.stream()
-    
+
     articles = []
     for doc in docs:
         data = doc.to_dict()
         articles.append(data)
-    
+
     return {"articles": articles, "count": len(articles)}
 
 
@@ -247,11 +248,11 @@ async def get_article(article_id: str):
     """Récupère un article spécifique."""
     if not db:
         raise HTTPException(status_code=503, detail="Firestore non disponible")
-    
+
     doc = db.collection("articles").document(article_id).get()
     if not doc.exists:
         raise HTTPException(status_code=404, detail="Article non trouvé")
-    
+
     return doc.to_dict()
 
 
@@ -260,7 +261,7 @@ async def get_linkedin_posts(limit: int = 10):
     """Récupère les posts LinkedIn prêts à publier."""
     if not db:
         raise HTTPException(status_code=503, detail="Firestore non disponible")
-    
+
     query = (
         db.collection("articles")
         .where("linkedin_post", "!=", "")
@@ -268,9 +269,9 @@ async def get_linkedin_posts(limit: int = 10):
         .order_by("score", direction=firestore.Query.DESCENDING)
         .limit(limit)
     )
-    
+
     docs = query.stream()
-    
+
     posts = []
     for doc in docs:
         data = doc.to_dict()
@@ -284,7 +285,7 @@ async def get_linkedin_posts(limit: int = 10):
             "linkedin_suggested_day": data.get("linkedin_suggested_day"),
             "visual_type": data.get("visual_type"),
         })
-    
+
     return {"posts": posts, "count": len(posts)}
 
 
@@ -452,7 +453,7 @@ async def get_linkedin_post_by_id(post_id: str):
 async def get_linkedin_stats():
     """Récupère les stats de tous les posts LinkedIn via l'API LinkedIn."""
     import httpx
-    from linkedin_publisher import LINKEDIN_ACCESS_TOKEN, LINKEDIN_PERSON_URN
+    from linkedin_publisher import LINKEDIN_ACCESS_TOKEN
 
     if not LINKEDIN_ACCESS_TOKEN:
         raise HTTPException(status_code=400, detail="Token LinkedIn non configuré")
@@ -728,7 +729,7 @@ async def newsletter_subscribe(data: NewsletterSubscribe):
 
         doc_ref.set({
             "email": email,
-            "subscribed_at": datetime.now(timezone.utc).isoformat(),
+            "subscribed_at": datetime.now(UTC).isoformat(),
             "source": "website",
             "active": True,
         })
@@ -804,7 +805,7 @@ async def livre_blanc_download(data: LivreBlancDownload):
             "company": company,
             "email": email,
             "newsletter": data.newsletter,
-            "downloaded_at": datetime.now(timezone.utc).isoformat(),
+            "downloaded_at": datetime.now(UTC).isoformat(),
             "pdf": "AIgovernance-renaudsecq-12pointsaverifier.pdf",
             "source": "website",
         }, merge=True)
@@ -813,7 +814,7 @@ async def livre_blanc_download(data: LivreBlancDownload):
             sub_id = hashlib.sha256(email.encode()).hexdigest()[:16]
             db.collection("newsletter_subscribers").document(sub_id).set({
                 "email": email,
-                "subscribed_at": datetime.now(timezone.utc).isoformat(),
+                "subscribed_at": datetime.now(UTC).isoformat(),
                 "source": "livre_blanc",
                 "active": True,
             }, merge=True)

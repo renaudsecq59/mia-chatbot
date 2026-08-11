@@ -11,5 +11,8 @@ frontend:
     baseDirectory: /
     files:
       - '**/*'
+    exclude:
+      - 'newdesing/**/*'
+      - 'newdesing/**'
   cache:
     paths: []

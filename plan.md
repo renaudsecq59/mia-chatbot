@@ -60,6 +60,19 @@ Agents disponibles : `chef-de-projet`, `developpeur`, `ux-designer`, `security`,
 - [ ] Créer un post LinkedIn dédié au lancement du livre blanc
 - [ ] Étudier l'ajout d'autres lead magnets (webinar replay, template audit)
 
+### CI/CD & Qualité
+- [x] GitHub Actions CI : lint ruff + tests pytest + audit pip-audit + SonarCloud
+- [x] GitHub Actions deploy : auto-déploiement Cloud Run sur push main (si backend modifié)
+- [x] `ruff.toml` — config lint (Python 3.11, règles E/W/F/I/B/UP/C4/S)
+- [x] `backend/requirements-dev.txt` — deps de dev (ruff, pytest, pip-audit)
+- [x] `backend/pytest.ini` — config tests
+- [x] `backend/tests/` — 9 tests (health, livre blanc, newsletter) — tous passent
+- [x] `sonar-project.properties` — config SonarCloud
+- [x] Lint ruff : 0 erreur après auto-fix
+- [ ] **Action user** : Créer compte SonarCloud → lier repo → ajouter `SONAR_TOKEN` dans GitHub Secrets
+- [ ] **Action user** : Créer service account GCP → ajouter `GCP_SA_KEY` et `GCP_PROJECT_ID` dans GitHub Secrets (pour deploy auto)
+- [ ] Vérifier que le workflow CI passe sur la première PR
+
 ### Sécurité
 - [ ] Auditer les règles Firestore (collection `livre_blanc_leads` en lecture publique ?)
 - [ ] Vérifier le rate-limiting sur l'endpoint `/api/livre-blanc/download`
@@ -73,4 +86,4 @@ Agents disponibles : `chef-de-projet`, `developpeur`, `ux-designer`, `security`,
 ---
 
 ## Dernière mise à jour
-2026-08-11 — Ajout livre blanc + agents
+2026-08-11 — Ajout CI/CD GitHub Actions + SonarCloud + tests

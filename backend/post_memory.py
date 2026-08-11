@@ -5,10 +5,11 @@ dans le prompt, et fait de la déduplication sémantique via embeddings Gemini.
 """
 import logging
 import math
-from datetime import datetime, timezone
+from datetime import UTC, datetime
+
+from config import GCP_LOCATION, GCP_PROJECT, GEMINI_API_KEY
 from google import genai
 from google.cloud import firestore
-from config import GCP_PROJECT, GCP_LOCATION, GEMINI_API_KEY
 
 logger = logging.getLogger(__name__)
 
@@ -28,7 +29,7 @@ except Exception:
     _EMBED_MODEL = None
 
 # Seuil de similarité cosinus au-dessus duquel on considère que c'est un duplicate
-DEDUP_THRESHOLD = 0.85
+DEDUP_THRESHOLD = 0.80
 
 
 def get_recent_posts(db, limit: int = 5) -> list[dict]:
@@ -61,18 +62,21 @@ def get_recent_posts(db, limit: int = 5) -> list[dict]:
         return []
 
 
-def get_post_history_summary(db, limit: int = 5) -> str:
+def get_post_history_summary(db, limit: int = 15) -> str:
     """Retourne un résumé textuel des derniers posts pour injection dans le prompt."""
     posts = get_recent_posts(db, limit)
     if not posts:
         return "Aucun post précédent — c'est le premier post."
 
-    lines = ["POSTS PRÉCÉDENTS (ne PAS répéter ces angles/sujets) :"]
+    lines = ["POSTS PRÉCÉDENTS DES 2 DERNIÈRES SEMAINES (ne PAS répéter ces angles/sujets/thèmes) :"]
     for i, p in enumerate(posts, 1):
-        hook = p.get("hook") or p["post_text"][:120]
+        hook = p.get("hook") or p["post_text"][:150]
         post_type = p.get("post_type", "?")
         date = p.get("published_at", "")[:10]
         lines.append(f"{i}. [{post_type}] ({date}) {hook}")
+
+    lines.append("")
+    lines.append("ATTENTION : Si un thème a déjà été traité (ex: sécurité des agents, gouvernance IA, coût de l'IA), tu DOIS trouver un angle radicalement différent. Ne reformule pas le même message avec d'autres mots.")
 
     return "\n".join(lines)
 
@@ -108,7 +112,7 @@ def cosine_similarity(a: list[float], b: list[float]) -> float:
     return dot / (norm_a * norm_b)
 
 
-def check_duplicate(db, new_post_text: str, limit: int = 10) -> dict:
+def check_duplicate(db, new_post_text: str, limit: int = 15) -> dict:
     """Vérifie si le nouveau post est trop similaire à un post précédent.
 
     Returns:
@@ -184,7 +188,7 @@ def store_post_embedding(db, post_text: str, post_id: str = ""):
                 "post_id": post_id,
                 "embedding": embedding,
                 "text_preview": post_text[:200],
-                "created_at": datetime.now(timezone.utc).isoformat(),
+                "created_at": datetime.now(UTC).isoformat(),
             })
             logger.info(f"💾 Embedding stocké pour post {post_id}")
         except Exception as e:
@@ -243,7 +247,7 @@ def fetch_linkedin_engagement(access_token: str, post_urn: str) -> dict | None:
         impressions = 0
         try:
             analytics_resp = httpx.get(
-                f"https://api.linkedin.com/rest/individualShareStatistics",
+                "https://api.linkedin.com/rest/individualShareStatistics",
                 params={"q": "share", "share": post_urn},
                 headers=headers, timeout=15,
             )
@@ -264,7 +268,7 @@ def fetch_linkedin_engagement(access_token: str, post_urn: str) -> dict | None:
             "comments": comments_count,
             "impressions": impressions,
             "engagement_rate": engagement_rate,
-            "fetched_at": datetime.now(timezone.utc).isoformat(),
+            "fetched_at": datetime.now(UTC).isoformat(),
         }
     except Exception as e:
         logger.warning(f"⚠️ Fetch engagement LinkedIn échoué pour {post_urn}: {e}")
@@ -302,7 +306,7 @@ def update_post_engagement(db, max_posts: int = 10) -> int:
 
             # Skip si déjà fetché il y a moins de 24h
             existing_eng = data.get("engagement", {})
-            if existing_eng and existing_eng.get("fetched_at", "")[:10] == datetime.now(timezone.utc).isoformat()[:10]:
+            if existing_eng and existing_eng.get("fetched_at", "")[:10] == datetime.now(UTC).isoformat()[:10]:
                 continue
 
             engagement = fetch_linkedin_engagement(access_token, post_id)
@@ -412,7 +416,7 @@ def store_critic_lesson(db, critic_result: dict, post_text: str):
             "suggestion": critic_result.get("suggestion", ""),
             "verdict": critic_result.get("verdict", ""),
             "post_preview": post_text[:200],
-            "created_at": datetime.now(timezone.utc).isoformat(),
+            "created_at": datetime.now(UTC).isoformat(),
         })
         logger.info(f"📝 Leçon critic stockée (avg={critic_result.get('average', 0)})")
     except Exception as e:
@@ -614,7 +618,7 @@ def update_source_scores(db):
         if scores:
             db.collection("source_scores").document("latest").set({
                 "scores": scores,
-                "updated_at": datetime.now(timezone.utc).isoformat(),
+                "updated_at": datetime.now(UTC).isoformat(),
             })
             logger.info(f"📊 Scores de {len(scores)} sources mis à jour")
 
@@ -672,7 +676,7 @@ def store_hook_experiment(db, hooks: list[str], winner_idx: int, critic_scores: 
             "winner_hook": hooks[winner_idx],
             "critic_scores": critic_scores,
             "post_id": post_id,
-            "created_at": datetime.now(timezone.utc).isoformat(),
+            "created_at": datetime.now(UTC).isoformat(),
         })
         logger.info(f"🧪 Expérience A/B hooks stockée — gagnant: hook #{winner_idx + 1}")
     except Exception as e:

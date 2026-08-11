@@ -14,7 +14,8 @@
       "package.json",
       "package-lock.json",
       "firestore.rules",
-      "firestore.indexes.json"
+      "firestore.indexes.json",
+      "newdesing/**"
     ]
   }
 }

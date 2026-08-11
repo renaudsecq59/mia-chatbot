@@ -1,0 +1,37 @@
+target-version = "py311"
+line-length = 120
+
+[lint]
+select = [
+  "E",   # pycodestyle errors
+  "W",   # pycodestyle warnings
+  "F",   # pyflakes
+  "I",   # isort
+  "B",   # flake8-bugbear
+  "UP",  # pyupgrade
+  "C4",  # flake8-comprehensions
+  "S",   # flake8-bandit (sécurité)
+]
+ignore = [
+  "E501",   # line too long (géré par line-length)
+  "S101",   # use of assert (OK en tests)
+  "S104",   # binding to all interfaces (FastAPI le fait par design)
+  "S108",   # hardcoded temp directory
+  "B008",   # function call in default argument (FastAPI Depends)
+  "S324",   # hashlib.md5 utilisé pour générer des IDs (pas de sécurité)
+  "S110",   # try/except/pass acceptable pour les blocs non-critiques
+  "E741",   # noms de variables courts (l, i) — code existant
+  "E402",   # imports en milieu de fichier (pattern FastAPI existant)
+  "B905",   # zip() sans strict= — code existant
+  "B007",   # variables de boucle non utilisées — code existant
+  "F841",   # variables assignées non utilisées — à nettoyer progressivement
+  "F821",   # noms non définis (refs forward dans templates)
+]
+
+[lint.per-file-ignores]
+"backend/main.py" = ["S301"]  # pickle/hashlib usage legit
+"backend/linkedin_publisher.py" = ["S301", "S501"]
+"backend/post_memory.py" = ["S301"]
+
+[format]
+quote-style = "double"

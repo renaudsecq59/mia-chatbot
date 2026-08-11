@@ -2,9 +2,10 @@
 import asyncio
 import json
 import logging
+
+from config import EXPERT_PROFILE, GCP_LOCATION, GCP_PROJECT, MIN_SCORE
 from google import genai
 from google.genai import types
-from config import GCP_PROJECT, GCP_LOCATION, EXPERT_PROFILE, MIN_SCORE, MIN_SCORE_LINKEDIN
 
 logger = logging.getLogger(__name__)
 
@@ -33,8 +34,9 @@ EXPERTISE DE RENAUD :
 
 TON : {tone}
 
-AUDIENCE CIBLE (décideurs tech/data en entreprise) :
-- CDOs, VP Data, CTOs qui recrutent des freelances
+AUDIENCE CIBLE (large spectre, du néophyte éclairé au CTO) :
+- Néophytes éclairés : managers, dirigeants, consultants qui veulent comprendre POURQUOI l'IA compte pour leur business
+- CDOs, VP Data, CTOs qui recrutent des freelances IA
 - Product Managers IA qui cherchent des insights terrain
 - Data Engineers/Scientists qui veulent monter en compétence
 - Recruteurs tech qui sourcent des profils IA/Data
@@ -51,33 +53,38 @@ CRITÈRES DE SCORING (0-10 chacun) :
    - 9-10 : Directement lié à build IA, gouvernance data, ou management tech
    - 5-8 : Lié à l'écosystème (cloud, outils, régulation)
    - 0-4 : Trop théorique, trop niche, ou hors sujet
-   
+
 2. QUALITÉ & CRÉDIBILITÉ
    - 9-10 : Source officielle (GCP, AWS, Databricks) ou média reconnu, contenu substantiel
    - 5-8 : Blog d'expert, retour d'expérience concret
    - 0-4 : Clickbait, contenu superficiel, source douteuse
-   
+
 3. NOUVEAUTÉ & TIMING
    - 9-10 : Annonce produit, nouvelle régulation, tendance émergente
    - 5-8 : Best practice récente, cas d'usage intéressant
    - 0-4 : Contenu recyclé, évident, ou dépassé
-   
+
 4. ACTIONNABLE BUSINESS
    - 9-10 : Insights qu'un décideur peut appliquer cette semaine (ex: nouvelle feature Vertex AI, checklist AI Act)
    - 5-8 : Utile pour la stratégie moyen terme
    - 0-4 : Trop théorique, pas d'application concrète
-   
+
 5. POTENTIEL LINKEDIN
    - 9-10 : Sujet qui génère du débat, chiffres marquants, opinion tranchée possible
    - 5-8 : Intéressant mais consensuel
    - 0-4 : Ennuyeux, trop technique, ou trop corporate
 
+6. ACCESSIBILITÉ (nouveau critère)
+   - 9-10 : Compréhensible par un manager non-tech. Analogie naturelle possible. Sujet business.
+   - 5-8 : Nécessite 1-2 phrases de contexte pour un non-tech, mais sinon accessible
+   - 0-4 : Trop technique, jargon lourd, impossible à vulgariser en 200 mots
+
 GÉNÈRE ENSUITE :
 
 RÉSUMÉ (2-3 phrases max) :
-- Accessible pour un non-tech
-- Focus sur le "pourquoi c'est important" pas le "comment ça marche"
-- Évite le jargon (ou explique-le)
+- Accessible pour un non-tech — explique le POURQUOI, pas le comment
+- Si jargon, explique-le en 3 mots dans la même phrase
+- Focus sur l'impact business, pas sur la technique pure
 
 AVIS EXPERT (1-2 phrases, ton Renaud) :
 - Opinion tranchée, pas neutre
@@ -99,7 +106,8 @@ RÉPONDS EN JSON STRICT :
     "qualite": X,
     "nouveaute": X,
     "impact_business": X,
-    "partageabilite": X
+    "partageabilite": X,
+    "accessibilite": X
   }},
   "score_final": X.X,
   "summary": "Résumé accessible en 2-3 phrases...",
@@ -152,7 +160,7 @@ async def score_article(article: dict) -> dict:
     if not client:
         article.update(_mock_score(article))
         return article
-    
+
     try:
         prompt = SCORING_PROMPT.format(
             name=EXPERT_PROFILE["name"],
@@ -164,7 +172,7 @@ async def score_article(article: dict) -> dict:
             category=article["category_label"],
             summary=article["summary_raw"],
         ).replace("{title}", article["title"]).replace("{source}", article["source_name"]).replace("{category}", article["category_label"]).replace("{summary}", article["summary_raw"])
-        
+
         response = client.models.generate_content(
             model=MODEL_ID,
             contents=prompt,
@@ -176,14 +184,14 @@ async def score_article(article: dict) -> dict:
         raw_text = response.text.strip()
         if raw_text.startswith("```"):
             raw_text = raw_text.split("\n", 1)[1].rsplit("```", 1)[0].strip()
-        
+
         result = json.loads(raw_text)
-        
+
         # Appliquer le poids de la source
         result["score_final"] = round(
             result["score_final"] * article.get("source_weight", 1.0), 1
         )
-        
+
         article.update({
             "scores": result["scores"],
             "score": result["score_final"],
@@ -192,13 +200,13 @@ async def score_article(article: dict) -> dict:
             "tags": result["tags"],
             "reject_reason": result.get("reject_reason"),
         })
-        
+
         logger.info(f"  📝 Score {result['score_final']}/10 - {article['title'][:60]}")
-        
+
     except Exception as e:
         logger.error(f"  ❌ Erreur scoring: {e}")
         article.update(_mock_score(article))
-    
+
     return article
 
 
@@ -207,7 +215,7 @@ async def generate_linkedin_post(article: dict) -> dict:
     if not client:
         logger.warning("⚠️ GenAI non disponible, post LinkedIn simulé")
         return _mock_linkedin(article)
-    
+
     try:
         prompt = LINKEDIN_PROMPT.format(
             name=EXPERT_PROFILE["name"],
@@ -218,7 +226,7 @@ async def generate_linkedin_post(article: dict) -> dict:
             expert_opinion=article.get("expert_opinion", ""),
             tags=", ".join(article.get("tags", [])),
         ).replace("{title}", article["title"]).replace("{source}", article["source_name"]).replace("{summary}", article.get("summary", "")).replace("{expert_opinion}", article.get("expert_opinion", "")).replace("{tags}", ", ".join(article.get("tags", [])))
-        
+
         response = client.models.generate_content(
             model=MODEL_ID,
             contents=prompt,
@@ -230,9 +238,9 @@ async def generate_linkedin_post(article: dict) -> dict:
         raw_text = response.text.strip()
         if raw_text.startswith("```"):
             raw_text = raw_text.split("\n", 1)[1].rsplit("```", 1)[0].strip()
-        
+
         result = json.loads(raw_text)
-        
+
         article.update({
             "linkedin_post": result["full_post"],
             "linkedin_hook": result["hook"],
@@ -240,13 +248,13 @@ async def generate_linkedin_post(article: dict) -> dict:
             "visual_type": result["visual_type"],
             "visual_data": result["visual_data"],
         })
-        
+
         logger.info(f"  📣 Post LinkedIn généré ({len(result['full_post'])} chars)")
-        
+
     except Exception as e:
         logger.error(f"  ❌ Erreur LinkedIn: {e}")
         article.update(_mock_linkedin(article))
-    
+
     return article
 
 
@@ -266,18 +274,18 @@ async def _linkedin_with_semaphore(article: dict) -> dict:
 
 async def process_articles(articles: list[dict]) -> list[dict]:
     """Pipeline : scoring mots-clés (instantané). L'édito LinkedIn est généré séparément."""
-    
+
     # Scoring par mots-clés (gratuit, instantané)
     logger.info(f"\n⚡ Scoring de {len(articles)} articles par mots-clés...")
     for article in articles:
         article.update(_mock_score(article))
-    
+
     # Filtrer et trier
     good_articles = [a for a in articles if a.get("score", 0) >= MIN_SCORE]
     good_articles.sort(key=lambda x: x.get("score", 0), reverse=True)
-    
+
     logger.info(f"✅ {len(good_articles)} articles retenus (score >= {MIN_SCORE}) sur {len(articles)}")
-    
+
     return good_articles
 
 
@@ -322,7 +330,7 @@ def _mock_score(article: dict) -> dict:
 
     # Avis expert contextualisé
     if high_hits >= 2:
-        opinion = f"Directement applicable en mission. À surveiller pour les équipes qui déploient de l'IA en prod."
+        opinion = "Directement applicable en mission. À surveiller pour les équipes qui déploient de l'IA en prod."
     elif "agent" in title:
         opinion = "Les agents IA sont le sujet chaud de 2026. Ce type d'article aide à cadrer les projets clients."
     elif any(kw in title for kw in ["governance", "govern", "catalog", "quality"]):

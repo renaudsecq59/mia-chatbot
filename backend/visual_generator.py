@@ -1,8 +1,9 @@
 """Générateur de visuels brandés pour LinkedIn."""
-import os
 import logging
-from jinja2 import Template
+import os
+
 from config import EXPERT_PROFILE, RSS_SOURCES
+from jinja2 import Template
 
 logger = logging.getLogger(__name__)
 
@@ -57,7 +58,7 @@ TEMPLATE_STAT_CHOC = """<!DOCTYPE html>
   .category {
     font-size: 12px; font-weight: 700;
     text-transform: uppercase; letter-spacing: 2px;
-    color: {{ color }}; 
+    color: {{ color }};
     padding: 6px 14px;
     border: 1px solid {{ color }}44;
     border-radius: 100px;
@@ -239,14 +240,14 @@ def generate_visual_html(article: dict) -> str:
     visual_data = article.get("visual_data", {})
     category_id = article.get("category", "ia_entreprise")
     category_config = RSS_SOURCES.get(category_id, {})
-    
+
     template_str = TEMPLATES.get(visual_type, TEMPLATE_ARTICLE)
     template = Template(template_str)
-    
+
     # Extraire les bullets du résumé si template article
     summary = article.get("summary", "")
     bullets = [s.strip() for s in summary.split('.') if len(s.strip()) > 20][:3]
-    
+
     html = template.render(
         color=category_config.get("color", "#c8ff00"),
         emoji=category_config.get("emoji", "📊"),
@@ -260,7 +261,7 @@ def generate_visual_html(article: dict) -> str:
         bullets=bullets,
         tags=article.get("tags", [])[:4],
     )
-    
+
     return html
 
 

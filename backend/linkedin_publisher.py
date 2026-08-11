@@ -13,18 +13,23 @@ import json
 import logging
 import os
 import re
-from google.cloud import firestore
+from datetime import UTC, datetime
+
 import httpx
-from datetime import datetime, timezone
+from config import EXPERT_PROFILE, GCP_LOCATION, GCP_PROJECT, GEMINI_API_KEY
 from google import genai
-from config import GCP_PROJECT, GCP_LOCATION, GEMINI_API_KEY, EXPERT_PROFILE
+from google.cloud import firestore
 from post_memory import (
-    get_post_history_summary, check_duplicate, store_post_embedding, get_performance_insights,
-    store_critic_lesson, get_critic_lessons,
+    check_duplicate,
+    get_critic_lessons,
+    get_hook_patterns,
+    get_performance_insights,
+    get_post_history_summary,
     get_style_guidelines,
-    update_source_scores, get_top_sources,
-    store_hook_experiment, get_hook_patterns,
+    get_top_sources,
     get_visual_lessons,
+    store_critic_lesson,
+    store_hook_experiment,
 )
 
 logger = logging.getLogger(__name__)
@@ -75,21 +80,32 @@ PROFIL RENAUD (à utiliser pour ancrer le propos, pas pour se vanter) :
 2. DATA GOVERNANCE — data quality, catalog, lineage, Collibra, data mesh, data contracts, stewardship
 3. VIBE CODING — cursor, claude code, copilot, windsurf, agent coding, vibe coding, dev assisté IA
 
-OBJECTIF : Que chaque post apporte UNE chose que le lecteur ne savait pas avant.
+OBJECTIF : Que chaque post apporte UNE chose que le lecteur ne savait pas avant. Accessible à un néophyte éclairé, pas seulement à un expert technique.
 
-LECTEUR IDÉAL — CDO, CTO ou Data Engineer en entreprise :
-- Il subit la pression de "faire de l'IA" sans budget ni équipe dédiée
-- Il a déjà lancé 3 POCs IA, 2 sont morts en production, 1 tourne à vide
-- Il connaît les outils mais manque de recul stratégique sur la gouvernance
-- Il scroll LinkedIn le matin en 5 min : il veut de la viande, pas du marketing
-- Ses pain points : coût GPU explosif, conformité EU AI Act qui arrive, qualité des données pourrie, vendor lock-in
-- Ce qui l'arrête de scroller : un chiffre précis, un nom d'outil qu'il ne connaissait pas, une contradiction avec ce qu'il croyait vrai
+LECTEUR IDÉAL — large spectre, du néophyte éclairé au CTO :
+- Le néophyte éclairé : manager, dirigeant, consultant qui entend parler d'IA partout mais ne sait pas démêler le vrai du marketing. Il veut comprendre POURQUOI ça compte pour son business, pas le comment technique.
+- Le CDO/CTO : il subit la pression de "faire de l'IA" sans budget ni équipe dédiée. Il a lancé 3 POCs, 2 sont morts, 1 tourne à vide.
+- Le Data Engineer : il connaît les outils mais manque de recul stratégique.
+- Tous scrollent LinkedIn le matin en 5 min : ils veulent de la viande, pas du marketing.
+- Pain points universels : coût de l'IA qui explose, conformité qui arrive, qualité des données, peur de se faire enfermer par un vendor.
+- Ce qui les arrête de scroller : un chiffre précis, une analogie inattendue, une contradiction avec ce qu'ils croyaient vrai, une question qui les interpelle directement.
 
-MOTS INTERDITS (jargon AI-slop, jamais les utiliser) : game-changer, révolutionnaire, passionnant, incroyable, leverage, dive in, supercharge, unlock, seamless, transformative, delve, harness, "Et vous ?", "Qu'en pensez-vous". Écris comme un humain, pas comme un LLM.
+RÈGLE D'ACCESSIBILITÉ ABSOLUE : Chaque post doit être compréhensible par un manager non-technique. Si tu utilises un terme technique (RAG, MCP, fine-tuning, vectoriel), explique-le en 3 mots dans la même phrase. Exemple : "RAG (l'IA qui cite ses sources)" ou "fine-tuning (adapter un modèle à vos données)". Pas plus d'1 terme technique non expliqué par post.
+
+MOTS INTERDITS (jargon AI-slop, jamais les utiliser) : game-changer, révolutionnaire, passionnant, incroyable, leverage, dive in, supercharge, unlock, seamless, transformative, delve, harness. Écris comme un humain, pas comme un LLM.
+
+QUESTIONS D'ENGAGEMENT AUTORISÉES ET ENCOURAGÉES : Contrairement aux questions rhétoriques creuses, une bonne question d'engagement est SPÉCIFIQUE et invite à partager une expérience concrète. Exemples qui marchent :
+- "Vous, c'est quoi le vrai bottleneck de vos projets IA ?"
+- "Quel outil utilisez-vous aujourd'hui pour ça ?"
+- "Combien de temps vous prend cette étape aujourd'hui ?"
+- "Vous avez déjà fait ce calcul pour votre équipe ?"
+Utilise 1 question d'engagement à la fin du post (pas systématique, 1 post sur 2).
 
 {post_history}
 
 ANTI-RÉPÉTION ABSOLUE : Le post que tu vas écrire DOIT avoir un angle radicalement différent des posts précédents ci-dessus. Si un post précédent parlait d'un outil, parle d'un autre. Si un post précédent était une revue, fais une analyse profonde. Varie les exemples, les chiffres, les références. NE JAMAIS reprendre la même structure ni le même angle.
+
+RÈGLE DES 14 JOURS : Regarde les hooks des posts précédents. Si un THÈME a déjà été abordé dans les 14 derniers jours (ex: "sécurité des agents", "gouvernance IA", "coût de l'IA", "contrôle des outils"), tu DOIS traiter un sujet différent. Reformuler le même thème avec d'autres mots n'est pas acceptable. Change de pilier éditorial si nécessaire.
 
 {performance_insights}
 
@@ -124,23 +140,23 @@ Pas de conclusion. Le lecteur scroll, absorbe, repart.
 --- SIGNAL_FAIBLE ---
 Repérer un signal que personne n'a encore connecté.
 Structure :
-1. Hook = un fait précis + une question implicite ("X vient de faire Y. C'est plus significatif qu'il n'y paraît.")
-2. L'explication : pourquoi ce signal annonce un changement de fond (2-3 paragraphes denses)
-3. Ce que ça implique concrètement pour les équipes data/IA en entreprise
+1. Hook OBLIGATOIREMENT contrarian ou provocateur : une affirmation qui contredit l'opinion dominante. PAS de hook descriptif. Exemples qui marchent : "Oubliez les comparatifs Cursor vs Copilot.", "Le principal risque des agents IA en 2026 n'est plus la performance, c'est la sécurité.", "C'est quoi ce chantier ? Vos agents IA gaspillent !"
+2. L'explication : pourquoi ce signal annonce un changement de fond (2-3 paragraphes, accessibles avec analogie si concept technique)
+3. Ce que ça implique concrètement pour les équipes en entreprise (pas seulement data/IA — viser large)
 4. Lien vers la veille
 
 --- AI_GOVERNANCE ---
 Analyser un enjeu de gouvernance de l'IA issu de l'actualité de la semaine.
 Structure :
-1. Hook = un fait précis sur la régulation, la conformité ou la gouvernance de l'IA (EU AI Act, model governance, AI safety, risk management)
-2. Le contexte réglementaire ou technique : pourquoi ce sujet est critique maintenant
-3. L'implication concrète pour les équipes data/IA en entreprise (process, outils, organisation)
+1. Hook = un fait précis avec UNE ANALOGIE concrète (pas une description technique). Exemple : "Vos tests de modèles IA ne couvrent pas le risque le plus dangereux de 2026 : le risque d'exécution."
+2. Le contexte : pourquoi ce sujet est critique maintenant — expliqué pour un manager, pas pour un ingénieur
+3. L'implication concrète pour les entreprises (process, organisation, budget — pas seulement technique)
 4. Une recommandation actionnable : ce qu'il faut faire (ou arrêter de faire)
 
 RÈGLES POUR CE FORMAT :
 - Ancre-toi sur les faits des articles de la semaine, pas sur des opinions générales
-- Cite des textes réglementaires, frameworks ou standards précis (EU AI Act, NIST AI RMF, ISO 42001, etc.)
-- Évite le sensationnalisme : la gouvernance est un sujet sérieux, traite-le avec rigueur
+- Cite des textes réglementaires ou frameworks précis (EU AI Act, NIST AI RMF, ISO 42001) MAIS explique-les en 1 phrase simple
+- Évite le sensationnalisme : la gouvernance est un sujet sérieux, traite-le avec rigueur mais accessibilité
 - Pas de conseil juridique : reste sur la dimension technique et organisationnelle
 
 --- COMPARATIF ---
@@ -160,6 +176,22 @@ Structure :
 3. Pourquoi il devrait inquiéter ou enthousiasmer
 4. Ce que ça change pour les pros data/IA
 
+--- EXPERIENCE_TERRAIN ---
+Retour d'expérience concret, pas lié à un article. Le plus accessible de tous les formats.
+Structure :
+1. Hook = une situation vécue ("J'ai vu un projet...", "La semaine dernière en mission...")
+2. Le problème concret (1 paragraphe, accessible à tous)
+3. Ce qui s'est passé (l'histoire, 1-2 paragraphes)
+4. La leçon (1 phrase percutante)
+5. Question d'engagement spécifique
+
+RÈGLES POUR CE FORMAT :
+- Pas besoin d'article source — invente une situation réaliste basée sur le profil de Renaud
+- Le ton est encore plus narratif que les autres formats
+- L'histoire doit être plausible et représentative des enjeux IA/Data en entreprise
+- Pas de nom de client, pas de détail confidentiel
+- C'est le format le plus accessible : un manager non-tech doit le lire comme une anecdote
+
 --- DECRYPTAGE ---
 Vulgariser un sujet complexe sans infantiliser.
 Structure :
@@ -168,46 +200,49 @@ Structure :
 3. Comment ça marche vraiment (2-3 paragraphes techniques mais lisibles)
 4. Pourquoi c'est important pour l'entreprise
 
-EXEMPLES DE POSTS QUI MARCHENT (3 styles différents — adapte selon le sujet) :
+EXEMPLES DE POSTS QUI MARCHENT (basés sur les vraies performances LinkedIn) :
 
-EXEMPLE 1 — STYLE PUNCHY (court, percutant, scroll-stopper) :
-73% des projets IA en production échouent. Et ce n'est même pas un problème de modèle.
+EXEMPLE 1 — STYLE ANALOGIE (meilleur portée : 213 impressions) :
+C'est quoi ce chantier ? Vos agents IA gaspillent !
 
-C'est un problème de données. Gartner le dit clairement : la cause n°1 n'est pas la techno, c'est la qualité des données en entrée.
+L'analogie : Imaginez des artisans travaillant chacun dans un immense atelier individuel, même pour une petite tâche. C'est ce que vous faites en allouant une infrastructure dédiée à chaque agent IA.
 
-Un LLM nourri avec des données non cataloguées, sans lineage, sans contrôle qualité ? C'est un chef étoilé qui cuisine avec des ingrédients périmés sans le savoir.
+Le problème de 2026 n'est plus la performance des modèles, mais le coût de leur déploiement. Un agent qui tourne à vide sur une instance GPU coûte une fortune.
 
-La solution n'est pas un outil. C'est une discipline : data contracts, catalogue vivant, lineage automatique. Collibra ou OpenMetadata — peu importe, tant que la gouvernance existe.
+La solution ? Partager l'infrastructure comme on partage un atelier. Kubernetes pour les agents, c'est ça.
 
-Sans ça, votre investissement IA est un château de cartes sur un sol de sable.
+Vous, c'est quoi le vrai bottleneck de vos projets IA ?
 
-EXEMPLE 2 — STYLE EXPERT DENSE (analyse profonde, sujets complexes) :
-L'EU AI Act arrive en août 2026. Personne n'est prêt. Et l'amende n'est pas le vrai problème.
+EXEMPLE 2 — STYLE SYNTHÈSE HEBDO (meilleur engagement : 5 likes) :
+La conversation sur les agents IA a basculé cette semaine. On quitte l'ère des comparatifs de performance pour entrer dans celle de l'industrialisation.
 
-Le vrai risque, c'est la documentation technique rétroactive. Si vous déployez un système IA "à haut risque" (recrutement, scoring, crédit), vous devez prouver que vous avez testé les biais, documenté les données d'entraînement, et mis en place un monitoring humain.
+▪️ Coût : Google Cloud avance 75% de réduction par agent sur GKE. Le TCO est le nouveau maître du jeu.
+▪️ Gouvernance : Snowflake formalise les "Agentic Controls" — contrôler le comportement de l'agent, pas juste la donnée.
+▪️ Middleware : GitHub Copilot lance ses "Agent Hooks" — la porte ouverte à la compliance dans l'IDE.
 
-En pratique : inventory complet de vos modèles IA, classification par niveau de risque, et pour chaque modèle à haut risque — un dossier de conformité. C'est 3-6 mois de travail pour 2-3 personnes.
+Ma sélection complète avec mes avis : {site_url}
 
-Cartographiez vos cas d'usage IA. Pas dans 6 mois. Maintenant.
+EXEMPLE 3 — STYLE CONTRARIAN (bonne portée : 158 impressions) :
+On me demande souvent quel cloud choisir pour l'IA. La vraie réponse : ça n'a aucune importance.
 
-EXEMPLE 3 — STYLE NARRATIF (histoire concrète, ancrage terrain) :
-Un data scientist a passé 3 semaines à tuner un modèle de churn. Accuracy : 94%. Le modèle était parfait pour des clients qui n'existaient plus.
+Vertex AI, SageMaker, Databricks — j'ai déployé des modèles sur les trois. Le bottleneck n'est jamais la plateforme.
 
-Les données d'entraînement dataient de 18 mois. Les comportements clients avaient changé. Le modèle optimisait dans le vide.
+C'est toujours le même trio : données mal préparées, équipe pas staffée, et zéro mesure de ROI.
 
-C'est le piège classique du ML en production : on tune la métrique, on oublie la donnée. Le modèle le plus performant sur papier peut être le plus dangereux en réel si personne ne monitor le drift.
+J'ai vu un projet passer de POC à production en 6 semaines. Le secret ? Pas le choix du cloud. Un sponsor business qui savait exactement quel problème résoudre.
 
-Un modèle à 80% sur des données propres bat toujours un modèle à 94% sur des données pourries.
+Vous, c'est quoi le vrai bottleneck de vos projets IA ?
 
 INTERDICTIONS ABSOLUES :
-- "On me demande souvent", "J'ai eu l'occasion de" → INTERDIT
+- "J'ai eu l'occasion de" → INTERDIT
 - "Game-changer", "révolutionnaire", "passionnant", "incroyable" → INTERDIT
-- Questions rhétoriques finales ("Et vous ?") → INTERDIT
+- Questions rhétoriques creuses ("Et vous ?", "Qu'en pensez-vous ?") → INTERDIT. Mais les questions d'engagement SPÉCIFIQUES sont autorisées (voir section ci-dessus).
 - Commencer par un emoji → INTERDIT
 - Humble-brag → INTERDIT
 - Phrases creuses sans information → INTERDIT (chaque phrase doit contenir un fait, un chiffre ou un nom)
 - CITER "DECATHLON" ou tout autre nom de client/employeur → STRICTEMENT INTERDIT. Utiliser "un grand retailer" ou "en entreprise" à la place.
 - INVENTER des chiffres (montants, pertes, économies, délais, pourcentages) NON PRÉSENTS dans les articles fournis → STRICTEMENT INTERDIT. Tout chiffre utilisé doit être issu des articles de la semaine.
+- Jargon technique non expliqué → INTERDIT. Chaque terme technique doit être expliqué en 3 mots dans la même phrase.
 
 EXIGENCES NON-NÉGOCIABLES :
 1. Au moins 1 CHIFFRE ou DONNÉE FACTUELLE dans le post — UNIQUEMENT s'il est présent dans les articles fournis. Si aucun chiffre dans les articles, utilise une donnée de notoriété publique (statistique officielle). Ne jamais inventer.
@@ -215,9 +250,11 @@ EXIGENCES NON-NÉGOCIABLES :
 3. Au moins 1 PRISE DE POSITION claire (pas tiède, pas "ça dépend")
 4. NE PAS inclure de lien URL dans post_text — le lien sera ajouté automatiquement en fin de post
 5. ENTRE 200 ET 300 MOTS
-6. 2-3 hashtags techniques et spécifiques (pas #IA #Data qui sont trop larges)
+6. 2-3 hashtags spécifiques (pas #IA #Data qui sont trop larges, mais pas non plus ultra-niche comme #MLOps)
 7. 0-1 emoji max
 8. Écriture naturelle en français. Pas de calque anglais.
+9. Au moins 1 ANALOGIE ou MÉTAPHORE concrète par post (pas abstraite). C'est ce qui rend le post accessible et mémorable.
+10. 1 question d'engagement spécifique à la fin (1 post sur 2 — pas systématique).
 
 RÉPONDS EN JSON STRICT :
 {{
@@ -230,11 +267,11 @@ RÉPONDS EN JSON STRICT :
 
 # 5 posts/semaine — chaque jour a son format signature
 DAILY_FORMAT = {
-    0: "revue_hebdo",      # Lundi : le rendez-vous veille
-    1: "decryptage",       # Mardi : vulgariser un concept complexe
-    2: "signal_faible",    # Mercredi : un signal que personne n'a connecté
-    3: "ai_governance",    # Jeudi : gouvernance de l'IA (EU AI Act, model governance, AI safety)
-    4: "chiffre_cle",      # Vendredi : un chiffre percutant (format court)
+    0: "revue_hebdo",        # Lundi : le rendez-vous veille
+    1: "decryptage",         # Mardi : vulgariser un concept complexe
+    2: "signal_faible",      # Mercredi : un signal que personne n'a connecté
+    3: "ai_governance",      # Jeudi : gouvernance de l'IA (EU AI Act, model governance, AI safety)
+    4: "experience_terrain", # Vendredi : retour d'expérience concret (pas d'article, terrain)
 }
 
 
@@ -742,7 +779,7 @@ def generate_weekly_edito(articles: list[dict], trends: list[str] = None, post_t
             prompt = EDITO_PROMPT.format(
                 name=EXPERT_PROFILE["name"],
                 title=EXPERT_PROFILE["title"],
-                today=datetime.now(timezone.utc).strftime("%d %B 2026"),
+                today=datetime.now(UTC).strftime("%d %B 2026"),
                 articles_summary=articles_summary,
                 article_deep_dive=article_deep_dive,
                 trends=trends_str,
@@ -787,7 +824,7 @@ def generate_weekly_edito(articles: list[dict], trends: list[str] = None, post_t
                 raw_text = raw_text.split("\n", 1)[1].rsplit("```", 1)[0].strip()
 
             result = json.loads(raw_text)
-            result["generated_at"] = datetime.now(timezone.utc).isoformat()
+            result["generated_at"] = datetime.now(UTC).isoformat()
             result["article_count"] = len(articles)
             result["post_type"] = post_type
             result["status"] = "generated"
@@ -875,14 +912,14 @@ def generate_weekly_edito(articles: list[dict], trends: list[str] = None, post_t
             logger.error(f"❌ Erreur génération édito (attempt {attempt+1}): {e}")
             # Si Claude 429 (quota), fallback sur Gemini pour les retries suivants
             if "429" in err_str and use_claude and gemini_client:
-                logger.warning(f"⏳ Claude 429 (quota) — fallback Gemini pour les retries suivants")
+                logger.warning("⏳ Claude 429 (quota) — fallback Gemini pour les retries suivants")
                 use_claude = False
                 if attempt < max_retries - 1:
                     continue
             elif "429" in err_str and attempt < max_retries - 1:
                 # Attendre 65s avant retry (quota 1/min)
                 import time
-                logger.warning(f"⏳ Rate limit 429 — attente 65s avant retry...")
+                logger.warning("⏳ Rate limit 429 — attente 65s avant retry...")
                 time.sleep(65)
                 continue
             if attempt < max_retries - 1:
@@ -900,12 +937,12 @@ POST :
 {post_text}
 
 RÈGLES STRICTES:
-- Le titre doit être court et percutant (5-7 mots max, en MAJUSCULES)
-- Le sous-titre donne le contexte (10-15 mots max)
-- Chaque section heading: 2-4 mots en MAJUSCULES
-- Chaque section body: 10-15 mots max, factuel et concret (pas d'opinion)
+- Le titre doit être la phrase d'accroche du post (la 1ère ligne), reformulée en 5-7 mots max, en MAJUSCULES
+- Le sous-titre donne le contexte (10-15 mots max, accessible à un non-tech)
+- Chaque section heading: 2-4 mots en MAJUSCULES, langage simple
+- Chaque section body: 10-15 mots max, factuel et concret (pas d'opinion, pas de jargon)
 - Le key_stat doit être un CHIFFRE précis extrait du post
-- Évite le jargon technique, vise un public CDO/CTO
+- ACCESSIBILITÉ: vise un manager non-technique, pas un CDO/CTO. Si un terme technique est utilisé, explique-le en 3 mots.
 - Le texte doit être PARFAITEMENT orthographié en français
 
 L'infographic doit capturer l'ESSENTIEL du post sous forme visuelle et didactique.
@@ -914,7 +951,7 @@ Pense au style "Save for later" de LinkedIn : un visuel que les gens bookmarkent
 Réponds en JSON strict :
 {{
   "title": "TITRE COURT EN MAJUSCULES",
-  "subtitle": "Sous-titre contextuel",
+  "subtitle": "Sous-titre contextuel accessible",
   "sections": [
     {{
       "number": "1",
@@ -1059,6 +1096,7 @@ def _visual_critic(image_bytes: bytes, post_text: str) -> dict | None:
         return None
     try:
         import base64
+
         from google.genai import types as genai_types
 
         image_b64 = base64.b64encode(image_bytes).decode()
@@ -1208,6 +1246,10 @@ def _select_visual_format(post_text: str, post_type: str, db=None) -> str:
         preferred = ["infographic", "comparison"]
     elif post_type == "ai_governance":
         preferred = ["infographic", "comparison", "stat_highlight"]
+    elif post_type == "experience_terrain":
+        preferred = ["quote_card", "stat_highlight", "infographic"]
+    elif post_type == "chiffre_cle":
+        preferred = ["stat_highlight", "infographic", "quote_card"]
     elif post_type == "tutoriel_rapide":
         preferred = ["comparison", "infographic", "stat_highlight"]
     else:
@@ -1428,9 +1470,9 @@ def _generate_comparison_prompt(post_text: str, db=None) -> str:
     except Exception as e:
         logger.warning(f"⚠️ Fallback comparison: {e}")
         return (
-            f"Create a vertical comparison table (1080x1440, 3:4 ratio) with white background, "
-            f"purple header, two-column table with 3-4 rows, clean borders, "
-            f"French text, flat corporate design."
+            "Create a vertical comparison table (1080x1440, 3:4 ratio) with white background, "
+            "purple header, two-column table with 3-4 rows, clean borders, "
+            "French text, flat corporate design."
         )
 
 
@@ -1495,9 +1537,9 @@ def _generate_stat_highlight_prompt(post_text: str, db=None) -> str:
     except Exception as e:
         logger.warning(f"⚠️ Fallback stat highlight: {e}")
         return (
-            f"Create a vertical stat highlight (1080x1440, 3:4 ratio) with white background, "
-            f"one huge purple number in center, context text below, minimalist flat design, "
-            f"French text, corporate style."
+            "Create a vertical stat highlight (1080x1440, 3:4 ratio) with white background, "
+            "one huge purple number in center, context text below, minimalist flat design, "
+            "French text, corporate style."
         )
 
 
@@ -1578,14 +1620,14 @@ def generate_visual(post_text: str, post_type: str, db=None) -> bytes | None:
                             "passed": critic.get("passed", False),
                             "attempt": v_attempt + 1,
                             "visual_format": visual_format,
-                            "created_at": datetime.now(timezone.utc).isoformat(),
+                            "created_at": datetime.now(UTC).isoformat(),
                         })
                         logger.info(f"👁️ Leçon visuelle stockée (avg={critic.get('average', 0)})")
                     except Exception:
                         pass
 
                 if critic.get("passed", False):
-                    logger.info(f"✅ Visual critic PASSED — image validée")
+                    logger.info("✅ Visual critic PASSED — image validée")
                     return image_bytes
                 else:
                     logger.warning(f"⚠️ Visual critic REJECTED (avg={critic.get('average', 0)}) — issues: {critic.get('issues', [])}")
@@ -1749,7 +1791,7 @@ def publish_to_linkedin(post_text: str, image_bytes: bytes = None) -> dict:
                 "post_id": post_id,
                 "post_text": post_text,
                 "has_image": bool(image_urn),
-                "published_at": datetime.now(timezone.utc).isoformat(),
+                "published_at": datetime.now(UTC).isoformat(),
             }
         else:
             logger.error(f"❌ LinkedIn API error {response.status_code}: {response.text}")
@@ -1880,7 +1922,7 @@ Plus de détails → {SITE_URL}
         "post_type": post_type,
         "hashtags": post["hashtags"],
         "word_count": len(post["post_text"].split()),
-        "generated_at": datetime.now(timezone.utc).isoformat(),
+        "generated_at": datetime.now(UTC).isoformat(),
         "article_count": len(articles),
         "status": "mock",
     }
