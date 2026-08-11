@@ -769,6 +769,66 @@ async def newsletter_count():
         return {"count": 0}
 
 
+# ─── Livre blanc ─────────────────────────────────────────────────────────────
+class LivreBlancDownload(BaseModel):
+    first_name: str
+    last_name: str
+    company: str
+    email: str
+    newsletter: bool = False
+
+
+@app.post("/api/livre-blanc/download")
+async def livre_blanc_download(data: LivreBlancDownload):
+    """Téléchargement d'un livre blanc — enregistre le lead puis retourne l'URL du PDF."""
+    import re
+    first_name = data.first_name.strip()
+    last_name = data.last_name.strip()
+    company = data.company.strip()
+    email = data.email.strip().lower()
+
+    if not first_name or not last_name or not company or not email:
+        return {"ok": False, "message": "Tous les champs sont obligatoires"}
+    if not re.match(r'^[^@\s]+@[^@\s]+\.[^@\s]+$', email):
+        return {"ok": False, "message": "Email invalide"}
+
+    if not db:
+        return {"ok": False, "message": "Service non disponible"}
+
+    try:
+        doc_id = hashlib.sha256(f"{email}:livre-blanc".encode()).hexdigest()[:16]
+        doc_ref = db.collection("livre_blanc_leads").document(doc_id)
+        doc_ref.set({
+            "first_name": first_name,
+            "last_name": last_name,
+            "company": company,
+            "email": email,
+            "newsletter": data.newsletter,
+            "downloaded_at": datetime.now(timezone.utc).isoformat(),
+            "pdf": "AIgovernance-renaudsecq-12pointsaverifier.pdf",
+            "source": "website",
+        }, merge=True)
+
+        if data.newsletter:
+            sub_id = hashlib.sha256(email.encode()).hexdigest()[:16]
+            db.collection("newsletter_subscribers").document(sub_id).set({
+                "email": email,
+                "subscribed_at": datetime.now(timezone.utc).isoformat(),
+                "source": "livre_blanc",
+                "active": True,
+            }, merge=True)
+
+        logger.info(f"📖 Téléchargement livre blanc: {email} ({company})")
+        return {
+            "ok": True,
+            "message": "Votre livre blanc est prêt.",
+            "download_url": "https://renaudsecq.com/livreblanc/AIgovernance-renaudsecq-12pointsaverifier.pdf",
+        }
+    except Exception as e:
+        logger.error(f"Erreur livre blanc: {e}")
+        return {"ok": False, "message": "Erreur lors du téléchargement"}
+
+
 if __name__ == "__main__":
     import uvicorn
     port = int(os.getenv("PORT", 8080))
