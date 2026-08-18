@@ -51,9 +51,12 @@ async def root():
 
 
 @app.post("/api/scrape")
-async def run_scrape():
-    """Déclenche le scraping complet : RSS → scoring → Firestore."""
-    logger.info("🚀 Démarrage du scraping...")
+async def run_scrape(dry_run: bool = False):
+    """Déclenche le scraping complet : RSS → scoring → Firestore.
+    
+    Si dry_run=True, génère le post LinkedIn sans le publier.
+    """
+    logger.info(f"🚀 Démarrage du scraping...{' (DRY RUN)' if dry_run else ''}")
 
     # 1. Scrape toutes les sources RSS
     raw_articles = await scrape_all_sources()
@@ -131,32 +134,10 @@ async def run_scrape():
             post_text = post_text.rstrip() + url_line + hashtag_line
 
         if post_text:
-            # Garde-fou anti-shadowban : max 1 post LinkedIn par jour
-            already_published_today = False
-            if db:
-                from zoneinfo import ZoneInfo
-                today_paris = datetime.now(ZoneInfo("Europe/Paris")).strftime("%Y-%m-%d")
-                recent = (
-                    db.collection("linkedin_posts")
-                    .order_by("published_at", direction=firestore.Query.DESCENDING)
-                    .limit(1)
-                    .stream()
-                )
-                for doc in recent:
-                    last_date = doc.to_dict().get("published_at", "")[:10]
-                    if last_date == today_paris:
-                        already_published_today = True
-                        logger.warning(f"⛔ Post déjà publié aujourd'hui ({last_date}) — publication bloquée pour éviter le shadowban")
-                        break
-
-            if already_published_today:
-                linkedin_result = {"status": "skipped", "reason": "Un post a déjà été publié aujourd'hui (limite 1/jour)"}
-            else:
-                # Générer un visuel IA pour accompagner le post
-                logger.info(f"📤 post_text avant publication: {len(post_text)} chars — fin: {repr(post_text[-80:])}")
+            if dry_run:
+                # Mode dry run : générer le visuel mais ne pas publier
+                logger.info(f"📤 [DRY RUN] post_text: {len(post_text)} chars — fin: {repr(post_text[-80:])}")
                 image_bytes = generate_visual(post_text, post_type, db=db)
-                linkedin_result = publish_to_linkedin(post_text, image_bytes)
-                # Compresser l'image en JPEG pour Firestore (< 200KB, limite 1MB)
                 image_b64_thumb = None
                 if image_bytes:
                     try:
@@ -164,20 +145,76 @@ async def run_scrape():
 
                         from PIL import Image
                         img = Image.open(io.BytesIO(image_bytes)).convert("RGB")
-                        img.thumbnail((800, 1067), Image.LANCZOS)  # ratio 3:4 max 800px
+                        img.thumbnail((800, 1067), Image.LANCZOS)
                         buf = io.BytesIO()
                         img.save(buf, format="JPEG", quality=65, optimize=True)
                         compressed = buf.getvalue()
                         image_b64_thumb = __import__('base64').b64encode(compressed).decode()
-                        logger.info(f"🖼️ Image compressée: {len(image_bytes)//1024}KB → {len(compressed)//1024}KB")
+                        logger.info(f"🖼️ [DRY RUN] Image compressée: {len(image_bytes)//1024}KB → {len(compressed)//1024}KB")
                     except Exception as e:
                         logger.warning(f"⚠️ Compression image échouée: {e}")
-                linkedin_result["image_b64"] = image_b64_thumb
-                linkedin_result["image_size_kb"] = round(len(image_bytes) / 1024) if image_bytes else 0
-            logger.info(f"📣 LinkedIn: {linkedin_result.get('status')} — type={post_type} — image={linkedin_result.get('has_image')}")
+                linkedin_result = {
+                    "status": "dry_run",
+                    "post_text": post_text,
+                    "post_type": post_type,
+                    "hook": edito.get("hook", ""),
+                    "hashtags": hashtags,
+                    "has_image": image_bytes is not None,
+                    "image_b64": image_b64_thumb,
+                    "image_size_kb": round(len(image_bytes) / 1024) if image_bytes else 0,
+                    "quality_gate": edito.get("quality_gate", {}),
+                    "dedup": edito.get("dedup", {}),
+                    "critic": edito.get("critic", {}),
+                }
+                logger.info(f"📣 [DRY RUN] LinkedIn: draft — type={post_type} — image={image_bytes is not None}")
+            else:
+                # Garde-fou anti-shadowban : max 1 post LinkedIn par jour
+                already_published_today = False
+                if db:
+                    from zoneinfo import ZoneInfo
+                    today_paris = datetime.now(ZoneInfo("Europe/Paris")).strftime("%Y-%m-%d")
+                    recent = (
+                        db.collection("linkedin_posts")
+                        .order_by("published_at", direction=firestore.Query.DESCENDING)
+                        .limit(1)
+                        .stream()
+                    )
+                    for doc in recent:
+                        last_date = doc.to_dict().get("published_at", "")[:10]
+                        if last_date == today_paris:
+                            already_published_today = True
+                            logger.warning(f"⛔ Post déjà publié aujourd'hui ({last_date}) — publication bloquée pour éviter le shadowban")
+                            break
+
+                if already_published_today:
+                    linkedin_result = {"status": "skipped", "reason": "Un post a déjà été publié aujourd'hui (limite 1/jour)"}
+                else:
+                    # Générer un visuel IA pour accompagner le post
+                    logger.info(f"📤 post_text avant publication: {len(post_text)} chars — fin: {repr(post_text[-80:])}")
+                    image_bytes = generate_visual(post_text, post_type, db=db)
+                    linkedin_result = publish_to_linkedin(post_text, image_bytes)
+                    # Compresser l'image en JPEG pour Firestore (< 200KB, limite 1MB)
+                    image_b64_thumb = None
+                    if image_bytes:
+                        try:
+                            import io
+
+                            from PIL import Image
+                            img = Image.open(io.BytesIO(image_bytes)).convert("RGB")
+                            img.thumbnail((800, 1067), Image.LANCZOS)  # ratio 3:4 max 800px
+                            buf = io.BytesIO()
+                            img.save(buf, format="JPEG", quality=65, optimize=True)
+                            compressed = buf.getvalue()
+                            image_b64_thumb = __import__('base64').b64encode(compressed).decode()
+                            logger.info(f"🖼️ Image compressée: {len(image_bytes)//1024}KB → {len(compressed)//1024}KB")
+                        except Exception as e:
+                            logger.warning(f"⚠️ Compression image échouée: {e}")
+                    linkedin_result["image_b64"] = image_b64_thumb
+                    linkedin_result["image_size_kb"] = round(len(image_bytes) / 1024) if image_bytes else 0
+                logger.info(f"📣 LinkedIn: {linkedin_result.get('status')} — type={post_type} — image={linkedin_result.get('has_image')}")
 
             # Sauvegarder le post dans Firestore
-            if db and linkedin_result.get("status") == "published":
+            if db and not dry_run and linkedin_result.get("status") == "published":
                 db.collection("linkedin_posts").add({
                     "post_text": post_text,
                     "post_type": post_type,
@@ -422,6 +459,7 @@ async def get_all_linkedin_posts():
                 "post_type": d.get("post_type"),
                 "published_at": d.get("published_at"),
                 "has_image": d.get("has_image", False),
+                "image_b64": d.get("image_b64"),
                 "hashtags": d.get("hashtags", []),
                 "post_text": d.get("post_text", ""),
             })

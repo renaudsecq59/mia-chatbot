@@ -929,52 +929,64 @@ def generate_weekly_edito(articles: list[dict], trends: list[str] = None, post_t
     return _mock_edito(articles, trends_str, post_type)
 
 
-INFOGRAPHIC_CONTENT_GENERATOR = """Tu es un expert en création d'infographics LinkedIn viraux sur la Data et l'IA.
+CARTOON_CONTENT_GENERATOR = """Tu es un scénariste de BD web moderne pour LinkedIn, spécialisé en IA & Data.
+Ton style s'inspire de CommitStrip, Dilbert, et xkcd : humoristique, geek mais accessible, avec un vrai punch qui fait rire.
 
-À partir du post LinkedIn ci-dessous, génère le CONTENU STRUCTURÉ d'un infographic éducatif en JSON.
+À partir du post LinkedIn ci-dessous, génère le scénario d'un cartoon humoristique mais professionnel.
 
 POST :
 {post_text}
 
-RÈGLES STRICTES:
-- Le titre doit être la phrase d'accroche du post (la 1ère ligne), reformulée en 5-7 mots max, en MAJUSCULES
-- Le sous-titre donne le contexte (10-15 mots max, accessible à un non-tech)
-- Chaque section heading: 2-4 mots en MAJUSCULES, langage simple
-- Chaque section body: 10-15 mots max, factuel et concret (pas d'opinion, pas de jargon)
-- Le key_stat doit être un CHIFFRE précis extrait du post
-- ACCESSIBILITÉ: vise un manager non-technique, pas un CDO/CTO. Si un terme technique est utilisé, explique-le en 3 mots.
-- Le texte doit être PARFAITEMENT orthographié en français
+PERSONNAGES RÉCURRENTS (choisis 1 ou 2 max) :
+- MARC : manager 50ans, cheveux gris, costume, air fatigué mais lucide. Représente le décideur business qui subit la hype IA.
+- ADA : agent IA humanoïde, yeux bleus lumineux, casque jaune. Bienveillante mais imprévisible. Représente la technologie.
+- LA GARDIENNE : responsable data governance, lunettes, tablette à la main, air sérieux. Représente la rigueur et la conformité.
 
-L'infographic doit capturer l'ESSENTIEL du post sous forme visuelle et didactique.
-Pense au style "Save for later" de LinkedIn : un visuel que les gens bookmarkent.
+RÈGLES POUR LA PUNCHLINE (CRITIQUE) :
+- La punchline doit être IMMÉDIATEMENT COMPRÉHENSIBLE par un manager non-technique
+- Elle doit faire rire OU sourire, pas juste "réfléchir"
+- Elle doit avoir un lien ÉVIDENT avec la scène illustrée
+- MAX 8 mots. Court = percutant.
+- INTERDIT: métaphores obscures, phrases qui "veulent dire quelque chose" mais ne veulent rien dire en surface
+
+BONNES punchlines (claires, drôles, directes) :
+- "Il a juste oublié de demander l'autorisation."
+- "On a déployé. Personne sait pourquoi."
+- "Le catalogue ? Personne l'ouvre."
+- "L'IA a décidé. Le client a payé."
+- "Tu lui as donné les clés sans le brief."
+
+MAUVAISES punchlines (à éviter absolument) :
+- "Le moral dans le brief" (trop abstrait, pas drôle)
+- "Arroser les gens pas les machines" (métaphore floue)
+- "La gouvernance c'est l'arbre qui cache la forêt" (cliché vide)
+
+RÈGLES GÉNÉRALES :
+- La scène doit illustrer l'IDÉE PRINCIPALE du post avec humour, pas la résumer littéralement
+- Le ton est celui d'une BD web moderne (CommitStrip/Dilbert) : intelligent, direct, un peu sarcastique
+- Accessible à un manager non-technique : la blague doit se comprendre sans connaître le jargon
+- Le texte doit être PARFAITEMENT orthographié en français
 
 Réponds en JSON strict :
 {{
-  "title": "TITRE COURT EN MAJUSCULES",
-  "subtitle": "Sous-titre contextuel accessible",
-  "sections": [
-    {{
-      "number": "1",
-      "heading": "TITRE COURT",
-      "body": "Texte factuel concis (10-15 mots max)"
-    }}
-  ],
-  "key_stat": "Chiffre clé extrait du post",
+  "characters": ["MARC"],
+  "scene_description": "Description détaillée de la scène (qui fait quoi, expression, décor, action concrète)",
+  "punchline": "Punchline claire et drôle en français (8 mots max)",
+  "setting": "bureau open-space | salle de réunion | datacenter | abstrait",
+  "mood": "sarcastique | ironique | absurde | situation comedy",
   "color_theme": "purple|blue|green|orange",
   "author": "Renaud Secq"
-}}
-
-Génère entre 4 et 6 sections. Chaque section doit apporter une information concrète, pas du blabla."""
+}}"""
 
 
 def _generate_image_prompt(post_text: str, post_type: str, db=None) -> str:
-    """Utilise Gemini Pro pour générer le contenu d'un infographic, puis crée le prompt Imagen."""
+    """Utilise Gemini Pro pour générer le scénario d'un cartoon éditorial, puis crée le prompt image."""
     try:
         # Récupérer les leçons visuelles passées
         visual_feedback = get_visual_lessons(db, limit=15) if db else ""
 
-        # Étape 1 : Gemini génère le contenu structuré de l'infographic
-        content_prompt = INFOGRAPHIC_CONTENT_GENERATOR.format(post_text=post_text[:1000])
+        # Étape 1 : Gemini génère le scénario du cartoon
+        content_prompt = CARTOON_CONTENT_GENERATOR.format(post_text=post_text[:1000])
         if visual_feedback:
             content_prompt += f"\n\n{visual_feedback}"
         content_response = gemini_client.models.generate_content(
@@ -993,102 +1005,97 @@ def _generate_image_prompt(post_text: str, post_type: str, db=None) -> str:
         import json
         data = json.loads(raw)
 
-        title = data.get("title", "DATA & AI INSIGHTS")
-        subtitle = data.get("subtitle", "")
-        sections = data.get("sections", [])[:6]
-        key_stat = data.get("key_stat", "")
+        characters = data.get("characters", ["MARC"])
+        scene = data.get("scene_description", "")
+        punchline = data.get("punchline", "")
+        setting = data.get("setting", "bureau")
+        mood = data.get("mood", "ironique")
         color = data.get("color_theme", "purple")
 
         color_map = {
-            "purple": "purple and violet (#6B46C1)",
-            "blue": "electric blue and indigo (#2563EB)",
-            "green": "emerald green (#059669)",
-            "orange": "deep orange (#EA580C)",
+            "purple": "warm purple accent (#7C3AED)",
+            "blue": "electric blue accent (#2563EB)",
+            "green": "emerald green accent (#059669)",
+            "orange": "warm orange accent (#EA580C)",
         }
         accent = color_map.get(color, color_map["purple"])
 
-        # Construire les sections numérotées pour le prompt
-        sections_lines = "\n".join(
-            [f"{s['number']}. {s['heading']} — {s['body']}" for s in sections]
-        )
+        # Décrire les personnages pour le prompt image
+        char_descriptions = {
+            "MARC": "Marc: a 50-year-old manager with gray hair, wearing a business suit, tired but sharp expression, slightly disheveled",
+            "ADA": "Ada: a friendly humanoid AI robot with glowing blue eyes, wearing a yellow hard hat, well-meaning but unpredictable expression",
+            "LA GARDIENNE": "La Gardienne: a serious data governance officer with glasses, holding a tablet, stern but caring expression",
+        }
+        chars_desc = ". ".join(char_descriptions.get(c, c) for c in characters)
 
-        # Étape 2 : Prompt structuré pour Gemini 3 Pro Image
-        # Instructions ultra-précises pour un rendu professionnel
+        # Étape 2 : Prompt pour Gemini 3 Pro Image — cartoon moderne
         prompt = (
-            f"Create a vertical infographic image (1080x1440 pixels, 3:4 portrait ratio).\n\n"
-            f"LAYOUT (top to bottom):\n"
-            f"1. HEADER ZONE (top 15% of image):\n"
-            f"   - Large bold title in {accent} color, font size ~48px, centered\n"
-            f"   - Title: \"{title}\"\n"
-            f"   - Subtitle below in dark gray (#374151), font size ~20px, centered\n"
-            f"   - Subtitle: \"{subtitle}\"\n"
-            f"   - Thin horizontal divider line in {accent} below subtitle\n\n"
-            f"2. CONTENT ZONE (middle 70% of image):\n"
-            f"   - {len(sections)} numbered sections stacked vertically with equal spacing\n"
-            f"   - Each section has:\n"
-            f"     * Left: a circular badge with the section number, {accent} background, white text, ~40px diameter\n"
-            f"     * Right of badge: section heading in bold dark text (#1F2937), ~18px\n"
-            f"     * Below heading: body text in medium gray (#6B7280), ~14px, max 2 lines\n"
-            f"   - Sections content:\n{sections_lines}\n\n"
-        )
-        if key_stat:
-            prompt += (
-                f"3. KEY STAT ZONE (below sections):\n"
-                f"   - A highlighted box with light {accent} background (10% opacity)\n"
-                f"   - Key statistic in large bold {accent} text, centered\n"
-                f"   - Stat: \"{key_stat}\"\n\n"
-            )
-        prompt += (
-            f"4. FOOTER ZONE (bottom 5% of image):\n"
-            f"   - Small text: \"{data.get('author', 'Renaud Secq')} — Consultant IA & Data\"\n"
-            f"   - Dark gray (#9CA3AF), ~12px, centered\n\n"
-            f"VISUAL SPECIFICATIONS:\n"
-            f"   - Background: pure white (#FFFFFF)\n"
-            f"   - Accent color: {accent}\n"
-            f"   - Typography: Inter or Helvetica Neue, clean sans-serif\n"
-            f"   - All text MUST be in French, perfectly spelled, no typos\n"
-            f"   - All text MUST be fully readable, no overlap, no truncation\n"
-            f"   - Use generous whitespace between sections (at least 20px padding)\n"
-            f"   - Style: professional, minimalist, corporate — like a McKinsey or BCG infographic\n"
-            f"   - NO photographs, NO gradients, NO 3D effects, NO shadows\n"
-            f"   - Flat design only with clean geometric shapes\n"
-            f"   - Vertical connector line between section badges in light gray (#E5E7EB)\n"
+            f"Create a vertical webcomic illustration (1080x1440 pixels, 3:4 portrait ratio).\n\n"
+            f"STYLE: Modern webcomic, like CommitStrip meets Dilbert.\n"
+            f"Clean vector art, bold black outlines, vibrant flat colors, slightly exaggerated expressions.\n"
+            f"Contemporary, fresh, NOT vintage, NOT childish, NOT anime.\n"
+            f"Think tech blog comic strip quality — modern, sharp, relatable.\n\n"
+            f"CHARACTERS in this scene:\n"
+            f"{chars_desc}\n\n"
+            f"SCENE: {scene}\n"
+            f"SETTING: {setting}\n"
+            f"MOOD: {mood}\n\n"
+            f"LAYOUT:\n"
+            f"1. CARTOON ZONE (top 80% of image): The illustrated scene with character(s)\n"
+            f"   - Characters should be expressive, exaggerated body language and facial expressions\n"
+            f"   - Background: simple flat color with {accent} accent touches, minimal but modern\n"
+            f"   - Style: clean vector illustration, bold outlines, vibrant flat colors\n"
+            f"   - Add small visual details that make the scene relatable (coffee cup, sticky notes, whiteboard)\n"
+            f"   - NO photorealism, NO 3D, NO gradients, NO shadows\n\n"
+            f"2. PUNCHLINE ZONE (bottom 15% of image):\n"
+            f"   - White background with a thin {accent} border line above\n"
+            f"   - Punchline text in bold dark text (#1F2937), centered, ~24px\n"
+            f"   - Text: \"{punchline}\"\n"
+            f"   - All text MUST be in French, perfectly spelled, no typos\n\n"
+            f"3. SIGNATURE (bottom 2%):\n"
+            f"   - Tiny text: \"{data.get('author', 'Renaud Secq')}\" in light gray (#9CA3AF), centered\n\n"
+            f"CRITICAL:\n"
+            f"   - All text MUST be in French, perfectly spelled\n"
+            f"   - Characters must be recognizable and consistent\n"
+            f"   - The humor must be clear and direct, not abstract\n"
+            f"   - Modern flat design, vibrant and clean\n"
         )
         if visual_feedback:
             prompt += f"\nCORRECTIONS FROM PREVIOUS FEEDBACK:\n{visual_feedback}\n"
-        logger.info(f"📊 Infographic: {title} | {len(sections)} sections")
+        logger.info(f"🎨 Cartoon: {characters} | {mood} | {punchline[:50]}")
         return prompt
 
     except Exception as e:
-        logger.warning(f"⚠️ Fallback infographic prompt: {e}")
+        logger.warning(f"⚠️ Fallback cartoon prompt: {e}")
         hook = post_text.split("\n")[0][:80]
         return (
-            f"Create a professional LinkedIn infographic in portrait format (3:4 ratio) "
-            f"with white background and purple accents, large bold title \"{hook[:50]}\", "
-            f"4-5 numbered sections with minimalist icons, clean flat design, "
-            f"perfectly readable French text, structured grid layout."
+            f"Create a vertical modern webcomic (1080x1440, 3:4 ratio) in clean vector style. "
+            f"A tired manager in a suit looking confused at a friendly robot with a yellow hard hat. "
+            f"Vibrant flat colors, bold black outlines, purple accents. Modern style like CommitStrip. "
+            f"French punchline at bottom: \"{hook[:50]}\". "
+            f"Relatable tech humor, not childish."
         )
 
 
-VISUAL_CRITIC_PROMPT = """Tu es un critique visuel d'infographics LinkedIn. Analyse cette image et évalue sa qualité.
+VISUAL_CRITIC_PROMPT = """Tu es un critique visuel de cartoons éditoriaux LinkedIn. Analyse cette image et évalue sa qualité.
 
 Réponds UNIQUEMENT avec un JSON valide, sans texte avant ou après, dans ce format exact:
-{"readability": 8, "spelling": 7, "layout": 8, "visual_appeal": 7, "text_accuracy": 9, "average": 7.8, "issues": ["problème 1", "problème 2"], "verdict": "1-2 phrases", "passed": true}
+{"readability": 8, "spelling": 7, "humor": 8, "visual_appeal": 7, "text_accuracy": 9, "average": 7.8, "issues": ["problème 1", "problème 2"], "verdict": "1-2 phrases", "passed": true}
 
 Critères (chaque dimension notée de 0 à 10):
-- readability: le texte est-il lisible ? Pas de chevauchement, taille suffisante ?
+- readability: le texte (punchline) est-il lisible ? Pas de chevauchement, taille suffisante ?
 - spelling: y a-t-il des fautes d'orthographe dans le texte de l'image ?
-- layout: la structure est-elle claire ? Alignement, espacement, hiérarchie visuelle ?
-- visual_appeal: est-ce professionnel et esthétique ? Digne d'un partage LinkedIn ?
-- text_accuracy: le texte correspond-il au contenu du post ? Pas d'hallucination ?
+- humor: le cartoon est-il drôle et intelligent ? L'humour sert-il le message du post ?
+- visual_appeal: est-ce professionnel et esthétique ? Style cartoon éditorial propre ?
+- text_accuracy: le texte et la scène correspondent-ils au contenu du post ? Pas d'hallucination ?
 - average: moyenne des 5 scores
 - passed: true si average >= 7, false sinon"""
 
 
 def _visual_critic(image_bytes: bytes, post_text: str) -> dict | None:
-    """Évalue la qualité d'un infographic via Gemini (vision).
+    """Évalue la qualité d'un cartoon éditorial via Gemini (vision).
 
-    Returns: {"readability": int, "spelling": int, "layout": int,
+    Returns: {"readability": int, "spelling": int, "humor": int,
               "visual_appeal": int, "text_accuracy": int, "average": float,
               "issues": list, "verdict": str, "passed": bool} ou None.
     """
@@ -1129,7 +1136,7 @@ def _visual_critic(image_bytes: bytes, post_text: str) -> dict | None:
         except json.JSONDecodeError:
             # Fallback: extraire les scores avec regex
             result = {}
-            for dim in ["readability", "spelling", "layout", "visual_appeal", "text_accuracy"]:
+            for dim in ["readability", "spelling", "humor", "visual_appeal", "text_accuracy"]:
                 m = re.search(rf'"{dim}"\s*:\s*(\d+(?:\.\d+)?)', raw)
                 if m:
                     result[dim] = float(m.group(1))
@@ -1558,21 +1565,14 @@ def generate_visual(post_text: str, post_type: str, db=None) -> bytes | None:
         logger.warning("⚠️ GenAI non dispo, pas de visuel")
         return None
 
-    # Sélectionner le format visuel adapté au contenu
-    visual_format = _select_visual_format(post_text, post_type, db=db)
+    # Toujours utiliser le cartoon éditorial (style CommitStrip/Dilbert)
+    visual_format = "cartoon"
     logger.info(f"🎨 Format visuel: {visual_format}")
 
     max_visual_attempts = 2
     for v_attempt in range(max_visual_attempts):
-        # Étape 1 : Générer le prompt selon le format sélectionné
-        if visual_format == "quote_card":
-            image_prompt = _generate_quote_card_prompt(post_text, db=db)
-        elif visual_format == "comparison":
-            image_prompt = _generate_comparison_prompt(post_text, db=db)
-        elif visual_format == "stat_highlight":
-            image_prompt = _generate_stat_highlight_prompt(post_text, db=db)
-        else:
-            image_prompt = _generate_image_prompt(post_text, post_type, db=db)
+        # Étape 1 : Générer le prompt cartoon
+        image_prompt = _generate_image_prompt(post_text, post_type, db=db)
         if v_attempt > 0:
             # Ajouter les feedbacks du critic au prompt pour la régénération
             image_prompt += f"\n\nCORRECTIONS À APPLIQUER: {visual_issues_feedback}"
@@ -1713,8 +1713,8 @@ def _upload_image_to_linkedin(image_bytes: bytes) -> str | None:
 
 def publish_to_linkedin(post_text: str, image_bytes: bytes = None) -> dict:
     """Publie un post sur LinkedIn via la nouvelle API Posts (/rest/posts)."""
-    # LinkedIn /rest/posts API : limite réelle = 3000 chars (texte + image OK)
-    MAX_COMMENTARY_CHARS = 3000
+    # LinkedIn /rest/posts API : limite 3000 chars sans image, mais ~1250 avec image (truncation LinkedIn)
+    MAX_COMMENTARY_CHARS = 1250 if image_bytes else 3000
     if len(post_text) > MAX_COMMENTARY_CHARS:
         # Troncature propre à la dernière phrase complète avant la limite
         truncated = post_text[:MAX_COMMENTARY_CHARS]
@@ -1723,7 +1723,7 @@ def publish_to_linkedin(post_text: str, image_bytes: bytes = None) -> dict:
             post_text = truncated[:last_period + 1]
         else:
             post_text = truncated.rstrip()
-        logger.warning(f"⚠️ post_text tronqué à {len(post_text)} chars (original > {MAX_COMMENTARY_CHARS})")
+        logger.warning(f"⚠️ post_text tronqué à {len(post_text)} chars (limite {MAX_COMMENTARY_CHARS})")
     logger.info(f"📤 Publication LinkedIn: {len(post_text)} chars")
 
     if not LINKEDIN_ACCESS_TOKEN:

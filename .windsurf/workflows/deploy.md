@@ -33,6 +33,7 @@ gcloud run deploy veille-backend \
   --cpu 1 \
   --timeout 300 \
   --set-env-vars "GCP_PROJECT=mia-chatbot-veille" \
+  --set-secrets "LINKEDIN_ACCESS_TOKEN=LINKEDIN_ACCESS_TOKEN:latest,LINKEDIN_PERSON_URN=LINKEDIN_PERSON_URN:latest" \
   --project mia-chatbot-veille
 ```
 

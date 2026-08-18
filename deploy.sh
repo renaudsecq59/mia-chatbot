@@ -39,6 +39,7 @@ gcloud run deploy ${SERVICE_NAME} \
   --cpu 1 \
   --timeout 300 \
   --set-env-vars "GCP_PROJECT=${PROJECT_ID}" \
+  --set-secrets "LINKEDIN_ACCESS_TOKEN=LINKEDIN_ACCESS_TOKEN:latest,LINKEDIN_PERSON_URN=LINKEDIN_PERSON_URN:latest" \
   --project=${PROJECT_ID}
 
 # 5. Récupérer l'URL du service
