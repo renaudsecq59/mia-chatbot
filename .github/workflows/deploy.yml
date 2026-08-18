@@ -68,25 +68,7 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
-      - name: Check if frontend changed
-        id: changed
-        uses: tj-actions/changed-files@v45
-        with:
-          files: |
-            index.html
-            article.html
-            veille.html
-            confidentialite.html
-            mia-agency.html
-            etudes-de-cas.html
-            preview.html
-            callback.html
-            favicon.svg
-            styles.css
-            script.js
-
       - name: Setup gcloud
-        if: steps.changed.outputs.any_changed == 'true'
         uses: google-github-actions/setup-gcloud@v2
         with:
           project_id: ${{ secrets.GCP_PROJECT_ID }}
@@ -94,7 +76,6 @@ jobs:
           export_default_credentials: true
 
       - name: Deploy to Firebase Hosting
-        if: steps.changed.outputs.any_changed == 'true'
         env:
           GCP_SA_KEY: ${{ secrets.GCP_SA_KEY }}
           GCP_PROJECT_ID: ${{ secrets.GCP_PROJECT_ID }}
