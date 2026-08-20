@@ -1,4 +1,4 @@
-name: Deploy — Cloud Run + Firebase Hosting
+name: Deploy — Cloud Run (backend + frontend)
 
 on:
   push:
